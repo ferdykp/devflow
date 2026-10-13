@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <title>Devflow @yield('title', 'Devflow System')</title>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-</head>
-
-<body>
-
-</body>
-
-</html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><meta name="theme-color" content="#101114"><title>@yield('title','Ruang kerja') — DevFlow</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><link rel="manifest" href="{{ asset('manifest.webmanifest') }}"><link rel="icon" href="{{ asset('icons/icon-192.png') }}">@vite(['resources/css/app.css','resources/js/app.js'])</head>
+<body class="df-shell [background:var(--df-canvas)] [font-family:Inter,ui-sans-serif,system-ui,sans-serif] min-h-screen text-[#1a1b1e] antialiased">
+<a href="#main-content" class="df-skip [position:absolute] [top:-100px] [left:10px] [background:#fff] [padding:10px] [z-index:100] focus:[top:10px]">Lewati ke konten</a>
+<div class="df-workspace [display:grid] [grid-template-columns:74px_minmax(0,1fr)] [min-height:100svh] max-[850px]:[grid-template-columns:minmax(0,1fr)]">
+ @include('components.layout.sidebar')
+ <div class="df-stage [min-width:0] min-w-0">
+ @include('components.layout.topbar')
+ <main id="main-content" tabindex="-1" class="df-canvas [width:min(100%,1510px)] [padding:clamp(24px,3.7vw,58px)_clamp(20px,4vw,64px)_80px] [margin:0_auto] max-[850px]:[padding:28px_18px_70px]">
+ <div class="df-toast-stack [position:fixed] [top:82px] [right:clamp(12px,3vw,32px)] [z-index:1000] [display:grid] [gap:10px] [width:min(390px,calc(100vw_-_24px))] [pointer-events:none] max-[650px]:[top:74px] max-[650px]:[right:12px]" role="region" aria-label="Notifikasi" data-toast-stack>
+ @if(session('success'))<div class="df-floating-toast [&>span]:[flex:1] [&>span]:[min-width:0] [&>span_small]:[display:block] [&>span_small]:[color:#767983] [&>i]:[margin-top:2px] [&_button]:[width:26px] [&_button]:[height:26px] [&_button]:[display:grid] [&_button]:[place-items:center] [&_button]:[color:#717580] [&_button]:[border-radius:6px] [&_button:hover]:[background:#f4f5f6] [pointer-events:auto] [background:#fff] [border:1px_solid_#e2e4e8] [box-shadow:0_15px_40px_#14171c1a] [display:flex] [align-items:start] [gap:12px] [padding:14px] [border-radius:10px] [font-size:13px] [line-height:1.5] [color:#20232a] [animation:df-toast-in_.2s_ease-out_both] [&.is-hiding]:[opacity:0] [&.is-hiding]:[transform:translateX(12px)] [&.is-hiding]:[transition:opacity_.2s,transform_.2s] df-toast-success [&>i]:[color:#15803d]" role="status" data-toast data-timeout="4500"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>{{ session('success') }}</span><button type="button" data-dismiss-toast aria-label="Tutup notifikasi"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>@endif
+ @if(session('error'))<div class="df-floating-toast [&>span]:[flex:1] [&>span]:[min-width:0] [&>span_small]:[display:block] [&>span_small]:[color:#767983] [&>i]:[margin-top:2px] [&_button]:[width:26px] [&_button]:[height:26px] [&_button]:[display:grid] [&_button]:[place-items:center] [&_button]:[color:#717580] [&_button]:[border-radius:6px] [&_button:hover]:[background:#f4f5f6] [pointer-events:auto] [background:#fff] [border:1px_solid_#e2e4e8] [box-shadow:0_15px_40px_#14171c1a] [display:flex] [align-items:start] [gap:12px] [padding:14px] [border-radius:10px] [font-size:13px] [line-height:1.5] [color:#20232a] [animation:df-toast-in_.2s_ease-out_both] [&.is-hiding]:[opacity:0] [&.is-hiding]:[transform:translateX(12px)] [&.is-hiding]:[transition:opacity_.2s,transform_.2s] df-toast-error [&>i]:[color:#dc2626]" role="alert" data-toast data-timeout="6500"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i><span>{{ session('error') }}</span><button type="button" data-dismiss-toast aria-label="Tutup notifikasi"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>@endif
+ @if($errors->any())<div class="df-floating-toast [&>span]:[flex:1] [&>span]:[min-width:0] [&>span_small]:[display:block] [&>span_small]:[color:#767983] [&>i]:[margin-top:2px] [&_button]:[width:26px] [&_button]:[height:26px] [&_button]:[display:grid] [&_button]:[place-items:center] [&_button]:[color:#717580] [&_button]:[border-radius:6px] [&_button:hover]:[background:#f4f5f6] [pointer-events:auto] [background:#fff] [border:1px_solid_#e2e4e8] [box-shadow:0_15px_40px_#14171c1a] [display:flex] [align-items:start] [gap:12px] [padding:14px] [border-radius:10px] [font-size:13px] [line-height:1.5] [color:#20232a] [animation:df-toast-in_.2s_ease-out_both] [&.is-hiding]:[opacity:0] [&.is-hiding]:[transform:translateX(12px)] [&.is-hiding]:[transition:opacity_.2s,transform_.2s] df-toast-error [&>i]:[color:#dc2626]" role="alert" data-toast data-timeout="8500"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i><span>{{ $errors->first() }} @if($errors->count()>1)<small>+{{ $errors->count()-1 }} kolom lainnya</small>@endif</span><button type="button" data-dismiss-toast aria-label="Tutup pesan validasi"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>@endif
+ </div>
+ @yield('content')
+ </main>
+ </div>
+</div>
+@include('components.layout.command')
+</body></html>

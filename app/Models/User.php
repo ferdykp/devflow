@@ -14,6 +14,8 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    public function workspaces() { return $this->hasMany(Workspace::class); }
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 

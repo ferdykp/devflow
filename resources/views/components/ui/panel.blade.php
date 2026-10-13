@@ -1,0 +1,1 @@
+<section {{ $attributes->class(['rounded-xl border border-[#eaeae8] bg-white p-5 sm:p-6']) }}>{{ $slot }}</section>

@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -23,9 +24,13 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): RedirectResponse
     {
         # berfungsi untuk mengambil data yang sudah lolos validasi
-        $user = User::create($request->validated());
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create($request->validated());
+            $user->workspaces()->create(['name' => 'Personal']);
 
-        # otomatis login ketika regis berhasil
+            return $user;
+        });
+
         Auth::login($user);
 
         # regenerasi sesion untuk mencegah session fixation attack
@@ -46,7 +51,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/dashboard');
+        return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali!');
     }
 
     public function logout(Request $request): RedirectResponse

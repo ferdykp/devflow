@@ -1,93 +1,88 @@
 @extends('layouts.guest')
-
-@section('title', 'Login')
-
+@section('title', 'Masuk')
 @section('content')
-    <section class="flex w-screen h-screen items-center justify-center">
-        <div class="w-full max-w-md shadow-2xl rounded-xl p-8 bg-white border border-gray-100">
-            <div class="space-y-1 mb-6">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-                    Sign in to Devflow
-                </h1>
-                <p class="text-sm text-[#52525B]">Continuous context & engineering workspace</p>
+    <div
+        class="w-full max-w-[440px] rounded-[16px] border border-[#E4E4E7] bg-white px-6 py-8 shadow-[0_8px_30px_rgba(0,0,0,.025)] sm:px-9 sm:py-10">
+        <h1 class="text-[25px] font-semibold tracking-[-.04em]">Selamat datang kembali</h1>
+        <p class="mt-2 text-sm text-[#71717A]">Masuk untuk melanjutkan pekerjaan di DevFlow.</p>
+        <form action="{{ route('login') }}" method="POST" class="mt-8 space-y-5">@csrf
+            <div>
+                <label for="email" class="mb-2 block text-sm font-medium">Alamat email</label>
+                <input id="email" name="email" type="email" autocomplete="email" autofocus required
+                    value="{{ old('email') }}" placeholder="you@example.com"
+                    class="w-full rounded-[10px] border border-[#D4D4D8] bg-white px-3.5 py-3 text-sm outline-none transition focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10 @error('email') border-red-500 @enderror">
+                @error('email')
+                    <p role="alert" class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
             </div>
+            <div>
+                <label for="password" class="mb-2 block text-sm font-medium">
+                    Kata sandi
+                </label>
 
-            <button type="button"
-                class="flex items-center justify-center space-x-3 w-full h-11 rounded-lg bg-black hover:bg-gray-800 transition-colors mb-6 shadow-sm">
-                <span class="text-white text-lg">
-                    <i class="fa-brands fa-github"></i>
-                </span>
-                <span class="text-white font-medium text-sm">
-                    Continue with GitHub
-                </span>
-            </button>
+                <div class="relative">
+                    <input id="password" name="password" type="password" autocomplete="current-password" required
+                        placeholder="Masukkan kata sandi"
+                        class="w-full rounded-[10px] border border-[#D4D4D8] bg-white
+                   py-3 pl-3.5 pr-12 text-sm outline-none transition
+                   focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10">
 
-            <div class="relative flex py-2 items-center mb-4">
-                <div class="flex-grow border-t border-gray-200"></div>
-                <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">Or continue with email</span>
-                <div class="flex-grow border-t border-gray-200"></div>
+                    <button type="button" id="toggle-password" aria-label="Tampilkan kata sandi" aria-pressed="false"
+                        title="Tampilkan kata sandi"
+                        class="absolute inset-y-0 right-0 z-10 flex w-11
+                   items-center justify-center rounded-r-[10px]
+                   text-zinc-500 transition-colors
+                   hover:text-zinc-950
+                   focus-visible:outline-2
+                   focus-visible:outline-offset-[-3px]
+                   focus-visible:outline-zinc-800">
+                        <i id="password-eye-icon" class="fa-regular fa-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                @error('password')
+                    <p role="alert" class="mt-1.5 text-xs text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
+
             </div>
+            <label class="flex items-center gap-2 text-sm text-[#52525B]"><input name="remember" value="1"
+                    type="checkbox" class="rounded border-[#D4D4D8] accent-black"> Ingat saya</label>
+            <button
+                class="w-full rounded-[10px] bg-[#111111] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#303030] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">Masuk
+                <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="mt-7 border-t border-[#E4E4E7] pt-6 text-center text-sm text-[#71717A]">Belum punya akun? <a
+                class="font-semibold text-[#111111] underline-offset-4 hover:underline"
+                href="{{ route('register') }}">Daftar sekarang</a></p>
+    </div>
+    @push('scripts')
+        <script>
+            (() => {
+                const input = document.getElementById('password');
+                const button = document.getElementById('toggle-password');
+                const icon = document.getElementById('password-eye-icon');
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-4">
-                @csrf
+                if (!input || !button || !icon) return;
 
-                <div class="space-y-1">
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" id="email" value="{{ old('email') }}" required
-                        class="w-full px-3.5 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                        placeholder="name@example.com">
-                </div>
+                button.addEventListener('click', () => {
+                    const showPassword = input.type === 'password';
 
-                <div class="space-y-1">
-                    <div class="flex items-center justify-between">
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <a class="text-sm font-medium text-gray-700 hover:underline" href="">Forgot Password</a>
-                    </div>
-                    <!-- Wrapper relative untuk memposisikan tombol toggle -->
-                    <div class="relative">
-                        <input type="password" name="password" id="password" required
-                            class="w-full px-3.5 py-2 pr-10 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                            placeholder="••••••••">
-                        <button type="button" id="togglePassword"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
-                            <i id="eyeIcon" class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
+                    input.type = showPassword ? 'text' : 'password';
 
-                <button type="submit"
-                    class="w-full h-10 rounded-lg bg-black text-white font-medium hover:bg-gray-800 transition-colors shadow-sm mt-2">
-                    Sign in
-                </button>
-                <div class="flex items-center justify-center pt-2">
-                    <a href="{{ route('register') }}"
-                        class="w-full flex items-center justify-center h-10 rounded-lg bg-[#F7F7F8] text-black font-medium hover:bg-gray-200 transition-colors shadow-sm mt-2">
-                        Create account
-                    </a>
-                </div>
-            </form>
-        </div>
-    </section>
+                    icon.classList.toggle('fa-eye', !showPassword);
+                    icon.classList.toggle('fa-eye-slash', showPassword);
 
-    <!-- Script untuk Toggle Show/Hide Password -->
-    <script>
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        const eyeIcon = document.getElementById('eyeIcon');
+                    const label = showPassword ?
+                        'Sembunyikan kata sandi' :
+                        'Tampilkan kata sandi';
 
-        togglePassword.addEventListener('click', function() {
-            // Ubah tipe input dari password ke text atau sebaliknya
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-
-            // Ubah ikon FontAwesome
-            if (type === 'text') {
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        });
-    </script>
+                    button.setAttribute('aria-label', label);
+                    button.setAttribute('aria-pressed', String(showPassword));
+                    button.title = label;
+                });
+            })();
+        </script>
+    @endpush
 @endsection

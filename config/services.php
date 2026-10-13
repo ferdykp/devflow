@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'github' => [
+        'webhook_secret' => env('GITHUB_WEBHOOK_SECRET'),
+        'app_id' => env('GITHUB_APP_ID'),
+        'client_id' => env('GITHUB_APP_CLIENT_ID'),
+        'client_secret' => env('GITHUB_APP_CLIENT_SECRET'),
+        'private_key' => env('GITHUB_APP_PRIVATE_KEY'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

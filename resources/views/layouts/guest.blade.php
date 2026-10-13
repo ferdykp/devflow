@@ -1,22 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Masuk') · DevFlow</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <title>Devflow @yield('title', 'Devflow System')</title>
-
+        referrerpolicy="no-referrer">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <link rel="icon" type="image/png" href="{{ asset('icons/icon-192.png') }}">
+    <meta name="theme-color" content="#111111">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 </head>
 
-<body class="h-full w-full bg-[#F7F7F8]">
+<body class="min-h-screen bg-[#fafaf9] font-sans text-[#191919] antialiased">
+    <main class="flex min-h-screen flex-col items-center justify-center px-5 py-12 sm:px-6">
+        <a href="{{ route('login') }}" class="mb-10 flex items-center gap-2.5 text-lg font-bold tracking-tight">
+            <span
+                class="flex size-10 items-center justify-center rounded-lg bg-[#191919] text-sm font-bold text-white">D<span
+                    class="text-[#a1a1aa]">F</span></span>
+            DevFlow
+        </a>
+        @yield('content')
+        <p class="mt-8 text-center text-xs text-[#71717A]">Kerja lebih terarah, tanpa ribet.</p>
+    </main>
+    @stack('scripts')
 
-    @yield('content')
 </body>
 
 </html>

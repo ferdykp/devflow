@@ -1,0 +1,7 @@
+@extends('layouts.app')
+@section('title','Fokus Saya')
+@section('page-heading','Fokus Saya')
+@section('content')
+<h1 class="df-heading [font-size:clamp(1.65rem,2.8vw,2.15rem)] [font-weight:650] [letter-spacing:-.045em] [line-height:1.18]">Fokus Saya</h1><p class="mb-6 mt-1 text-sm text-[#747571]">Pilih maksimal tiga tugas dari proyek aktif. Tugas terhambat dan selesai tidak ditampilkan.</p>
+<x-ui.panel><div class="mb-4 flex items-center justify-between gap-3"><h2 class="font-semibold">Tugas tersedia</h2><span class="text-xs text-[#747571]">{{ count($selected) }}/3 dipilih</span></div><div class="divide-y divide-zinc-100">@forelse($tasks as $task)<div class="flex items-center justify-between gap-3 py-4"><div><a href="{{ route('projects.show',$task->project) }}" class="text-sm font-semibold hover:underline">{{ $task->title }}</a><p class="mt-1 text-xs text-[#747571]">{{ $task->project->name }} · {{ $task->priority }} priority</p></div><form action="{{ route('focus.toggle',$task) }}" method="POST">@csrf<button class="rounded-lg border border-[#e4e4e1] px-3 py-2 text-xs font-semibold hover:bg-zinc-50">{{ in_array($task->id,$selected)?'Remove':'Fokus hari ini' }}</button></form></div>@empty<p class="py-8 text-center text-sm text-[#747571]">Belum ada tugas yang tersedia. Tambahkan tugas dari halaman proyek.</p>@endforelse</div></x-ui.panel>
+@endsection

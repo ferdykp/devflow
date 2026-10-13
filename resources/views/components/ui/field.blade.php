@@ -1,0 +1,4 @@
+@props(['name','label','type'=>'text','value'=>null,'placeholder'=>'','required'=>false,'id'=>null])
+<div><label for="{{ $id ?? $name }}" class="mb-2 block text-[13px] font-semibold text-[#282828]">{{ $label }} @unless($required)<span class="font-normal text-[#7c7c7c]">(opsional)</span>@endunless</label>
+<input id="{{ $id ?? $name }}" name="{{ $name }}" type="{{ $type }}" value="{{ old($name,$value) }}" placeholder="{{ $placeholder }}" @required($required) @error($name) aria-invalid="true" aria-describedby="{{ $name }}-error" @enderror {{ $attributes->class(['df-input']) }}>
+@error($name)<p id="{{ $name }}-error" role="alert" class="mt-1.5 text-xs text-red-700">{{ $message }}</p>@enderror</div>

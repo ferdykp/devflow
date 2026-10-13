@@ -1,36 +1,50 @@
 <?php
-
 use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    }
-
-    return redirect()->route('login');
+use App\Http\Controllers\{WorkspaceController,ProjectController,TaskController,ProjectExtrasController,PrdController,ScopeController,GithubController,FocusController};
+use App\Models\{Project,Task,Activity};
+use Illuminate\Support\Facades\{Auth,Route};
+Route::get('/',fn()=>redirect()->route(Auth::check()?'dashboard':'login'));
+Route::middleware('guest')->group(function(){
+ Route::get('/login',[AuthController::class,'showLogin'])->name('login');
+ Route::post('/login',[AuthController::class,'login'])->middleware('throttle:5,1');
+ Route::get('/register',[AuthController::class,'showRegister'])->name('register');
+ Route::post('/register',[AuthController::class,'register'])->middleware('throttle:5,1');
 });
-
-Route::middleware('guest')->group(function () {
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
-
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-});
-
-Route::middleware(['auth', 'cache-history'])->group(function () {
-    Route::get('/logout', function () {
-        Auth::logout();
-        return redirect()->route('login');
-    })->name('logout');
-
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
+Route::middleware(['auth','cache-history'])->group(function(){
+ Route::get('/dashboard',function(){
+  $projects=Project::whereHas('workspace',fn($q)=>$q->where('user_id',auth()->id()))->withCount(['tasks','activities'])->latest()->limit(6)->get();
+  $openTasks=Task::whereHas('project.workspace',fn($q)=>$q->where('user_id',auth()->id()))->whereNotIn('status',['done'])->count();
+  $activities=Activity::whereHas('project.workspace',fn($q)=>$q->where('user_id',auth()->id()))->with('project')->orderByDesc('occurred_at')->limit(8)->get();
+  return view('dashboard.index',compact('projects','openTasks','activities'));
+ })->name('dashboard');
+ Route::post('/logout',[AuthController::class,'logout'])->name('logout');
+ Route::post('/workspaces',[WorkspaceController::class,'store'])->name('workspaces.store');
+ Route::get('/projects',[ProjectController::class,'index'])->name('projects.index');
+ Route::post('/projects',[ProjectController::class,'store'])->name('projects.store');
+ Route::get('/projects/{project}',[ProjectController::class,'show'])->name('projects.show');
+ Route::get('/projects/{project}/resume',[\App\Http\Controllers\ProjectResumeController::class,'show'])->name('projects.resume');
+ Route::put('/projects/{project}',[ProjectController::class,'update'])->name('projects.update');
+ Route::delete('/projects/{project}',[ProjectController::class,'destroy'])->name('projects.destroy');
+ Route::post('/projects/{project}/tasks',[TaskController::class,'store'])->name('tasks.store');
+ Route::patch('/projects/{project}/tasks/{task}',[TaskController::class,'update'])->name('tasks.update');
+ Route::delete('/projects/{project}/tasks/{task}',[TaskController::class,'destroy'])->name('tasks.destroy');
+ Route::post('/projects/{project}/notes',[ProjectExtrasController::class,'note'])->name('notes.store');
+ Route::post('/projects/{project}/milestones',[ProjectExtrasController::class,'milestone'])->name('milestones.store');
+ Route::post('/projects/{project}/backlog',[ProjectExtrasController::class,'backlog'])->name('backlog.store');
+ Route::get('/projects/{project}/insights',[\App\Http\Controllers\ProjectInsightsController::class,'show'])->name('projects.insights');
+ Route::post('/projects/{project}/insights',[\App\Http\Controllers\ProjectInsightsController::class,'analyze'])->middleware('throttle:5,1')->name('projects.insights.analyze');
+ Route::post('/projects/{project}/scope-baseline',[ProjectExtrasController::class,'baseline'])->name('scope.baseline');
+ Route::post('/projects/{project}/scope-reviews',[ScopeController::class,'review'])->name('scope.review');
+ Route::post('/projects/{project}/scope-reviews/{review}/decision',[ScopeController::class,'decide'])->name('scope.decide');
+ Route::post('/projects/{project}/scope-reviews/{review}/backlog',[ScopeController::class,'backlog'])->name('scope.backlog');
+ Route::post('/projects/{project}/documents',[PrdController::class,'store'])->name('prd.store');
+ Route::post('/projects/{project}/documents/{document}/versions',[PrdController::class,'revise'])->name('prd.revise');
+ Route::post('/projects/{project}/documents/{document}/versions/{version}/approve',[PrdController::class,'approve'])->name('prd.approve');
+ Route::get('/projects/{project}/github/authorize',[\App\Http\Controllers\GitHubAppController::class,'authorizeApp'])->name('github.app.authorize');
+ Route::get('/github/callback',[\App\Http\Controllers\GitHubAppController::class,'callback'])->name('github.app.callback');
+ Route::post('/projects/{project}/github/connect',[\App\Http\Controllers\GitHubAppController::class,'connect'])->name('github.app.connect');
+ Route::post('/projects/{project}/repositories',[GithubController::class,'link'])->name('github.link');
+ Route::post('/projects/{project}/repositories/{repository}/sync',[GithubController::class,'sync'])->middleware('throttle:8,1')->name('github.sync');
+ Route::get('/focus',[FocusController::class,'index'])->name('focus.index');
+ Route::post('/focus/{task}',[FocusController::class,'toggle'])->name('focus.toggle');
 });

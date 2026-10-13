@@ -3,7 +3,6 @@
 > Copy the prompt below into an AI coding assistant when implementing DevFlow UI. Attach `prd.md`, `design-system.md`, and relevant `user-flow.md` sections as context.
 
 ## Master prompt
-
 You are a senior SaaS product designer and senior Laravel full-stack engineer. Build **DevFlow**, an adaptive developer workspace, with a **clean, modern, premium, professional, crisp, highly usable** interface. The user must understand each screen immediately, without training or reading documentation.
 
 **Tech stack (strict):** Full Laravel 12, Blade, Livewire 4, Alpine.js bundled with Livewire (do not load Alpine twice), Tailwind CSS 4, Vite, MySQL 8+. Follow Laravel best practices: components, services, Form Requests/Livewire Form Objects, policies, validation, escaping, CSRF, query efficiency, accessible interactions. Do not introduce Vue, React, Inertia, PostgreSQL, Bootstrap, or extra UI framework unless explicitly approved.
@@ -17,7 +16,6 @@ You are a senior SaaS product designer and senior Laravel full-stack engineer. B
 **Critical product UX rule:** No PRD, GitHub, AI, or milestone is required. A project is fully manageable from its name alone. Use contextual CTAs for optional modules; do not show a broken/empty dashboard merely because no external source exists. If a project has GitHub only, show commit/PR activity and a truthful resume but **never invent a completion percentage**. If no data is available, display helpful next steps and `Not estimated`.
 
 **Screens to implement:**
-
 1. Overview: focus/continue project first; important sync/scope alerts second; clear recent projects list; optionally metrics supported by real data.
 2. Projects: neat list/grid toggle, search, filters, quick creation modal; no mandatory integrations.
 3. Project Detail: prominent name, status, last activity, context-based tabs; tasks, notes, backlog always; PRD/GitHub/milestones opt-in.
@@ -33,7 +31,6 @@ You are a senior SaaS product designer and senior Laravel full-stack engineer. B
 **Output expected for each page:** (a) succinct information architecture; (b) component tree; (c) complete Laravel/Livewire/Blade/Tailwind implementation matching existing code conventions; (d) mobile and desktop states; (e) empty/loading/error cases; (f) test scenarios and accessibility checklist. Implement only the requested page/module, do not generate unrelated features. Use reusable components and actual data contracts; no hardcoded production data.
 
 ## Page implementation prompt template
-
 ```text
 Implement DevFlow screen: [PAGE NAME]
 Current phase: [PHASE]
@@ -49,7 +46,6 @@ If you identify extra feature ideas, list them separately as Future Backlog prop
 ```
 
 ## Microcopy examples
-
 - `No PRD yet. That's okay — you can track tasks and GitHub activity without one.`
 - `Completion not estimated — add tasks or milestones to measure progress.`
 - `Last synced 12 minutes ago` (show actual time; never invented).
@@ -57,7 +53,6 @@ If you identify extra feature ideas, list them separately as Future Backlog prop
 - `Suggested next step — based on 3 open tasks` (only if evidence supports this).
 
 ## UI acceptance checklist
-
 - Layout aligned on 360px / 768px / 1280px / 1440px.
 - Body text readable and contrast verified; predictable spacing and table density.
 - One primary action per view; secondary actions appropriately subordinate.

@@ -1,0 +1,2 @@
+@props(['type'=>'submit'])
+<button type="{{ $type }}" {{ $attributes->class(['inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[#191919] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#3a3a3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50']) }}>{{ $slot }}</button>
