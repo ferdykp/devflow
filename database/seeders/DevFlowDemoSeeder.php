@@ -29,7 +29,7 @@ class DevFlowDemoSeeder extends Seeder
                 $user = User::query()->create([
                     'name' => 'DevFlow Demo',
                     'email' => $email,
-                    'password' => Hash::make('Dev123333!'),
+                    'password' => Hash::make('Devdemo123.'),
                     'email_verified_at' => now(),
                 ]);
             }

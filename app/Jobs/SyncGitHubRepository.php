@@ -2,12 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Models\GithubDelivery;
 use App\Models\GithubRepository;
 use App\Services\GitHub\GitHubActivitySync;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class SyncGitHubRepository implements ShouldQueue
@@ -15,11 +16,15 @@ class SyncGitHubRepository implements ShouldQueue
     use Queueable;
 
     public int $tries = 3;
+
     public int $timeout = 45;
 
     public function __construct(public int $repositoryId, public ?string $deliveryId = null) {}
 
-    public function backoff(): array { return [30, 120, 300]; }
+    public function backoff(): array
+    {
+        return [30, 120, 300];
+    }
 
     public function handle(GitHubActivitySync $service): void
     {
@@ -39,7 +44,7 @@ class SyncGitHubRepository implements ShouldQueue
         }
 
         DB::transaction(function () use ($success) {
-            $delivery = \App\Models\GithubDelivery::where('delivery_id', $this->deliveryId)
+            $delivery = GithubDelivery::where('delivery_id', $this->deliveryId)
                 ->lockForUpdate()->first();
             if (! $delivery) {
                 return;
@@ -72,7 +77,7 @@ class SyncGitHubRepository implements ShouldQueue
         $this->recordResult(false);
         Log::warning('DevFlow GitHub sync failed', [
             'repository_id' => $this->repositoryId,
-            'message' => $exception?->getMessage(),
+            'exception_type' => $exception ? $exception::class : null,
         ]);
     }
 }

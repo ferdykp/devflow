@@ -1,15 +1,16 @@
 // Progressive enhancement: native forms still work without JavaScript.
 document.querySelectorAll('[data-toggle-password]').forEach((button) => {
     button.addEventListener('click', () => {
-        const field = button.closest('.relative')?.querySelector('[data-password-input]');
+        const field = document.getElementById(button.getAttribute('aria-controls'));
         if (!field) return;
         const reveal = field.type === 'password';
         field.type = reveal ? 'text' : 'password';
         button.setAttribute('aria-label', reveal ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
         button.setAttribute('title', reveal ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
         button.setAttribute('aria-pressed', String(reveal));
-        button.querySelector('[data-eye-open]')?.classList.toggle('hidden', reveal);
-        button.querySelector('[data-eye-closed]')?.classList.toggle('hidden', !reveal);
+        const icon = button.querySelector('[data-password-icon]');
+        icon?.classList.toggle('fa-eye', !reveal);
+        icon?.classList.toggle('fa-eye-slash', reveal);
     });
 });
 const password = document.querySelector('#password');
@@ -25,9 +26,9 @@ function updateMatch() {
 }
 password?.addEventListener('input', updateMatch);
 confirmation?.addEventListener('input', updateMatch);
-document.querySelectorAll('[data-dismiss-toast]').forEach(button=>button.addEventListener('click',()=>button.closest('[data-toast]')?.remove()));
 const confirmDialog = document.createElement('dialog');
 confirmDialog.className = 'w-[min(92vw,420px)] rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl backdrop:bg-black/40';
+confirmDialog.setAttribute('aria-label', 'Konfirmasi tindakan');
 confirmDialog.innerHTML = '<h2 class="text-lg font-semibold">Konfirmasi tindakan</h2><p data-dialog-message class="mt-2 text-sm text-zinc-600"></p><div class="mt-6 flex justify-end gap-2"><button type="button" data-dialog-cancel class="rounded-xl border border-zinc-200 px-4 py-2 text-sm">Batal</button><button type="button" data-dialog-confirm class="rounded-xl bg-red-700 px-4 py-2 text-sm font-semibold text-white">Lanjutkan</button></div>';
 if(document.querySelector('form[data-confirm]')){
  document.body.append(confirmDialog);
@@ -66,17 +67,35 @@ dfSearch?.addEventListener('keydown',event=>{const visible=dfVisibleItems();if(e
 dfPalette?.addEventListener('click',event=>{if(event.target===dfPalette)dfPalette.close()});
 const dfRail=document.querySelector('[data-sidebar]');const dfScrim=document.querySelector('[data-sidebar-overlay]');
 const dfRailOpen=document.querySelector('[data-sidebar-open]');
-function dfSetRail(open){if(!dfRail)return;dfRail.toggleAttribute('data-open',open);dfScrim.hidden=!open;dfRailOpen?.setAttribute('aria-expanded',String(open));if(open)document.querySelector('[data-sidebar-close]')?.focus();else dfRailOpen?.focus()}
+const dfRailMedia = window.matchMedia('(max-width: 850px)');
+const dfStage = document.querySelector('.df-stage');
+function dfSyncRail(open) {
+ if (!dfRail) return;
+ const mobileOpen = dfRailMedia.matches && open;
+ dfRail.inert = dfRailMedia.matches && !open;
+ if (dfStage) dfStage.inert = mobileOpen;
+ document.body.style.overflow = mobileOpen ? 'hidden' : '';
+ dfRail.toggleAttribute('data-open', mobileOpen);
+ if (dfScrim) dfScrim.hidden = !mobileOpen;
+ dfRailOpen?.setAttribute('aria-expanded', String(mobileOpen));
+}
+function dfSetRail(open) {
+ dfSyncRail(open);
+ if (open) document.querySelector('[data-sidebar-close]')?.focus();
+ else dfRailOpen?.focus();
+}
+dfSyncRail(false);
+dfRailMedia.addEventListener('change', () => dfSyncRail(false));
 dfRailOpen?.addEventListener('click',()=>dfSetRail(true));document.querySelector('[data-sidebar-close]')?.addEventListener('click',()=>dfSetRail(false));dfScrim?.addEventListener('click',()=>dfSetRail(false));
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&dfRail?.hasAttribute('data-open'))dfSetRail(false)});
 // Context navigation marks the currently selected section without mutating app data.
 document.querySelectorAll('.df-project-nav a[href^="#"]').forEach(anchor=>anchor.addEventListener('click',()=>{document.querySelectorAll('.df-project-nav a').forEach(link=>link.removeAttribute('aria-current'));anchor.setAttribute('aria-current','location')}));
 
 // Toasts are non-blocking; focus/hover pause auto dismissal.
-document.querySelectorAll('[data-toast]').forEach((toast) => {
+function initializeToast(toast) {
   let timer;
   const dismiss = () => { toast.classList.add('is-hiding'); setTimeout(() => toast.remove(), 220); };
-  const start = () => { timer = setTimeout(dismiss, Number(toast.dataset.timeout) || 4500); };
+  const start = () => { const timeout = Number(toast.dataset.timeout); if (timeout > 0) timer = setTimeout(dismiss, timeout); };
   const stop = () => clearTimeout(timer);
   toast.addEventListener('mouseenter', stop);
   toast.addEventListener('mouseleave', start);
@@ -84,7 +103,8 @@ document.querySelectorAll('[data-toast]').forEach((toast) => {
   toast.addEventListener('focusout', start);
   toast.querySelector('[data-dismiss-toast]')?.addEventListener('click', () => { stop(); dismiss(); });
   start();
-});
+}
+document.querySelectorAll('[data-toast]').forEach(initializeToast);
 const taskRoot = document.querySelector('[data-tasks-root]');
 if (taskRoot) {
  const composer = taskRoot.querySelector('#new-task-panel');
@@ -104,13 +124,13 @@ if (taskRoot) {
    const stack = document.querySelector('[data-toast-stack]');
    if (!stack) return;
    stack.querySelector('[data-task-move-error]')?.remove();
-   const toast = document.createElement('div');
-   toast.className = 'df-floating-toast df-toast-error [pointer-events:auto] [background:#fff] [border:1px_solid_#e2e4e8] [box-shadow:0_15px_40px_#14171c1a] [display:flex] [align-items:start] [gap:12px] [padding:14px] [border-radius:10px] [font-size:13px] [line-height:1.5] [color:#20232a] [animation:df-toast-in_.2s_ease-out_both] [&.is-hiding]:[opacity:0] [&.is-hiding]:[transform:translateX(12px)] [&.is-hiding]:[transition:opacity_.2s,transform_.2s]';
-   toast.setAttribute('role', 'alert');
+   const template = document.querySelector('[data-error-toast-template]');
+   if (!template) return;
+   const toast = template.content.firstElementChild.cloneNode(true);
    toast.dataset.taskMoveError = '';
-   toast.textContent = message;
+   toast.querySelector('[data-error-message]').textContent = message;
    stack.appendChild(toast);
-   setTimeout(() => toast.remove(), 6500);
+   initializeToast(toast);
  };
  taskRoot.querySelectorAll('[data-task-card]').forEach((card) => {
    card.addEventListener('dragstart', (event) => {
@@ -182,3 +202,69 @@ if (taskRoot) {
    });
  });
 }
+
+// Project menus close predictably without affecting document/version details.
+document.querySelectorAll('[data-project-menu]').forEach((menu) => {
+  const panel = menu.querySelector('[data-project-menu-panel]');
+  const fitPanel = () => {
+    if (!menu.open || !panel) return;
+    const bounds = menu.getBoundingClientRect();
+    const below = window.innerHeight - bounds.bottom - 24;
+    const above = bounds.top - 80;
+    const openAbove = below < 220 && above > below;
+    panel.style.top = openAbove ? 'auto' : '100%';
+    panel.style.bottom = openAbove ? 'calc(100% + 8px)' : 'auto';
+    panel.style.maxHeight = `${Math.max(80, openAbove ? above : below)}px`;
+  };
+  menu.addEventListener('toggle', fitPanel);
+  window.addEventListener('resize', fitPanel);
+  document.addEventListener('click', (event) => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  menu.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+      event.stopPropagation();
+    }
+  });
+});
+
+// Keep the native submission intact while preventing accidental repeat clicks.
+document.querySelectorAll('[data-busy-form]').forEach((form) => {
+  let submitting = false;
+  form.addEventListener('submit', (event) => {
+    if (submitting) {
+      event.preventDefault();
+      return;
+    }
+    submitting = true;
+    form.setAttribute('aria-busy', 'true');
+    const button = event.submitter || form.querySelector('[data-busy-label]');
+    if (button) {
+      button.dataset.idleLabel = button.textContent;
+      button.textContent = button.dataset.busyLabel || 'Menyimpan…';
+      button.setAttribute('aria-disabled', 'true');
+      button.classList.add('opacity-60', 'cursor-wait');
+    }
+  });
+  window.addEventListener('pageshow', () => {
+    submitting = false;
+    form.removeAttribute('aria-busy');
+    form.querySelectorAll('[data-idle-label]').forEach((button) => {
+      button.textContent = button.dataset.idleLabel;
+      button.removeAttribute('aria-disabled');
+      button.classList.remove('opacity-60', 'cursor-wait');
+    });
+  });
+});
+
+// Unselected drafts stay available to review but never block a valid submission.
+document.querySelectorAll('[data-task-draft]').forEach((draft) => {
+  const choice = draft.querySelector('input[type="checkbox"]');
+  const fields = draft.querySelector('[data-draft-fields]');
+  if (!choice || !fields) return;
+  const update = () => { fields.disabled = !choice.checked; };
+  choice.addEventListener('change', update);
+  update();
+});

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // Each scenario uses a freshly registered user, no fixed credentials or real user data.
 test('guest access and account creation', async ({ page }) => {
@@ -47,7 +47,7 @@ test('project lifecycle, task views, resume and focus', async ({ page }) => {
   await page.getByRole('navigation', { name: 'Bagian proyek' }).getByRole('link', { name: 'Tugas' }).click();
   await expect(page).toHaveURL(/section=tasks/);
   await page.getByRole('button', { name: 'Tugas baru' }).click();
-  await page.getByLabel('Nama tugas').fill(`E2E Task ${nonce}`);
+  await page.locator('#new-task-panel').getByLabel('Nama tugas').fill(`E2E Task ${nonce}`);
   await page.getByRole('button', { name: 'Buat tugas' }).click();
   await expect(page.getByText(`E2E Task ${nonce}`, { exact: true })).toBeVisible();
 

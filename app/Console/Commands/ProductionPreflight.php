@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -28,11 +29,15 @@ class ProductionPreflight extends Command
         $this->components->info('DevFlow deployment preflight (credentials are never displayed)');
         $check('Environment is production', $production, true);
         $check('Debug mode is disabled', config('app.debug') === false);
+        $check('Session cookie requires HTTPS', config('session.secure') === true);
+        $check('Session cookie is HTTP-only', config('session.http_only') === true);
+        $check('Session cookie has SameSite protection', in_array(config('session.same_site'), ['lax', 'strict'], true));
+        $check('Application locale is Indonesian', config('app.locale') === 'id');
         $appKey = (string) config('app.key');
         $keyBytes = str_starts_with($appKey, 'base64:')
             ? base64_decode(substr($appKey, 7), true)
             : $appKey;
-        $validKey = is_string($keyBytes) && in_array(strlen($keyBytes), [16, 24, 32], true);
+        $validKey = is_string($keyBytes) && Encrypter::supported($keyBytes, (string) config('app.cipher'));
         $check('Application key has a valid encryption length', $validKey);
 
         $appUrl = (string) config('app.url');
@@ -46,7 +51,7 @@ class ProductionPreflight extends Command
         $check('Session storage is server-side and persistent', in_array(config('session.driver'), ['database', 'redis', 'file'], true));
         $check('Queue is asynchronous', in_array(config('queue.default'), ['database', 'redis', 'sqs', 'beanstalkd'], true));
         $check('Cache uses persistent storage', in_array(config('cache.default'), ['database', 'redis', 'file', 'memcached', 'dynamodb'], true));
-        $check('Application logging is not debug level', config('logging.channels.'.config('logging.default').'.level', env('LOG_LEVEL', 'debug')) !== 'debug', false);
+        $check('Application logging is not debug level', config('logging.channels.'.config('logging.default').'.level', 'debug') !== 'debug', false);
         $check('Webhook secret is configured', filled(config('services.github.webhook_secret')), false);
 
         try {

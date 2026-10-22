@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FocusItem;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class FocusController extends Controller
             ->pluck('task_id')->all();
 
         $tasks = Task::query()
-            ->whereHas('project.workspace', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('project.workspace', fn ($query) => $query->accessibleTo($userId))
             ->whereHas('project', fn ($query) => $query->where('status', 'active'))
             ->whereNotIn('status', ['done', 'blocked'])
             ->with('project')
@@ -36,12 +37,13 @@ class FocusController extends Controller
     {
         $userId = $request->user()->id;
         $task = Task::query()
-            ->whereHas('project.workspace', fn ($query) => $query->where('user_id', $userId))
+            ->whereHas('project.workspace', fn ($query) => $query->accessibleTo($userId))
             ->whereHas('project', fn ($query) => $query->where('status', 'active'))
             ->whereNotIn('status', ['done', 'blocked'])
             ->findOrFail($task);
 
         $result = DB::transaction(function () use ($userId, $task) {
+            Workspace::query()->accessibleTo($userId)->lockForUpdate()->findOrFail($task->project->workspace_id);
             // Serialize concurrent focus changes for this user on MySQL.
             User::query()->whereKey($userId)->lockForUpdate()->firstOrFail();
 
@@ -52,6 +54,7 @@ class FocusController extends Controller
 
             if ($focusQuery->exists()) {
                 $focusQuery->delete();
+
                 return 'removed';
             }
 
@@ -71,7 +74,7 @@ class FocusController extends Controller
 
         return back()->with(
             $result === 'limit' ? 'error' : 'success',
-            $result === 'limit' ? 'Choose up to three focus tasks.' : "Today's focus updated."
+            $result === 'limit' ? 'Pilih maksimal tiga tugas fokus.' : 'Fokus hari ini diperbarui.'
         );
     }
 }

@@ -1,0 +1,17 @@
+[Unit]
+Description=DevFlow queue worker
+After=network.target mysql.service
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/devflow/current
+ExecStart=/usr/bin/php8.5 artisan queue:work database --sleep=3 --tries=3 --timeout=60 --max-time=3600
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=90
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0027
+[Install]
+WantedBy=multi-user.target

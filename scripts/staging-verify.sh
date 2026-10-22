@@ -33,8 +33,11 @@ echo '==> Production frontend build'
 npm run build
 test -s public/build/manifest.json
 
+echo '==> Browser tests (isolated SQLite/session/cache)'
+npm run test:e2e
+
 echo '==> Verify PHP files'
 find app routes database tests -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
 
 echo '==> Completed code verification.'
-echo 'NOTE: Staging deployment, browser E2E, backup restore, GitHub App and AI provider still require separate live checks.'
+echo 'NOTE: Staging deployment, off-site backup restore, live GitHub App and AI provider still require separate live checks.'

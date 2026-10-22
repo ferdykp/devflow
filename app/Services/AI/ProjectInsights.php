@@ -20,7 +20,7 @@ class ProjectInsights
     public function analyze(Project $project, string $mode, ?string $proposal = null): array
     {
         if (! $this->ready()) {
-            throw ValidationException::withMessages(['ai' => 'AI is not configured. Project management and manual scope review remain available.']);
+            throw ValidationException::withMessages(['ai' => 'AI belum dikonfigurasi. Pengelolaan proyek dan peninjauan manual tetap tersedia.']);
         }
 
         $summary = $this->resume->build($project);
@@ -30,7 +30,7 @@ class ProjectInsights
         $hasScope = $prd || filled($baseline?->in_scope) || filled($baseline?->out_of_scope);
 
         if ($mode === 'scope' && ! $hasScope) {
-            return ['classification' => 'not_assessable', 'summary' => 'No approved PRD or scope baseline is available.', 'evidence' => [], 'suggested_next_step' => 'Add an approved PRD or define scope boundaries, then review manually.', 'source' => 'local'];
+            return ['classification' => 'not_assessable', 'summary' => 'Belum ada PRD yang disetujui atau batas cakupan pekerjaan.', 'evidence' => [], 'suggested_next_step' => 'Setujui PRD atau tetapkan batas cakupan, lalu tinjau secara manual.', 'source' => 'local'];
         }
 
         $context = [
@@ -49,10 +49,10 @@ class ProjectInsights
             .'Respond ONLY as one JSON object with keys classification, summary, evidence, suggested_next_step. '
             .'classification must be in_scope, out_of_scope, uncertain, or not_assessable. '
             .'evidence must be a list of up to 4 short phrases quoting/paraphrasing only supplied context. '
-            .'If evidence is insufficient choose uncertain or not_assessable. Max 500 characters per string.';
+            .'If evidence is insufficient choose uncertain or not_assessable. Max 500 characters per string. Write all user-facing text in Indonesian.';
         try {
             $response = Http::withToken((string) config('devflow_ai.api_key'))
-                ->acceptJson()->asJson()->timeout(max(5, min(30, (int) config('devflow_ai.timeout'))))
+                ->acceptJson()->asJson()->connectTimeout(5)->timeout(max(5, min(30, (int) config('devflow_ai.timeout'))))
                 ->post((string) config('devflow_ai.endpoint'), [
                     'model' => config('devflow_ai.model'), 'temperature' => 0.1,
                     'messages' => [
@@ -62,16 +62,17 @@ class ProjectInsights
                 ]);
         } catch (\Throwable $e) {
             report($e);
-            throw ValidationException::withMessages(['ai' => 'The AI provider could not be reached. Try again later.']);
+            throw ValidationException::withMessages(['ai' => 'Penyedia AI tidak dapat dihubungi. Coba lagi nanti.']);
         }
         if (! $response->successful()) {
-            throw ValidationException::withMessages(['ai' => 'AI analysis is temporarily unavailable. You can continue reviewing manually.']);
+            throw ValidationException::withMessages(['ai' => 'Analisis AI sementara tidak tersedia. Anda dapat melanjutkan peninjauan manual.']);
         }
         $body = $response->json('choices.0.message.content');
         $result = is_string($body) ? json_decode($body, true) : null;
         if (! is_array($result) || ! in_array($result['classification'] ?? null, ['in_scope', 'out_of_scope', 'uncertain', 'not_assessable'], true) || ! is_string($result['summary'] ?? null) || ! is_string($result['suggested_next_step'] ?? null) || ! is_array($result['evidence'] ?? null)) {
-            throw ValidationException::withMessages(['ai' => 'The AI provider returned an invalid result. No changes were made.']);
+            throw ValidationException::withMessages(['ai' => 'Penyedia AI mengembalikan hasil tidak valid. Tidak ada perubahan yang disimpan.']);
         }
+
         return [
             'classification' => $result['classification'],
             'summary' => mb_substr(strip_tags($result['summary']), 0, 500),

@@ -1,0 +1,4 @@
+# Install once for www-data; adjust PHP binary and app path.
+* * * * * cd /srv/devflow/current && /usr/bin/php8.5 artisan schedule:run >> /var/log/devflow/scheduler.log 2>&1
+# Example on a backup host with off-site upload configured separately:
+# */15 * * * * /srv/devflow/current/scripts/backup-mysql.sh /etc/devflow/backup.cnf devflow /var/backups/devflow >> /var/log/devflow/backup.log 2>&1

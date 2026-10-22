@@ -16,7 +16,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-[#fafaf9] font-sans text-[#191919] antialiased">
+<body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased">
     <main class="flex min-h-screen flex-col items-center justify-center px-5 py-12 sm:px-6">
         <a href="{{ route('login') }}" class="mb-10 flex items-center gap-2.5 text-lg font-bold tracking-tight">
             <span

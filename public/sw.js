@@ -1,5 +1,5 @@
 /* DevFlow app shell service worker. Never cache authenticated HTML or API responses. */
-const CACHE_NAME = 'devflow-static-v1';
+const CACHE_NAME = 'devflow-static-v2';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE = [OFFLINE_URL, '/icons/icon-192.png', '/icons/icon-512.png'];
 self.addEventListener('install', (event) => {
@@ -7,7 +7,7 @@ self.addEventListener('install', (event) => {
 });
 self.addEventListener('activate', (event) => {
   event.waitUntil(Promise.all([
-    caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))),
+    caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('devflow-static-') && key !== CACHE_NAME).map(key => caches.delete(key)))),
     self.clients.claim()
   ]));
 });

@@ -33,6 +33,7 @@ class GitHubAppClient
         if (! openssl_sign($input, $signature, $key, OPENSSL_ALGO_SHA256)) {
             throw new RuntimeException('Unable to sign GitHub App JWT.');
         }
+
         return $input.'.'.rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
     }
 
@@ -50,6 +51,7 @@ class GitHubAppClient
         if (! $response->successful() || ! is_string($response->json('token'))) {
             throw new RuntimeException('GitHub App installation token request failed (HTTP '.$response->status().').');
         }
+
         return $response->json('token');
     }
 
@@ -65,6 +67,7 @@ class GitHubAppClient
         if (! $response->successful() || ! is_string($response->json('access_token'))) {
             throw new RuntimeException('GitHub authorization was unsuccessful.');
         }
+
         return $response->json('access_token');
     }
 
@@ -76,7 +79,33 @@ class GitHubAppClient
         if (! $response->successful()) {
             throw new RuntimeException('Could not read authorized GitHub installations.');
         }
+
         return $response->json('installations') ?? [];
+    }
+
+    public function repositoriesForUserInstallation(string $userToken, int $installationId): array
+    {
+        $result = [];
+        for ($page = 1; $page <= 10; $page++) {
+            $response = Http::withToken($userToken)->acceptJson()
+                ->withHeaders(['User-Agent' => 'DevFlow', 'X-GitHub-Api-Version' => '2022-11-28'])
+                ->connectTimeout(5)->timeout(15)
+                ->get("https://api.github.com/user/installations/{$installationId}/repositories", ['per_page' => 100, 'page' => $page]);
+            if (! $response->successful() || ! is_array($response->json('repositories'))) {
+                throw new RuntimeException('Could not list repositories authorized for this GitHub user.');
+            }
+            $batch = $response->json('repositories');
+            foreach ($batch as $repo) {
+                if (is_int($repo['id'] ?? null) && is_string($repo['full_name'] ?? null)) {
+                    $result[] = ['id' => $repo['id'], 'full_name' => $repo['full_name'], 'default_branch' => $repo['default_branch'] ?? 'main'];
+                }
+            }
+            if (count($batch) < 100) {
+                break;
+            }
+        }
+
+        return $result;
     }
 
     public function repositoriesForInstallation(int $installationId): array
@@ -97,8 +126,11 @@ class GitHubAppClient
                     $result[] = ['id' => $repo['id'], 'full_name' => $repo['full_name'], 'default_branch' => $repo['default_branch'] ?? 'main'];
                 }
             }
-            if (count($batch) < 100) break;
+            if (count($batch) < 100) {
+                break;
+            }
         }
+
         return $result;
     }
 }

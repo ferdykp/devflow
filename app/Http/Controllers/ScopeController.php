@@ -39,7 +39,7 @@ class ScopeController extends Controller
         DB::transaction(function () use ($project, $review, $request, $data) {
             // A project-scoped query prevents cross-project modifications.
             $item = $project->reviews()->lockForUpdate()->findOrFail($review);
-            abort_unless($item->status === 'pending', 409, 'This review has already been resolved.');
+            abort_unless($item->status === 'pending', 409, 'Peninjauan ini sudah diputuskan.');
 
             if ($data['decision'] === 'move_to_backlog') {
                 $project->backlogItems()->create([

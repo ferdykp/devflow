@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "DevFlow \u2014 Developer Workspace",
+  "name": "DevFlow \u2014 Ruang Kerja Developer",
   "short_name": "DevFlow",
-  "description": "A focused developer workspace.",
+  "description": "Ruang kerja developer untuk mengelola proyek dan fokus harian.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

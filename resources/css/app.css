@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @source "../views/**/*.blade.php";
 @source "../js/**/*.js";
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
@@ -7,16 +7,16 @@
  --color-ink: #151515; --color-subtle: #65676b; --color-canvas: #f9f9f8; --color-hairline: #e9e9e7;
 }
 :root{color-scheme:light;font-synthesis:none}
-html{scroll-behavior:smooth}body{font-feature-settings:"cv11","ss01";letter-spacing:-.007em}
+body{font-feature-settings:"cv11","ss01";letter-spacing:-.007em}
 ::selection{background:#dfe8ff;color:#151515}
 :focus-visible{outline:2px solid #2563eb;outline-offset:3px}
 button,a,input,select,textarea{touch-action:manipulation}
-input,select,textarea{font:inherit}
+input,select,textarea{font-family:inherit}
 input:not([type=checkbox]):not([type=radio]),select,textarea{min-height:42px}
 [data-sidebar]{will-change:transform}
 [data-toast]{box-shadow:0 5px 16px rgba(0,0,0,.035)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 /* Tema global. Semua gaya komponen berada dalam utility Tailwind di Blade. */
-:root{--df-ink:#17181b;--df-muted:#686b72;--df-edge:#e7e8eb;--df-paper:#fff;--df-canvas:#f8f9fa;--df-action:#245de7}
+:root{--df-ink:#18181b;--df-muted:#71717a;--df-edge:#e4e4e7;--df-paper:#fff;--df-canvas:#fafafa;--df-action:#2563eb}
 [id^="section-"],#project-settings{scroll-margin-top:165px}
 @keyframes df-toast-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}

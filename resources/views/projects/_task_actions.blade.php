@@ -1,9 +1,11 @@
-<div class="df-task-actions [display:flex] [align-items:center] [gap:8px] [justify-content:space-between] [margin-top:12px]">
- <form action="{{ route('tasks.update',[$project,$task]) }}" method="POST">@csrf @method('PATCH')
-  <label class="sr-only" for="status-{{ $task->id }}">Status for {{ $task->title }}</label>
-  <select id="status-{{ $task->id }}" name="status" class="df-task-status [border:1px_solid_#e2e4e9] [border-radius:7px] [padding:7px_21px_7px_8px] [font-size:11px] [color:#4c535f] [background:#fff] [max-width:155px]" data-task-status onchange="this.form.requestKirim()">@foreach($columns as $key=>$name)<option value="{{ $key }}" @selected($task->status===$key)>{{ $name }}</option>@endforeach</select>
+<div class="df-task-actions [display:flex] [align-items:center] [gap:8px] [justify-content:space-between] flex-wrap sm:flex-nowrap [margin-top:12px]">
+ <form action="{{ route('tasks.update',[$project,$task]) }}" method="POST" class="min-w-0 flex-1 basis-full sm:basis-auto">@csrf @method('PATCH')
+  <label class="sr-only" for="status-{{ $task->id }}">Status tugas {{ $task->title }}</label>
+  <select id="status-{{ $task->id }}" name="status" class="df-task-status w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base leading-6 text-zinc-900 shadow-xs outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500 aria-invalid:border-red-500 sm:text-sm motion-reduce:transition-none" data-task-status onchange="this.form.requestSubmit()">@foreach($columns as $key=>$name)<option value="{{ $key }}" @selected($task->status===$key)>{{ $name }}</option>@endforeach</select>
  </form>
- <form action="{{ route('tasks.destroy',[$project,$task]) }}" method="POST" data-confirm="Hapus this task? This can't be undone.">@csrf @method('DELETE')
-  <button type="submit" class="df-icon-button [min-height:32px] [min-width:32px] [border-radius:7px] [color:#89909a] hover:[color:#b91c1c] hover:[background:#fff1f1]" aria-label="Hapus {{ $task->title }}" title="Hapus task"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
+ <a href="{{ route('tasks.show', [$project, $task]) }}" aria-label="Detail {{ $task->title }}" title="Detail dan diskusi" class="grid size-11 shrink-0 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"><i class="fa-regular fa-comment" aria-hidden="true"></i></a>
+ <a href="{{ route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list', 'edit' => $task->id]) }}" aria-label="Ubah {{ $task->title }}" title="Ubah tugas" class="flex size-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+ <form action="{{ route('tasks.destroy',[$project,$task]) }}" method="POST" data-confirm="Hapus tugas ini? Tindakan ini tidak dapat dibatalkan.">@csrf @method('DELETE')
+  <button type="submit" class="df-icon-button [min-height:44px] [min-width:44px] [border-radius:7px] [color:#89909a] hover:[color:#b91c1c] hover:[background:#fff1f1]" aria-label="Hapus {{ $task->title }}" title="Hapus tugas"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
  </form>
 </div>
