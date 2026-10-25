@@ -38,6 +38,7 @@ Route::middleware(['auth', 'cache-history'])->group(function () {
         return view('dashboard.index', compact('projects', 'openTasks', 'activities'));
     })->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/workspaces/create', [WorkspaceController::class, 'create'])->name('workspaces.create');
     Route::post('/workspaces', [WorkspaceController::class, 'store'])->name('workspaces.store');
     Route::get('/workspaces/{workspace}/members', [WorkspaceMemberController::class, 'show'])->name('workspaces.members.show');
     Route::post('/workspaces/{workspace}/invitations', [WorkspaceMemberController::class, 'store'])->middleware('throttle:20,1')->name('workspaces.invitations.store');
@@ -46,7 +47,9 @@ Route::middleware(['auth', 'cache-history'])->group(function () {
     Route::get('/invitations/{token}', [WorkspaceMemberController::class, 'invitation'])->name('invitations.show');
     Route::post('/invitations/{token}', [WorkspaceMemberController::class, 'accept'])->middleware('throttle:20,1')->name('invitations.accept');
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/projects/{project}/resume', [ProjectResumeController::class, 'show'])->name('projects.resume');
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');

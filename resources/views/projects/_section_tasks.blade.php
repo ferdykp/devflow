@@ -3,21 +3,33 @@
         'backlog' => 'Antrean tugas', 'todo' => 'Belum dikerjakan', 'in_progress' => 'Sedang dikerjakan',
         'in_review' => 'Dalam peninjauan', 'blocked' => 'Terhambat', 'done' => 'Selesai',
     ];
-    $view = in_array(request('view'), ['list','board'], true) ? request('view') : 'board';
+    $view = in_array(request('view'), ['list','board'], true) ? request('view') : 'list';
 @endphp
 <div class="df-task-page" data-tasks-root>
- <div class="df-section-header [display:flex] [align-items:end] [justify-content:space-between] [gap:20px] [margin-bottom:22px] max-[650px]:[align-items:start] max-[650px]:[flex-direction:column]">
-  <div><h2 class="df-section-title [font-size:24px] [letter-spacing:-.045em] [line-height:1.3] [font-weight:650]">Tugas <span class="df-count [font-size:13px] [font-weight:550] [color:#747984] [margin-left:5px]">{{ $taskPlan ? $tasks->total() : $project->tasks_count }}</span></h2><p class="df-section-caption [color:#707681] [font-size:12px] [margin-top:6px] [line-height:1.6]">Atur tugas berdasarkan status. Geser kartu atau gunakan pilihan status.</p></div>
-  <div class="df-section-actions [display:flex] [align-items:center] [gap:8px] [flex-wrap:wrap]" role="group" aria-label="Tampilan tugas">
-   <a href="{{ route('projects.show', ['project'=>$project,'section'=>'tasks','view'=>'list', 'plan' => $taskPlan?->id]) }}" class="df-view-switch [height:39px] [display:inline-flex] [align-items:center] [gap:7px] [font-size:12px] [font-weight:600] [border:1px_solid_#e4e5e9] [padding:0_13px] [border-radius:8px] [background:#fff] [color:#636976] [&.is-active]:[background:#eff2f8] [&.is-active]:[color:#20242c] [&.is-active]:[border-color:#cfd5e2] hover:[border-color:#aab1bf] {{ $view==='list'?'is-active':'' }}" @if($view==='list') aria-current="page" @endif><i class="fa-solid fa-list" aria-hidden="true"></i> Daftar</a>
-   <a href="{{ route('projects.show', ['project'=>$project,'section'=>'tasks','view'=>'board', 'plan' => $taskPlan?->id]) }}" class="df-view-switch [height:39px] [display:inline-flex] [align-items:center] [gap:7px] [font-size:12px] [font-weight:600] [border:1px_solid_#e4e5e9] [padding:0_13px] [border-radius:8px] [background:#fff] [color:#636976] [&.is-active]:[background:#eff2f8] [&.is-active]:[color:#20242c] [&.is-active]:[border-color:#cfd5e2] hover:[border-color:#aab1bf] {{ $view==='board'?'is-active':'' }}" @if($view==='board') aria-current="page" @endif><i class="fa-solid fa-table-columns" aria-hidden="true"></i> Papan</a>
-   <button type="button" class="df-action [display:inline-flex] [align-items:center] [justify-content:center] [gap:8px] [min-height:40px] [padding:9px_16px] [background:#191b1f] [color:#fff] [border-radius:9px] [font-size:12px] [font-weight:650] hover:[background:#33373e]" data-task-form-toggle aria-controls="new-task-panel" aria-expanded="{{ $errors->any() ? 'true' : 'false' }}"><i class="fa-solid fa-plus" aria-hidden="true"></i> Tugas baru</button>
+ <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+  <div><h2 class="text-lg font-semibold tracking-tight">Tugas <span class="ml-1 text-sm font-normal text-zinc-400">{{ $taskPlan ? $tasks->total() : $project->tasks_count }}</span></h2><p class="mt-1 text-sm text-zinc-500">Tulis to-do, kerjakan bersama, lalu tandai selesai.</p></div>
+  <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Tampilan tugas">
+   <div class="inline-flex rounded-lg bg-zinc-100 p-1">
+    @foreach(['list' => ['Daftar', 'fa-list'], 'board' => ['Papan', 'fa-table-columns']] as $key => [$label, $icon])
+     <a href="{{ route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => $key, 'plan' => $taskPlan?->id]) }}" class="inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors {{ $view === $key ? 'bg-white text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-950' }}" @if($view === $key) aria-current="page" @endif><i class="fa-solid {{ $icon }} text-xs" aria-hidden="true"></i>{{ $label }}</a>
+    @endforeach
+   </div>
+   <x-ui.button type="button" variant="secondary" data-task-form-toggle aria-controls="new-task-panel" aria-expanded="{{ $errors->any() ? 'true' : 'false' }}"><i class="fa-solid fa-sliders" aria-hidden="true"></i>Tugas baru</x-ui.button>
   </div>
  </div>
  @if($taskPlan)
  <x-ui.panel class="mb-6"><div class="flex flex-wrap items-start justify-between gap-4"><div class="min-w-0"><p class="text-xs font-medium text-blue-700">To-do dari dokumen</p><h3 class="mt-1 break-words font-semibold">{{ $taskPlan->version?->document?->title ?? 'Rencana proyek' }}</h3><p class="mt-2 text-sm leading-6 text-zinc-500">{{ $taskPlan->created_count }} tugas disusun sesuai urutan dokumen. Buka tugas untuk mencentang checklist atau mengubah detailnya.</p></div><x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list'])" variant="secondary">Semua tugas</x-ui.button></div></x-ui.panel>
  @endif
- <div class="mb-5"><a href="{{ route('task-imports.create', $project) }}" class="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-blue-700 hover:underline"><i class="fa-solid fa-file-lines" aria-hidden="true"></i>Buat tugas dari dokumen</a></div>
+ <x-ui.panel class="mb-5" :padding="false">
+  <form action="{{ route('tasks.store', $project) }}" method="POST" class="flex items-center gap-3 p-3 sm:p-4" aria-label="Tambah to-do cepat" data-busy-form>@csrf
+   <span class="hidden text-zinc-400 sm:block" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+   <label for="quick-task-title" class="sr-only">Tambah to-do</label>
+   <input id="quick-task-title" name="title" required maxlength="200" autocomplete="off" @if(session('quick_task_added')) autofocus @endif placeholder="Apa yang perlu dikerjakan?" aria-describedby="quick-task-help" class="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-2 py-2.5 text-base outline-none placeholder:text-zinc-400 focus:border-blue-300 sm:text-sm">
+   <input type="hidden" name="status" value="todo"><input type="hidden" name="quick_add" value="1">
+   <x-ui.button data-busy-label="Menambah…">Tambah</x-ui.button>
+  </form>
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-zinc-100 px-4 py-2.5 sm:px-5"><p id="quick-task-help" class="text-xs text-zinc-500">Ketik judul lalu tekan Enter. Detail bisa ditambahkan nanti.</p><a href="{{ route('task-imports.create', $project) }}" class="inline-flex min-h-11 items-center gap-2 text-xs font-medium text-blue-700 hover:underline"><i class="fa-regular fa-file-lines" aria-hidden="true"></i>Buat tugas dari dokumen</a></div>
+ </x-ui.panel>
  <div id="new-task-panel" class="df-composer [border:1px_solid_#e0e3e8] [padding:22px] [border-radius:12px] [background:#fff] [margin-bottom:22px] [&[hidden]]:[display:none]" @if(!$errors->any()) hidden @endif>
   <form action="{{ route('tasks.store',$project) }}" method="POST" class="space-y-4">@csrf
     <div class="df-form-grid max-[650px]:[grid-template-columns:1fr] [display:grid] [grid-template-columns:repeat(2,minmax(0,1fr))] [gap:15px]"><div class="df-form-span [grid-column:1/-1]"><label for="new-task-title" class="df-form-label [display:block] [font-size:12px] [font-weight:650] [margin-bottom:6px]">Nama tugas</label><input id="new-task-title" name="title" class="df-input w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base leading-6 text-zinc-900 shadow-xs outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500 aria-invalid:border-red-500 sm:text-sm motion-reduce:transition-none" maxlength="200" required value="{{ old('title') }}" placeholder="Apa yang perlu dikerjakan?"></div>
@@ -50,15 +62,23 @@
  <div class="df-task-list [border-top:1px_solid_#e8e9ec]" aria-label="Daftar tugas">
   @php($previousGroup = null)
   @forelse($tasks as $task)
-   @if($loop->first || $previousGroup !== $task->milestone_id)
+   @if(($loop->first || $previousGroup !== $task->milestone_id) && $task->milestone_id !== null)
     <h3 class="mt-5 border-b border-zinc-200 bg-zinc-100/60 px-4 py-3 text-sm font-semibold text-zinc-700">{{ $task->milestone?->title ?? 'Tanpa kelompok' }}</h3>
    @endif
    @php($previousGroup = $task->milestone_id)
-   <article class="df-task-row [&>.df-status-dot]:[margin-top:6px] [&.df-task-actions]:[margin-top:0] [&.df-task-description]:[max-width:580px] max-[650px]:[&.df-task-actions]:[width:100%] max-[650px]:[&.df-task-actions]:[margin-left:23px] [display:flex] [align-items:start] [gap:14px] [padding:16px_8px] [border-bottom:1px_solid_#e8e9ec] max-[650px]:[flex-wrap:wrap]">
+   <article class="df-task-row [&>.df-status-dot]:[margin-top:6px] [&.df-task-actions]:[margin-top:0] [&.df-task-description]:[max-width:580px] max-[650px]:[&.df-task-actions]:[width:100%] max-[650px]:[&.df-task-actions]:[margin-left:23px] [display:flex] [align-items:start] [gap:14px] [padding:12px_4px] [border-bottom:1px_solid_#e8e9ec] max-[650px]:[flex-wrap:wrap]">
     @if($task->source_index !== null)<span class="grid size-7 shrink-0 place-items-center rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-500" aria-label="Langkah {{ $task->source_index + 1 }}">{{ $task->source_index + 1 }}</span>@endif
-    <span class="df-status-dot [width:9px] [height:9px] [border:2px_solid_#a8afb9] [border-radius:50%] [flex:none] [display:inline-block] df-status-{{ $task->status }}" aria-hidden="true"></span>
-    <div class="min-w-0 flex-1"><a href="{{ route('tasks.show', [$project, $task]) }}" draggable="false" class="block df-task-title [font-size:13px] [line-height:1.5] [font-weight:650] [overflow-wrap:anywhere] {{ $task->status==='done'?'line-through text-zinc-400':'' }} hover:text-blue-700">{{ $task->title }}</a><p class="df-task-meta [font-size:11px] [color:#757b86] [margin-top:5px]">{{ $columns[$task->status] ?? $task->status }} · {{ \App\Support\UiLabel::priority($task->priority) }}@if($task->assignee) · {{ $task->assignee->name }}@endif @if($task->checklist) · Checklist {{ collect($task->checklist)->where('done', true)->count() }}/{{ count($task->checklist) }} @endif @if($task->comments_count) · {{ $task->comments_count }} komentar @endif @if($task->due_date) · Tenggat {{ $task->due_date->format('M j') }}@endif</p>@if($task->description)<p class="df-task-description [font-size:11px] [line-height:1.55] [color:#717783] [margin-top:7px] [white-space:pre-line] [overflow-wrap:anywhere]">{{ $task->description }}</p>@endif</div>
-    @include('projects._task_actions',['task'=>$task,'columns'=>$columns])
+    <form action="{{ route('tasks.update', [$project, $task]) }}" method="POST" class="shrink-0" data-busy-form>@csrf @method('PATCH')
+     <input type="hidden" name="status" value="{{ $task->status === 'done' ? 'todo' : 'done' }}">
+     <button type="submit" role="checkbox" aria-checked="{{ $task->status === 'done' ? 'true' : 'false' }}" aria-label="Selesai: {{ $task->title }}" class="grid size-11 place-items-center rounded-lg text-xl text-zinc-400 hover:bg-blue-50 hover:text-blue-700 aria-checked:text-blue-700"><i class="{{ $task->status === 'done' ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle' }}" aria-hidden="true"></i></button>
+    </form>
+    <div class="min-w-0 flex-1"><a href="{{ route('tasks.show', [$project, $task]) }}" draggable="false" class="block df-task-title [font-size:14px] [line-height:1.6] [font-weight:550] [overflow-wrap:anywhere] {{ $task->status==='done'?'line-through text-zinc-400':'' }} hover:text-blue-700">{{ $task->title }}</a><p class="df-task-meta [font-size:11px] [color:#757b86] [margin-top:5px]">{{ $columns[$task->status] ?? $task->status }} · {{ \App\Support\UiLabel::priority($task->priority) }}@if($task->assignee) · {{ $task->assignee->name }}@endif @if($task->checklist) · Checklist {{ collect($task->checklist)->where('done', true)->count() }}/{{ count($task->checklist) }} @endif @if($task->comments_count) · {{ $task->comments_count }} komentar @endif @if($task->due_date) · Tenggat {{ $task->due_date->format('M j') }}@endif</p>@if($task->description)<p class="df-task-description [font-size:12px] [line-height:1.65] [color:#717783] [margin-top:7px] [white-space:pre-line] [overflow-wrap:anywhere] line-clamp-2">{{ $task->description }}</p>@endif</div>
+    <details class="relative shrink-0" data-task-menu>
+     <summary aria-label="Pilihan tugas {{ $task->title }}" class="grid size-11 cursor-pointer list-none place-items-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900 [&::-webkit-details-marker]:hidden"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></summary>
+     <div data-task-menu-panel class="absolute right-0 top-full z-30 w-72 max-w-[calc(100vw-40px)] overflow-y-auto rounded-xl border border-zinc-200 bg-white p-3 shadow-lg">
+      @include('projects._task_actions',['task'=>$task,'columns'=>$columns])
+     </div>
+    </details>
    </article>
   @empty <div class="df-section-empty [&_p]:[font-size:12px] [&_p]:[color:#7a808b] [&_p]:[margin-top:8px] [padding:70px_20px] [text-align:center] [color:#343b47]"><strong>Belum ada tugas</strong><p>{{ request()->filled('search') || request()->filled('status') || request()->filled('priority') || request()->filled('assignee') ? 'Tidak ada tugas yang cocok. Coba ubah atau reset filter.' : 'Buat tugas pertama untuk mulai merencanakan pekerjaan.' }}</p></div> @endforelse
  </div>

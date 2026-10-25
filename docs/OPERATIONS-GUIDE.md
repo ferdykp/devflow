@@ -79,10 +79,47 @@ Logging production gunakan kanal harian dengan level warning/error yang sesuai, 
 
 1. Di Proyek, klik nama ruang kerja untuk membuka Anggota. Pemilik mengisi email, membuat undangan, lalu menyalin dan membagikan tautan. DevFlow tidak mengirim email otomatis; tautan berlaku tujuh hari dan hanya dapat diterima akun dengan email yang diundang.
 2. Calon anggota membuka tautan, masuk/mendaftar dengan email tersebut, lalu memilih Terima undangan. Pemilik dan anggota dapat mengelola konten seluruh proyek dalam ruang kerja; hanya pemilik mengelola anggota lain.
-3. Buka proyek → Dokumen → Buat tugas dari dokumen. Tempel teks atau unggah TXT/Markdown UTF-8 maksimal 200 KB. Alternatifnya, buka versi PRD tersimpan dan pilih Buat tugas dari versi ini. Untuk PDF/Word, salin teksnya terlebih dahulu.
-4. Tinjau draf: pilih tugas yang diperlukan, ubah judul/deskripsi, prioritas, penanggung jawab dan tenggat, kemudian tekan Buat tugas terpilih. Pemecahan bersifat lokal berdasarkan struktur dokumen, bukan analisis AI; review pengguna diperlukan. Maksimal 50 kandidat per dokumen, tanpa pemotongan diam-diam.
-5. Buka tugas dari halaman hasil atau judul tugas pada Papan/Daftar. Gunakan detail tugas untuk diskusi dan pengaturan. Cari dan filter tugas menyediakan pencarian, status, prioritas, Ditugaskan ke saya dan Belum ditentukan.
+3. Buka proyek → Dokumen → Buat tugas dari dokumen. Unggah `.md` melalui kolom Atau unggah berkas (atau tempel teks), lalu pilih Langsung buat to-do list pada Setelah dokumen dibaca dan tekan Proses dokumen. Mode otomatis sudah dipilih secara default. TXT/Markdown UTF-8 maksimal 200 KB didukung. Versi PRD tersimpan tetap dapat dikonversi melalui Buat tugas dari versi ini dengan alur tinjau. Untuk PDF/Word, salin teksnya terlebih dahulu.
+4. Dalam mode otomatis, DevFlow langsung membuka daftar tugas dari dokumen tersebut. Judul bagian/tahap menjadi kelompok pekerjaan, langkah utama menjadi tugas sesuai urutan sumber, dan subpoin menjadi checklist. Tujuan, latar belakang, dan referensi tetap menjadi konteks. Mode Tinjau draf terlebih dahulu tersedia untuk memilih/mengedit judul, kelompok, deskripsi, checklist, prioritas, penanggung jawab dan tenggat sebelum membuat tugas. Pemecahan bersifat lokal berdasarkan struktur dokumen, bukan analisis AI atau inferensi dependensi. Maksimal 1.000 tugas per dokumen, tanpa pemotongan diam-diam. Untuk lebih dari 50 tugas, tinjauan menampilkan 25 tugas per halaman dan tombol Buat semua membuat seluruh halaman sekaligus; detail dapat diubah setelah tugas dibuat.
+5. Buka judul tugas pada Papan/Daftar untuk mencentang checklist, berdiskusi, dan mengubah pengaturan. Checklist tersimpan setelah refresh dan tidak mengubah status tugas secara otomatis. Urutan dokumen tetap sama setelah perubahan status dan perpindahan tampilan Daftar/Papan. Tombol Semua tugas keluar dari tampilan khusus dokumen. Cari dan filter tugas menyediakan pencarian, status, prioritas, Ditugaskan ke saya dan Belum ditentukan.
 6. Pengiriman ulang dokumen identik dalam proyek yang sama membuka hasil sebelumnya. Konfirmasi yang sudah selesai tidak menciptakan tugas tambahan. Ubah sumber dokumen bila memang ada kebutuhan baru; konversi tidak mengubah persetujuan PRD atau baseline.
 7. Pemilik dapat membatalkan undangan tertunda atau mengeluarkan anggota. Pencabutan akses langsung membersihkan penugasan dan Fokus terkait; undangan lama yang sudah digunakan tidak dapat memulihkan keanggotaan. Komentar terdahulu tetap tersedia sebagai konteks proyek.
 
 Migrasi tambahan pada rilis ini harus dijalankan sebelum source baru dipakai. Pada lokal sudah diterapkan. Rollback migration menghapus data kolaborasi/impor yang baru; setelah fitur dipakai, gunakan backup dan perbaikan maju sesuai prosedur deployment, bukan rollback database otomatis.
+
+
+Contoh struktur Markdown untuk to-do otomatis:
+
+```markdown
+# Website toko
+## Tahap 1: Persiapan
+1. Siapkan proyek
+   - Atur database
+   - Jalankan migrasi
+2. Siapkan CI
+## Tahap 2: Implementasi
+### Buat halaman masuk
+- Validasi email
+- Uji kredensial salah
+```
+
+Contoh tersebut menghasilkan tiga tugas dalam dua kelompok. Dua subpoin pada tugas pertama dan dua poin di bawah judul tugas terakhir menjadi checklist yang bisa dicentang.
+
+## Alur sederhana untuk tim kecil — 25 Oktober 2026
+
+1. Buka Proyek, isi nama proyek dan pilih ruang kerja. PRD dan GitHub tidak wajib.
+2. Proyek langsung membuka Tugas dalam tampilan Daftar. Ketik judul di Tambah to-do lalu tekan Enter atau Tambah. Setelah dibuat, fokus kembali ke input agar bisa melanjutkan mengetik.
+3. Klik lingkaran di samping judul untuk menyelesaikan tugas; klik lagi untuk mengembalikannya ke Belum dikerjakan. Pengaturan status lain, ubah, diskusi dan hapus tersedia melalui menu tiga titik.
+4. Gunakan Tugas baru jika perlu menentukan detail sejak awal, atau buka judul tugas untuk mengubah penanggung jawab, tenggat, kelompok dan checklist.
+5. Untuk dokumen .md, pilih Buat tugas dari dokumen di bawah input cepat atau buka tab Dokumen. Pilih pembuatan otomatis atau tinjauan draf. Batas tetap 200 KB dan 1.000 tugas.
+6. Tampilan Papan, Ringkasan dan Lanjutkan tetap tersedia. Fitur tambahan ada di Lainnya. Anggota tim dikelola dari ruang kerja.
+
+Siap digunakan untuk uji coba lokal. Penggunaan produksi online tetap mengikuti gate staging, integrasi dan pemulihan pada GO-NO-GO.
+
+## Kelola proyek dan ruang kerja — 25 Oktober 2026
+
+- Daftar Proyek hanya menampilkan pencarian, ruang kerja dan kartu proyek. Pilih Proyek baru untuk membuka form terpisah. Pilih Ruang kerja baru untuk membuat ruang kerja di halaman tersendiri; setelah berhasil, form proyek terbuka dengan ruang kerja tersebut terpilih.
+- Edit proyek melalui ikon pensil pada kartu di daftar atau tombol Edit proyek di halaman proyek. Nama dan deskripsi langsung terlihat; tujuan, status, prioritas serta target selesai ada dalam Opsi tambahan.
+- Hapus proyek tersedia di bawah halaman edit, hanya untuk pemilik ruang kerja. Dialog menyebut nama proyek dan penghapusan permanen tugas, dokumen serta diskusi. Batal mempertahankan proyek. Pilih status Diarsipkan jika ingin menyimpan data tanpa melanjutkan pekerjaan.
+- Sidebar desktop memakai rail 80px dengan label aksesibel dan tooltip. Pada mobile, tombol navigasi membuka menu berlabel. Tugas dan Dokumen menjadi tab utama mobile; Ringkasan dan Lanjutkan dapat dibuka dari menu lainnya.
+- Layout diverifikasi pada lebar 320–3840px. Form dibatasi lebarnya agar mudah dibaca; daftar proyek memakai grid responsif dan area tugas dapat memakai ruang lebih luas pada monitor besar.

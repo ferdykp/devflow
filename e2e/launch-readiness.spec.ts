@@ -19,6 +19,7 @@ async function createProject(page: Page) {
   await page.getByRole('button', { name: /Buat akun/ }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto('/projects');
+  await page.getByRole('link', { name: 'Proyek baru', exact: true }).click();
   await page.locator('select[name="workspace_id"]').selectOption({ label: 'Personal' });
   await page.getByLabel('Nama proyek', { exact: true }).fill('Proyek pengujian');
   await page.getByRole('button', { name: 'Buat proyek', exact: true }).click();
@@ -37,7 +38,7 @@ async function createTask(page: Page, project: string) {
 test('navigasi utama jelas dan menu tambahan dapat ditutup dengan keyboard atau klik luar', async ({ page }) => {
   await createProject(page);
   const navigation = page.getByRole('navigation', { name: 'Bagian proyek', exact: true });
-  for (const label of ['Ringkasan', 'Tugas', 'Dokumen', 'Lanjutkan']) {
+  for (const label of (page.viewportSize()!.width < 640 ? ['Tugas', 'Dokumen'] : ['Ringkasan', 'Tugas', 'Dokumen', 'Lanjutkan'])) {
     await expect(navigation.getByRole('link', { name: label, exact: true })).toBeInViewport();
   }
   const trigger = page.getByLabel('Menu proyek lainnya', { exact: true });
@@ -62,11 +63,13 @@ test('status alternatif tersimpan, konfirmasi batal aman, dan penghapusan bekerj
   const project = await createProject(page);
   await createTask(page, project);
   if (isMobile) await page.getByRole('link', { name: 'Daftar', exact: true }).click();
+  await page.getByLabel('Pilihan tugas Tugas pengujian', { exact: true }).click();
   await page.getByLabel('Status tugas Tugas pengujian', { exact: true }).scrollIntoViewIfNeeded();
   await page.getByLabel('Status tugas Tugas pengujian', { exact: true }).selectOption('in_review');
   await expect(page.getByLabel('Status tugas Tugas pengujian')).toHaveValue('in_review');
   await page.reload();
   await expect(page.getByLabel('Status tugas Tugas pengujian')).toHaveValue('in_review');
+  await page.getByLabel('Pilihan tugas Tugas pengujian', { exact: true }).click();
   await page.getByRole('link', { name: 'Ubah Tugas pengujian', exact: true }).click();
   const editor = page.getByRole('region', { name: 'Ubah tugas', exact: true });
   await expect(editor).toBeVisible();
@@ -76,11 +79,13 @@ test('status alternatif tersimpan, konfirmasi batal aman, dan penghapusan bekerj
   await editor.getByRole('button', { name: 'Simpan perubahan' }).click();
   await expect(page.locator('.df-task-list').getByText('Deskripsi diperbarui', { exact: true })).toBeVisible();
   await page.reload();
+  await page.getByLabel('Pilihan tugas Tugas pengujian', { exact: true }).click();
   await page.getByRole('link', { name: 'Ubah Tugas pengujian', exact: true }).click();
   await expect(editor.getByLabel('Prioritas')).toHaveValue('high');
   await editor.getByRole('link', { name: 'Batal', exact: true }).click();
   await expect(page).toHaveURL(/section=tasks&view=list$/);
   await expect(editor).toHaveCount(0);
+  await page.getByLabel('Pilihan tugas Tugas pengujian', { exact: true }).click();
   await page.getByRole('button', { name: 'Hapus Tugas pengujian', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Konfirmasi tindakan' });
   await expect(dialog).toBeVisible();
@@ -96,6 +101,7 @@ test('drag and drop tersimpan dan kegagalan request mengembalikan kartu', async 
   test.skip(isMobile, 'Perangkat sentuh memakai kontrol status alternatif.');
   const project = await createProject(page);
   await createTask(page, project);
+  await page.getByRole('link', { name: 'Papan', exact: true }).click();
   await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="in_progress"]'));
   await expect(page.locator('[data-task-column="in_progress"] [data-task-card]')).toHaveCount(1);
   await page.reload();
@@ -165,11 +171,11 @@ test('CSRF dan pembatasan login tetap aktif di browser', async ({ page }) => {
   expect(blocked.status()).toBe(429);
 });
 
-for (const width of [375, 430, 768, 1280, 1440]) {
+for (const width of [320, 375, 430, 768, 1280, 1920, 2560, 3840]) {
   test(`audit viewport ${width}px dan tangkapan kandidat visual`, async ({ page, isMobile }, testInfo) => {
     test.skip(isMobile, 'Matriks viewport dijalankan sekali pada proyek desktop.');
     test.setTimeout(120_000);
-    await page.setViewportSize({ width, height: 900 });
+    await page.setViewportSize({ width, height: width <= 430 ? 568 : 900 });
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     for (const route of ['/login', '/register']) {
@@ -185,10 +191,11 @@ for (const width of [375, 430, 768, 1280, 1440]) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), section).toBe(true);
       await capture(page, testInfo, `${section}-${width}.png`);
     }
-    for (const route of ['/dashboard', '/projects', '/focus', `${project}/resume`]) {
+    for (const route of ['/dashboard', '/projects', '/projects/create', '/workspaces/create', '/focus', `${project}/edit`, `${project}/resume`]) {
       await page.goto(route);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), route).toBe(true);
-      await capture(page, testInfo, `${route.split('/').pop()}-${width}.png`);
+      const screen = route === '/projects/create' ? 'project-create' : route === '/workspaces/create' ? 'workspace-create' : route.split('/').pop();
+      await capture(page, testInfo, `${screen}-${width}.png`);
     }
     expect(errors).toEqual([]);
   });

@@ -27,6 +27,7 @@ class DocumentTaskPlanner
             sort($selected, SORT_NUMERIC);
             $participantIds = $workspace->participants()->modelKeys();
             $position = (int) $project->tasks()->max(DB::raw('COALESCE(sort_order, id)'));
+            $milestones = [];
             foreach ($selected as $index) {
                 $draft = $import->draft_tasks[$index] ?? null;
                 $task = $edits === [] ? Arr::only($draft ?? [], ['title', 'description']) : ($edits[$index] ?? null);
@@ -40,12 +41,14 @@ class DocumentTaskPlanner
                 $checklist = array_key_exists('checklist_text', $task)
                     ? $this->checklist($task['checklist_text'] ?? '', (int) $index)
                     : ($draft['checklist'] ?? []);
-                $milestone = filled($group) ? $project->milestones()->firstOrCreate(['title' => $group]) : null;
+                if (filled($group) && ! array_key_exists($group, $milestones)) {
+                    $milestones[$group] = $project->milestones()->firstOrCreate(['title' => $group])->id;
+                }
                 $project->tasks()->create(Arr::only($task, ['title', 'description', 'priority', 'due_date', 'assignee_id']) + [
                     'document_task_import_id' => $import->id,
                     'source_index' => $index,
                     'sort_order' => ++$position,
-                    'milestone_id' => $milestone?->id,
+                    'milestone_id' => filled($group) ? $milestones[$group] : null,
                     'checklist' => $checklist,
                     'status' => 'todo',
                 ]);

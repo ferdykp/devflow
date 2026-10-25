@@ -7,6 +7,8 @@ use Illuminate\Validation\ValidationException;
 
 class DocumentTaskParser
 {
+    public const int MAX_TASKS = 1000;
+
     /** @return list<array{title: string, description: string, source_text: string, group: ?string, checklist: list<array{title: string, done: bool}>, position: int}> */
     public function parse(string $content): array
     {
@@ -137,8 +139,8 @@ class DocumentTaskParser
                 }
             }
         }
-        if (count($items) > 50) {
-            $this->reject('Dokumen menghasilkan lebih dari 50 tugas. Pecah dokumen menjadi bagian yang lebih kecil.');
+        if (count($items) > self::MAX_TASKS) {
+            $this->reject('Dokumen menghasilkan lebih dari 1.000 tugas. Pecah dokumen menjadi bagian yang lebih kecil.');
         }
         $result = [];
         foreach ($items as $item) {

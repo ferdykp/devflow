@@ -2,13 +2,7 @@
 @section('title',$project->name)
 @section('page-heading',$project->name)
 @section('content')
-@php
-    $allowedSections = ['overview', 'tasks', 'resume', 'activity', 'notes', 'backlog', 'milestones', 'scope', 'prd', 'github', 'settings'];
-    $requestedSection = request()->query('section', 'overview');
-    $section = is_string($requestedSection) && in_array($requestedSection, $allowedSections, true)
-        ? $requestedSection
-        : 'overview';
-@endphp
+
 @include('projects._workspace_navigation', ['section' => $section])
 <section class="relative min-w-0 w-full min-h-[400px]" aria-label="Proyek section">
 

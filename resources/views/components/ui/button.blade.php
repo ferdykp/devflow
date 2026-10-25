@@ -5,7 +5,7 @@
         'secondary' => 'border border-zinc-300 bg-white text-zinc-700 shadow-xs hover:border-zinc-400 hover:bg-zinc-50',
         'danger' => 'border border-red-200 bg-red-50 text-red-700 hover:border-red-300 hover:bg-red-100',
         'ghost' => 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950',
-        default => 'border border-zinc-950 bg-zinc-950 text-white shadow-xs hover:border-zinc-800 hover:bg-zinc-800',
+        default => 'border border-blue-600 bg-blue-600 text-white shadow-xs hover:border-blue-700 hover:bg-blue-700',
     };
 @endphp
 @if($href)

@@ -9,6 +9,7 @@ use App\Services\DocumentTaskPlanner;
 use App\Support\ProjectAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -49,10 +50,15 @@ class DocumentTaskImportController extends Controller
                 : $data['content_markdown'];
         }
         $content = trim(str_replace(["\r\n", "\r", "\xEF\xBB\xBF"], ["\n", "\n", ''], $content));
+        $sourceField = $request->hasFile('document_file') ? 'document_file' : 'content_markdown';
         if (! mb_check_encoding($content, 'UTF-8') || preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', $content) || mb_strlen($content) > 200000) {
-            throw ValidationException::withMessages(['content_markdown' => 'Gunakan dokumen UTF-8 berupa teks biasa atau Markdown, maksimal 200.000 karakter.']);
+            throw ValidationException::withMessages([$sourceField => 'Gunakan dokumen UTF-8 berupa teks biasa atau Markdown, maksimal 200.000 karakter.']);
         }
-        $drafts = $parser->parse($content);
+        try {
+            $drafts = $parser->parse($content);
+        } catch (ValidationException $exception) {
+            throw ValidationException::withMessages([$sourceField => collect($exception->errors())->flatten()->all()]);
+        }
         $hash = hash('sha256', $content);
         $import = DB::transaction(function () use ($project, $version, $content, $drafts, $hash, $data, $request): DocumentTaskImport {
             Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
@@ -87,9 +93,15 @@ class DocumentTaskImportController extends Controller
         $project->load('workspace');
         $import = $project->taskImports()->with('version.document')->findOrFail($import);
         $participants = $project->workspace->participants();
-        $tasks = $import->committed_at ? $import->tasks()->orderBy('source_index')->get() : collect();
+        $tasks = $import->committed_at ? $import->tasks()->orderBy('source_index')->paginate(60)->withQueryString() : collect();
+        $largePreview = count($import->draft_tasks) > 50;
+        $page = max(1, min(request()->integer('page', 1), (int) ceil(count($import->draft_tasks) / 25)));
+        $draftPages = new LengthAwarePaginator(
+            array_slice($import->draft_tasks, ($page - 1) * 25, 25, true), count($import->draft_tasks), 25, $page,
+            ['path' => request()->url(), 'query' => request()->except('page')]
+        );
 
-        return view('projects.task-import-review', compact('project', 'import', 'participants', 'tasks'));
+        return view('projects.task-import-review', compact('project', 'import', 'participants', 'tasks', 'largePreview', 'draftPages'));
     }
 
     public function update(Request $request, int $project, int $import, DocumentTaskPlanner $planner): RedirectResponse
@@ -98,6 +110,13 @@ class DocumentTaskImportController extends Controller
         $import = $project->taskImports()->findOrFail($import);
         if ($import->committed_at !== null) {
             return redirect()->route('task-imports.show', [$project, $import])->with('success', 'Tugas dari draf ini sudah dibuat.');
+        }
+        if ($request->has('confirm_all')) {
+            $request->validate(['confirm_all' => ['required', 'accepted']]);
+            $planner->createTasks($project, $import, $request->user()->id);
+
+            return redirect()->route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list', 'plan' => $import->id])
+                ->with('success', 'Semua tugas dari dokumen berhasil dibuat sesuai urutan.');
         }
         $data = $request->validate([
             'selected' => ['required', 'array', 'min:1', 'max:50'],

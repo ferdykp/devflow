@@ -19,6 +19,9 @@ class ProjectNavigationTest extends TestCase
         $this->actingAs($user)
             ->get(route('projects.show', $project))
             ->assertOk()
+            ->assertViewHas('section', 'tasks')
+            ->assertSee('Tambah to-do cepat')
+            ->assertSee('Daftar tugas')
             ->assertSee('Bagian proyek')
             ->assertSee('Menu proyek lainnya')
             ->assertSee('Tugas')
@@ -35,6 +38,7 @@ class ProjectNavigationTest extends TestCase
             ->assertSee('Terakhir sampai mana?')
             ->assertSee('aria-current="page"', false);
     }
+
     public function test_each_project_section_renders_without_missing_view_variables(): void
     {
         $user = User::factory()->create();
@@ -53,5 +57,4 @@ class ProjectNavigationTest extends TestCase
             ->assertSee('Bagian proyek')
             ->assertSee('Demo project');
     }
-
 }

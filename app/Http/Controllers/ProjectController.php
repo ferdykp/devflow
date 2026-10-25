@@ -5,20 +5,42 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Workspace;
 use App\Support\ProjectAccess;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class ProjectController extends Controller
 {
     public function index(Request $request)
     {
+        $filters = $request->validate(['search' => ['nullable', 'string', 'max:200']]);
         $workspaces = Workspace::query()->accessibleTo($request->user()->id)->with('user')->orderBy('name')->get();
         $projects = Project::whereHas('workspace', fn ($q) => $q->accessibleTo($request->user()->id))
-            ->with('workspace')->withCount(['tasks', 'activities'])
-            ->when($request->search, fn ($q, $v) => $q->where('name', 'like', '%'.addcslashes($v, '%_\\').'%'))
+            ->with('workspace')->withCount('tasks')
+            ->when($filters['search'] ?? null, fn ($q, $v) => $q->where('name', 'like', '%'.addcslashes($v, '%_\\').'%'))
             ->latest()->paginate(12)->withQueryString();
 
         return view('projects.index', compact('workspaces', 'projects'));
+    }
+
+    public function create(Request $request): View
+    {
+        $data = $request->validate(['workspace' => ['nullable', 'integer']]);
+        $workspaces = Workspace::query()->accessibleTo($request->user()->id)->with('user')->orderBy('name')->get();
+        $selectedWorkspace = $data['workspace'] ?? $workspaces->first()?->id;
+        abort_if($selectedWorkspace !== null && ! $workspaces->contains('id', $selectedWorkspace), 404);
+
+        return view('projects.create', compact('workspaces', 'selectedWorkspace'));
+    }
+
+    public function edit(int $project): View
+    {
+        $project = ProjectAccess::find($project);
+        $project->load('workspace');
+
+        return view('projects.edit', compact('project'));
     }
 
     public function store(Request $request)
@@ -33,7 +55,7 @@ class ProjectController extends Controller
     public function show(int $project)
     {
         $project = ProjectAccess::find($project);
-        $requestedSection = request()->query('section', 'overview');
+        $requestedSection = request()->query('section', 'tasks');
         $allowedSections = ['overview', 'tasks', 'activity', 'notes', 'backlog', 'milestones', 'scope', 'prd', 'github', 'settings'];
         $section = is_string($requestedSection) && in_array($requestedSection, $allowedSections, true)
             ? $requestedSection
@@ -120,11 +142,15 @@ class ProjectController extends Controller
         return back()->with('success', 'Proyek berhasil diperbarui.');
     }
 
-    public function destroy(int $project)
+    public function destroy(Request $request, int $project): RedirectResponse
     {
         $project = ProjectAccess::find($project);
-        $project->update(['status' => 'archived']);
+        DB::transaction(function () use ($request, $project): void {
+            $workspace = Workspace::query()->accessibleTo($request->user()->id)->lockForUpdate()->findOrFail($project->workspace_id);
+            abort_unless($workspace->user_id === $request->user()->id, 403);
+            $workspace->projects()->lockForUpdate()->findOrFail($project->id)->delete();
+        });
 
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil diarsipkan.');
+        return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus.');
     }
 }

@@ -17,6 +17,7 @@ async function createProject(page: Page) {
   const ownerEmail = `team-${Date.now()}-${Math.random().toString(36).slice(2)}@example.test`;
   await register(page, 'Pemilik Tim', ownerEmail);
   await page.goto('/projects');
+  await page.getByRole('link', { name: 'Proyek baru', exact: true }).click();
   await page.getByLabel('Ruang kerja', { exact: true }).selectOption({ label: 'Personal' });
   await page.getByLabel('Nama proyek', { exact: true }).fill('Proyek tim kecil');
   await page.getByRole('button', { name: 'Buat proyek', exact: true }).click();
@@ -94,6 +95,7 @@ test('undangan menghubungkan dua akun dan pencabutan anggota mencabut akses proy
   await expect(page.getByText('Anggota Tim', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Buat undangan' })).toHaveCount(0);
   await page.goto('/projects');
+  await page.getByRole('link', { name: 'Proyek baru', exact: true }).click();
   await expect(page.locator('select[name="workspace_id"] option', { hasText: 'Personal · Pemilik Tim' })).toHaveCount(1);
   await page.goto(project);
   await expect(page.getByRole('heading', { name: 'Proyek tim kecil', exact: true })).toBeVisible();
@@ -143,6 +145,7 @@ test('unggah Markdown langsung membuat to-do berkelompok, urut, dan checklist ya
   await expect(page.getByText('1/2 selesai', { exact: true })).toBeVisible();
   await capture(page, testInfo, 'checklist-tersimpan.png');
   await page.goto(planUrl);
+  await page.getByLabel('Pilihan tugas Siapkan proyek', { exact: true }).click();
   await page.getByLabel('Status tugas Siapkan proyek', { exact: true }).selectOption('done');
   await expect(titles).toHaveText(['Siapkan proyek', 'Siapkan CI', 'Buat halaman masuk']);
   await page.getByRole('link', { name: 'Papan', exact: true }).click();
@@ -153,4 +156,92 @@ test('unggah Markdown langsung membuat to-do berkelompok, urut, dan checklist ya
   await page.getByLabel('Isi dokumen', { exact: true }).fill(markdown);
   await page.getByRole('button', { name: 'Proses dokumen', exact: true }).click();
   await expect(titles).toHaveCount(3);
+});
+
+test('dokumen besar ditinjau per halaman dan seluruh tugas dibuat sesuai urutan', async ({ page }, testInfo) => {
+  const { project } = await createProject(page);
+  await page.goto(`${project}/task-imports/create`);
+  await page.getByLabel('Atau unggah berkas', { exact: true }).setInputFiles({
+    name: 'rencana-besar.md', mimeType: 'text/markdown',
+    buffer: Buffer.from(Array.from({ length: 75 }, (_, i) => `- Pekerjaan ${i + 1}`).join('\n')),
+  });
+  await page.getByLabel('Setelah dokumen dibaca', { exact: true }).selectOption('review');
+  await page.getByRole('button', { name: 'Proses dokumen', exact: true }).click();
+  const reviewUrl = page.url();
+  await expect(page.locator('[data-large-draft]')).toHaveCount(25);
+  await expect(page.locator('[data-large-draft] h2').first()).toHaveText('Pekerjaan 1');
+  await capture(page, testInfo, 'large-document-preview.png');
+  await page.goto(`${reviewUrl}?page=2`);
+  await expect(page.locator('[data-large-draft] h2').first()).toHaveText('Pekerjaan 26');
+  await page.getByRole('button', { name: 'Buat semua 75 tugas', exact: true }).click();
+  await expect(page.locator('.df-task-row')).toHaveCount(60);
+  const tasksUrl = page.url();
+  await page.goto(`${tasksUrl}&page=2`);
+  await expect(page.locator('.df-task-row')).toHaveCount(15);
+  await expect(page.getByRole('link', { name: 'Pekerjaan 75', exact: true })).toBeVisible();
+});
+
+
+test('to-do cepat cukup judul dan selesai dapat dibatalkan setelah refresh', async ({ page }, testInfo) => {
+  const { project } = await createProject(page);
+  await expect(page.getByRole('link', { name: 'Daftar', exact: true })).toHaveAttribute('aria-current', 'page');
+  const quick = page.getByRole('form', { name: 'Tambah to-do cepat', exact: true });
+  await expect(quick).toBeVisible();
+  await quick.getByRole('textbox', { name: 'Tambah to-do', exact: true }).fill('Kirim rancangan ke tim');
+  await quick.getByRole('textbox').press('Enter');
+  await expect(page.locator('.df-task-row')).toHaveCount(1);
+  await expect(quick.getByRole('textbox')).toBeFocused();
+  await expect(page.getByLabel('Status tugas Kirim rancangan ke tim')).toHaveValue('todo');
+  const done = page.getByRole('checkbox', { name: 'Selesai: Kirim rancangan ke tim', exact: true });
+  await done.click();
+  await expect(done).toBeChecked();
+  await page.reload();
+  await expect(done).toBeChecked();
+  await done.click();
+  await expect(done).not.toBeChecked();
+  await capture(page, testInfo, 'simple-todo-list.png');
+  await page.goto('/dashboard');
+  await capture(page, testInfo, 'unified-home.png');
+  await page.goto('/projects');
+  await capture(page, testInfo, 'unified-projects.png');
+  await page.goto(`${project}/task-imports/create`);
+  await capture(page, testInfo, 'unified-markdown-import.png');
+});
+
+test('halaman pembuatan terpisah, proyek bisa diedit dan hapus perlu konfirmasi', async ({ page }, testInfo) => {
+  const { project } = await createProject(page);
+  await page.getByRole('form', { name: 'Tambah to-do cepat' }).getByRole('textbox').fill('Tugas yang tetap tersimpan');
+  await page.getByRole('form', { name: 'Tambah to-do cepat' }).getByRole('textbox').press('Enter');
+  await expect(page.locator('.df-task-row')).toHaveCount(1);
+  await page.goto('/projects');
+  await expect(page.locator('form[action$="/projects"][method="POST"]')).toHaveCount(0);
+  await expect(page.locator('form[action$="/workspaces"][method="POST"]')).toHaveCount(0);
+  await capture(page, testInfo, 'projects-only.png');
+  await page.getByRole('link', { name: 'Edit proyek Proyek tim kecil', exact: true }).click();
+  await expect(page).toHaveURL(/\/edit$/);
+  await page.getByLabel('Nama proyek', { exact: true }).fill('Rencana tim diperbarui');
+  await page.getByLabel('Deskripsi', { exact: true }).fill('Fokus pada pekerjaan utama tim.');
+  await page.getByText('Opsi tambahan', { exact: true }).click();
+  await page.getByLabel('Status', { exact: true }).selectOption('paused');
+  await page.getByLabel('Target selesai').fill('2026-12-01');
+  await page.getByRole('button', { name: 'Simpan pengaturan', exact: true }).click();
+  await expect(page.getByLabel('Nama proyek', { exact: true })).toHaveValue('Rencana tim diperbarui');
+  await page.reload();
+  await page.getByText('Opsi tambahan', { exact: true }).click();
+  await expect(page.getByLabel('Status', { exact: true })).toHaveValue('paused');
+  await expect(page.getByLabel('Target selesai')).toHaveValue('2026-12-01');
+  await capture(page, testInfo, 'project-edit.png');
+  await page.getByRole('button', { name: 'Hapus proyek', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Konfirmasi tindakan' });
+  await expect(dialog).toContainText('Rencana tim diperbarui');
+  await dialog.getByRole('button', { name: 'Batal', exact: true }).click();
+  await page.getByRole('link', { name: 'Kembali ke tugas', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Rencana tim diperbarui', exact: true })).toBeVisible();
+  await expect(page.locator('.df-task-row')).toHaveCount(1);
+  await page.getByRole('link', { name: 'Edit proyek', exact: true }).click();
+  await page.getByRole('button', { name: 'Hapus proyek', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Lanjutkan', exact: true }).click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page.getByRole('heading', { name: 'Rencana tim diperbarui', exact: true })).toHaveCount(0);
+  expect((await page.goto(project))?.status()).toBe(404);
 });

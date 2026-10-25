@@ -54,7 +54,7 @@ class TaskController extends Controller
             $projectModel->tasks()->create($data);
         });
 
-        return back()->with('success', 'Tugas berhasil dibuat.');
+        return back()->with('success', 'Tugas berhasil dibuat.')->with('quick_task_added', $request->boolean('quick_add'));
     }
 
     public function update(Request $request, int $project, int $task): RedirectResponse|JsonResponse

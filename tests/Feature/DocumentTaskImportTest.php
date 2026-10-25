@@ -71,7 +71,7 @@ class DocumentTaskImportTest extends TestCase
         $this->actingAs($project->workspace->user);
         $this->post(route('task-imports.store', $project), [])->assertSessionHasErrors('content_markdown');
         $this->post(route('task-imports.store', $project), ['document_file' => UploadedFile::fake()->createWithContent('bad.pdf', '%PDF-1.4 fake')])->assertSessionHasErrors('document_file');
-        $this->post(route('task-imports.store', $project), ['document_file' => UploadedFile::fake()->createWithContent('bad.txt', "secret\x00binary")])->assertSessionHasErrors('content_markdown');
+        $this->post(route('task-imports.store', $project), ['document_file' => UploadedFile::fake()->createWithContent('bad.txt', "secret\x00binary")])->assertSessionHasErrors('document_file');
         $this->post(route('task-imports.store', $project), ['document_file' => UploadedFile::fake()->create('big.txt', 201, 'text/plain')])->assertSessionHasErrors('document_file');
         $this->post(route('task-imports.store', $project), ['content_markdown' => '- Example', 'document_file' => UploadedFile::fake()->createWithContent('good.txt', '- Other')])->assertSessionHasErrors('content_markdown');
         $this->assertDatabaseCount('document_task_imports', 0);
@@ -81,7 +81,7 @@ class DocumentTaskImportTest extends TestCase
     public function test_large_documents_are_not_silently_truncated_into_partial_tasks(): void
     {
         $project = Project::factory()->create();
-        $this->actingAs($project->workspace->user)->post(route('task-imports.store', $project), ['content_markdown' => implode("\n", array_map(fn ($i) => '- Tugas '.$i, range(1, 51)))])->assertSessionHasErrors('content_markdown');
+        $this->actingAs($project->workspace->user)->post(route('task-imports.store', $project), ['content_markdown' => implode("\n", array_map(fn ($i) => '- Tugas '.$i, range(1, 1001)))])->assertSessionHasErrors('content_markdown');
         $this->post(route('task-imports.store', $project), ['content_markdown' => '- '.str_repeat('a', 201)])->assertSessionHasErrors('content_markdown');
         $this->assertDatabaseCount('document_task_imports', 0);
     }

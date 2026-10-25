@@ -13,15 +13,15 @@ class ProjectIntegrityTest extends TestCase
 
     public function test_project_and_workspace_name_fields_have_distinct_html_ids(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
 
-        $this->actingAs($user)->get(route('projects.index'))
+        $this->actingAs($user)->get(route('workspaces.create'))
             ->assertOk()
             ->assertSee('id="workspace_name"', false)
             ->assertSee('for="workspace_name"', false);
     }
 
-    public function test_creating_workspace_redirects_to_projects_and_populates_project_selector(): void
+    public function test_creating_workspace_redirects_to_project_creation_and_populates_project_selector(): void
     {
         $user = User::factory()->create();
         $workspaceName = 'E2E Workspace Example';
@@ -29,7 +29,7 @@ class ProjectIntegrityTest extends TestCase
         $this->actingAs($user)
             ->from(route('projects.index'))
             ->post(route('workspaces.store'), ['name' => $workspaceName])
-            ->assertRedirect(route('projects.index'))
+            ->assertRedirect(route('projects.create', ['workspace' => $user->workspaces()->where('name', $workspaceName)->sole()->id]))
             ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('workspaces', [
@@ -37,7 +37,7 @@ class ProjectIntegrityTest extends TestCase
             'name' => $workspaceName,
         ]);
 
-        $this->actingAs($user)->get(route('projects.index'))
+        $this->actingAs($user)->get(route('projects.create'))
             ->assertOk()
             ->assertSee($workspaceName);
     }

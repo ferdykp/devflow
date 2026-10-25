@@ -1,5 +1,5 @@
 <div class="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-blue-100 bg-blue-50 p-5">
-    <div class="min-w-0"><h2 class="font-semibold text-blue-950">Dari dokumen menjadi tugas</h2><p class="mt-1 text-sm leading-6 text-blue-800">Pecah kebutuhan menjadi draf, tinjau bersama tim, lalu buat tugas terpilih.</p></div>
+    <div class="min-w-0"><h2 class="font-semibold text-blue-950">Dari dokumen menjadi tugas</h2><p class="mt-1 text-sm leading-6 text-blue-800">Unggah PRD atau panduan .md untuk membuat tugas berurutan dan checklist. Bisa langsung dibuat atau ditinjau dahulu.</p></div>
     <x-ui.button :href="route('task-imports.create', $project)">Buat tugas dari dokumen</x-ui.button>
 </div>
 @if($project->taskImports->isNotEmpty())
@@ -24,7 +24,7 @@
                     <pre class="mt-3 whitespace-pre-wrap break-words font-mono text-xs leading-6">{{ $v->content_markdown }}</pre>
                     <form action="{{ route('task-imports.store', $project) }}" method="POST" class="mt-4" data-busy-form>@csrf<input type="hidden" name="version_id" value="{{ $v->id }}"><x-ui.button variant="secondary" data-busy-label="Menyiapkan draf…">Buat tugas dari versi ini</x-ui.button></form>
                     @if($v->status === 'draft')
-                        <form action="{{ route('prd.approve', [$project, $document, $v]) }}" method="POST" class="mt-3" data-confirm="Setujui versi PRD ini sebagai acuan? Versi yang disetujui sebelumnya akan digantikan.">
+                        <form action="{{ route('prd.approve', [$project, $document, $v]) }}" method="POST" class="mt-3" data-busy-form data-confirm="Setujui versi PRD ini sebagai acuan? Versi yang disetujui sebelumnya akan digantikan.">
                             @csrf
                             <x-ui.button>Setujui versi ini</x-ui.button>
                         </form>

@@ -7,7 +7,9 @@
     <x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list'])" variant="secondary">Buka tugas</x-ui.button>
 </x-ui.page-heading>
 @if($import->committed_at)
-    <x-ui.panel><p class="text-sm leading-6 text-zinc-600">{{ $import->created_count }} tugas telah dibuat dari dokumen ini. Mengirim ulang konfirmasi tidak akan membuat tugas tambahan.</p><ul class="mt-4 divide-y divide-zinc-100">@foreach($tasks as $task)<li><a href="{{ route('tasks.show', [$project, $task]) }}" class="block break-words py-3 text-sm font-medium text-blue-700 hover:underline">{{ $task->title }}</a></li>@endforeach</ul></x-ui.panel>
+    <x-ui.panel><p class="text-sm leading-6 text-zinc-600">{{ $import->created_count }} tugas telah dibuat dari dokumen ini. Mengirim ulang konfirmasi tidak akan membuat tugas tambahan.</p><ul class="mt-4 divide-y divide-zinc-100">@foreach($tasks as $task)<li><a href="{{ route('tasks.show', [$project, $task]) }}" class="block break-words py-3 text-sm font-medium text-blue-700 hover:underline">{{ $task->title }}</a></li>@endforeach</ul><div class="mt-4">{{ $tasks->links() }}</div></x-ui.panel>
+@elseif($largePreview)
+    @include('projects._task_import_large_preview')
 @else
     <ol class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-500" aria-label="Langkah konversi"><li>1. Pilih dokumen</li><li class="font-medium text-blue-700" aria-current="step">2. Tinjau draf</li><li>3. Buat tugas</li></ol>
     <p class="mb-5 text-sm leading-6 text-zinc-600">Belum ada tugas yang dibuat. Pilih draf yang diperlukan, periksa judul dan uraian, lalu tentukan penanggung jawab. Hanya draf terpilih yang akan masuk ke status Belum dikerjakan.</p>

@@ -19,7 +19,7 @@ class IndonesianInterfaceRegressionTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('Tugas belum selesai dari semua proyekmu');
+            ->assertSee('tugas belum selesai. Pilih maksimal tiga untuk fokus hari ini.');
 
         $this->actingAs($user)
             ->get(route('projects.show', ['project' => $project, 'section' => 'scope']))

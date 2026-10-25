@@ -1,6 +1,25 @@
-# Laporan QA — 22 Oktober 2026
+# Laporan QA — 24 Oktober 2026
 
-## Verifikasi fitur tim dan konversi dokumen — 22 Oktober 2026
+## Verifikasi to-do otomatis dari Markdown — 24 Oktober 2026
+
+| Pemeriksaan | Status | Bukti/batas |
+|---|---|---|
+| Backend SQLite | PASS | 85 tes, 492 assertions, database memori terisolasi |
+| Backend MySQL | PASS | 85 tes, 492 assertions, database QA baru yang dibersihkan setelah suite selesai |
+| Browser desktop/mobile | PASS lokal | 32 lulus, 6 dilewati sesuai cakupan. Lima matriks duplikat dan satu drag touch dilewati; kontrol status alternatif diuji di mobile |
+| Build | PASS | Vite; CSS 73.03 kB/gzip 16.06, JS 9.24 kB/gzip 3.30 |
+| Migrasi | PASS lokal | `2026_10_22_114301_add_order_and_checklist_to_tasks_table` terverifikasi berstatus Ran; kolom `sort_order` dan `checklist` tersedia |
+| Perilaku otomatis | PASS | Unggahan `.md` langsung menjadi tugas berkelompok dan berurutan; checklist tersimpan setelah refresh; sumber tidak berubah; unggahan ulang tidak menggandakan tugas |
+| Alur tinjau | PASS | Mode review tetap tersedia; perubahan kelompok/checklist tersimpan, pilihan tugas mengikuti urutan sumber |
+| Batas akses | PASS terbatas | Isolasi plan antarproyek, draf belum dikomit, dan perubahan checklist tanpa hak akses ditolak |
+| Source diff | PASS | `git diff --check`; source fitur pada commit `6821712`, pemeriksaan akhir memperbarui dokumentasi |
+| Infrastruktur eksternal | BLOCKED | Staging dan kredensial integrasi belum tersedia; hasil lokal tidak menyatakan production-ready |
+
+Pemecahan berbasis struktur Markdown, bukan inferensi dependensi menggunakan AI. Judul bagian/tahap menjadi kelompok, tugas mempertahankan urutan dokumen, subpoin menjadi checklist. Tujuan/latar belakang/referensi dan frontmatter tetap sebagai konteks. Batas saat verifikasi awal ini 200 KB dan 50 tugas; perbaikan batas terbaru dicatat di bawah. Key JSON pada MySQL tidak dijadikan dasar urutan; tes memeriksa urutan item dan nilai selesai secara eksplisit.
+
+Bukti run lengkap disimpan di `/tmp/devflow-structured-evidence`, termasuk screenshot dan laporan browser. Bukti sementara perlu disalin sebelum dibersihkan sistem. Screenshot belum menjadi baseline yang disetujui.
+
+## Riwayat fitur tim dan konversi dokumen — 22 Oktober 2026
 
 | Pemeriksaan | Status | Bukti/batas |
 |---|---|---|
@@ -93,3 +112,37 @@ Editor tugas memakai GET proyek `section=tasks&view=list&edit=<id>` dengan query
 Bukti run browser terakhir disalin ke `/tmp/devflow-release-evidence` (80 screenshot dan laporan HTML). Arsip bukti: `/tmp/devflow-v1-qa-evidence.zip`. Artefak temp perlu disimpan oleh pemilik sebelum dibersihkan sistem.
 
 Build diulang setelah seluruh screenshot dihasilkan; SHA-256 aset CSS/JS sama dengan build sebelum run. Pembatasan source Tailwind membuat laporan tes tidak mengubah hasil build.
+
+## Perbaikan batas dokumen besar — 24 Oktober 2026
+
+- Suite backend SQLite: 88 tes / 527 assertions lulus, termasuk impor 1.000 tugas, penolakan 1.001 tugas, konfirmasi semua halaman, pengiriman ulang tanpa duplikasi, dan penandaan kesalahan berkas.
+- Build produksi dan Pint lulus. Tidak ada perubahan skema. Verifikasi MySQL pada tabel di atas mendahului perbaikan ini.
+- Browser terarah: 8/8 tes Chromium desktop/mobile lulus, termasuk dokumen 75 tugas, tinjauan halaman kedua dan hasil halaman kedua. Bukti tersimpan sementara di `/tmp/devflow-large-document-evidence`.
+
+## Redesign tim kecil — 25 Oktober 2026
+
+- Backend SQLite: 88 tes / 530 assertions lulus; perubahan mencakup halaman awal proyek langsung ke tugas dan pemuatan Ringkasan eksplisit. MySQL tidak diulang untuk redesign ini.
+- Browser Chromium desktop/mobile: dari 42 kasus, 32 lulus pada run utama, empat kasus terdampak diperbaiki dan lulus pada rerun, enam dilewati sesuai cakupan. Overflow navigasi pada 375/430px diperbaiki; dua skenario impor disesuaikan untuk membuka menu tugas sebelum mengubah status.
+- Alur baru terverifikasi: judul saja + Enter, fokus kembali ke input, selesai/buka kembali setelah refresh. Impor otomatis Markdown, urutan, checklist, tinjauan dokumen besar, penanggung jawab, komentar, undangan, CSRF, menu, dan drag desktop tetap diuji.
+- Build Vite dan Pint lulus; CSS 70.41 kB/gzip 15.41, JS 9.31 kB/gzip 3.32. Tidak ada dependency atau perubahan skema baru.
+- Screenshot desktop/mobile diperiksa, serta pemeriksaan overflow pada 375, 430, 768, 1280, 1440px. Tidak menyatakan audit aksesibilitas menyeluruh atau kesiapan produksi publik.
+- Bukti sementara: `/tmp/devflow-redesign-evidence`, berisi run utama, rerun, hasil backend dan screenshot. Snapshot belum dijadikan baseline yang disetujui.
+
+## Kelola proyek dan responsivitas — 25 Oktober 2026
+
+- SQLite: seluruh 94 tes / 588 assertions lulus. MySQL: 6 tes pengelolaan proyek / 58 assertions lulus pada database QA acak yang kemudian dihapus, mencakup cascade penghapusan dan isolasi proyek lain. Database aplikasi tidak digunakan untuk pengujian destruktif.
+- Browser: 41 kasus unik lulus dan 9 dilewati sesuai cakupan. Run utama: 39 lulus, dua skenario undangan masih memakai lokasi form lama. Setelah navigasinya diperbarui, rerun empat kasus lulus: kedua skenario undangan serta audit ulang 320/3840px dengan nama screenshot form yang terpisah. Delapan matriks viewport mobile duplikat dan satu drag touch dilewati.
+- Alur baru: pembuatan ruang kerja → proyek terpilih, form terpisah, edit tersimpan setelah reload, batal hapus mempertahankan tugas, dan konfirmasi hapus menghilangkan proyek. Akses tamu, lintas ruang kerja, anggota, pemilik dan anggota yang dicabut diuji di backend.
+- Tidak ada overflow halaman pada 320, 375, 430, 768, 1280, 1920, 2560, 3840px. Tinggi 568px digunakan pada mobile kecil. Screenshot proyek baru, edit mobile, index 320px dan tugas monitor besar diperiksa secara visual.
+- Build dan Pint lulus. CSS 71.12 kB/gzip 15.55; JS 9.33 kB/gzip 3.33. Tidak menambah dependency atau mengubah skema.
+- Bukti sementara tersedia di `/tmp/devflow-project-management-evidence`: run lengkap, rerun, hasil SQLite/MySQL, dan screenshot. Hasil ini tidak menggantikan verifikasi staging atau baseline visual yang disetujui.
+
+## Dialog konfirmasi dan audit terkait — 25 Oktober 2026
+
+- Akar posisi kiri atas: margin bawaan dialog hilang oleh CSS reset tanpa aturan pemusatan eksplisit. Diperbaiki melalui fixed/inset-0/m-auto dan batas viewport.
+- Temuan tambahan: submit langsung melewati validasi/handler, form konfirmasi berpotensi masuk status sibuk sebelum pengguna menyetujui, overflow nama panjang pada mobile mengganggu hit target, dan query pencarian bertipe array memicu error. Semua diperbaiki beserta tes regresi terkait.
+- Backend SQLite: 95 tes / 598 assertions lulus. MySQL tidak diulang untuk perbaikan ini; penghapusan MySQL terverifikasi pada bagian sebelumnya.
+- Browser run akhir: 55 lulus, 9 dilewati dari 64 kasus. Chromium menjalankan regresi aplikasi lengkap; WebKit desktop/mobile menjalankan tes dialog dan kata sandi. Delapan matriks viewport mobile duplikat dan satu drag touch dilewati sesuai cakupan.
+- Delapan tes khusus dialog juga lulus terpisah pada empat kombinasi browser/perangkat. Pengukuran pusat dan batas dialog mencakup 320×568, 568×320, 1280×800, 3840×900 serta resize saat terbuka ke 375×667. Pembatalan tidak mengirim penghapusan, fokus/scroll dipulihkan, konfirmasi menghasilkan satu request.
+- Build dan Pint lulus. CSS 71.25 kB/gzip 15.58; JS 9.96 kB/gzip 3.57. Tidak ada dependency atau migrasi baru. Log browser terbaru hanya menunjukkan koneksi Vite; error backend terakhir bertanggal sebelumnya merupakan pembatasan koneksi sandbox, bukan temuan baru.
+- Bukti dan screenshot di `/tmp/devflow-dialog-evidence`, termasuk run khusus, run lengkap dan hasil backend. Screenshot desktop/mobile WebKit diperiksa. Verifikasi ini mencakup alur yang diuji, bukan klaim seluruh kemungkinan bug telah hilang.

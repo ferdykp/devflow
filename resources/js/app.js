@@ -27,16 +27,63 @@ function updateMatch() {
 password?.addEventListener('input', updateMatch);
 confirmation?.addEventListener('input', updateMatch);
 const confirmDialog = document.createElement('dialog');
-confirmDialog.className = 'w-[min(92vw,420px)] rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl backdrop:bg-black/40';
-confirmDialog.setAttribute('aria-label', 'Konfirmasi tindakan');
-confirmDialog.innerHTML = '<h2 class="text-lg font-semibold">Konfirmasi tindakan</h2><p data-dialog-message class="mt-2 text-sm text-zinc-600"></p><div class="mt-6 flex justify-end gap-2"><button type="button" data-dialog-cancel class="rounded-xl border border-zinc-200 px-4 py-2 text-sm">Batal</button><button type="button" data-dialog-confirm class="rounded-xl bg-red-700 px-4 py-2 text-sm font-semibold text-white">Lanjutkan</button></div>';
-if(document.querySelector('form[data-confirm]')){
- document.body.append(confirmDialog);
- let pendingForm = null;
- document.querySelectorAll('form[data-confirm]').forEach(form=>form.addEventListener('submit',event=>{event.preventDefault(); pendingForm=form; confirmDialog.querySelector('[data-dialog-message]').textContent=form.dataset.confirm; confirmDialog.showModal(); confirmDialog.querySelector('[data-dialog-cancel]').focus();}));
- confirmDialog.querySelector('[data-dialog-cancel]').addEventListener('click',()=>confirmDialog.close());
- confirmDialog.addEventListener('close',()=>{if(pendingForm){const submitter=pendingForm.querySelector('button[type=submit]');submitter?.focus();pendingForm=null;}});
- confirmDialog.querySelector('[data-dialog-confirm]').addEventListener('click',()=>{const form=pendingForm;pendingForm=null;confirmDialog.close();form?.submit();});
+confirmDialog.className = 'fixed inset-0 m-auto max-h-[calc(100dvh-32px)] w-[min(420px,calc(100vw-32px))] overflow-y-auto overscroll-contain rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl backdrop:bg-black/40';
+confirmDialog.setAttribute('aria-labelledby', 'confirmation-title');
+confirmDialog.setAttribute('aria-describedby', 'confirmation-message');
+confirmDialog.innerHTML = '<h2 id="confirmation-title" class="text-lg font-semibold">Konfirmasi tindakan</h2><p id="confirmation-message" data-dialog-message class="mt-2 text-sm leading-6 text-zinc-600 [overflow-wrap:anywhere]"></p><div class="mt-6 flex flex-wrap justify-end gap-2"><button type="button" data-dialog-cancel class="min-h-11 rounded-lg border border-zinc-200 px-4 py-2 text-sm">Batal</button><button type="button" data-dialog-confirm class="min-h-11 rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white">Lanjutkan</button></div>';
+if (document.querySelector('form[data-confirm]')) {
+  document.body.append(confirmDialog);
+  const confirmedForms = new WeakSet();
+  let pendingForm = null;
+  let pendingSubmitter = null;
+  let previousOverflow = '';
+  const clearConfirmation = (restoreFocus = true) => {
+    document.body.style.overflow = previousOverflow;
+    if (restoreFocus) pendingSubmitter?.focus({ preventScroll: true });
+    pendingForm = null;
+    pendingSubmitter = null;
+  };
+  document.querySelectorAll('form[data-confirm]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      if (confirmedForms.has(form)) return;
+      event.preventDefault();
+      if (confirmDialog.open) return;
+      pendingForm = form;
+      pendingSubmitter = event.submitter;
+      confirmDialog.querySelector('[data-dialog-message]').textContent = form.dataset.confirm;
+      previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      confirmDialog.showModal();
+      confirmDialog.querySelector('[data-dialog-cancel]').focus();
+    });
+  });
+  confirmDialog.querySelector('[data-dialog-cancel]').addEventListener('click', () => {
+    confirmDialog.close();
+    clearConfirmation();
+  });
+  confirmDialog.addEventListener('close', () => {
+    if (!confirmDialog.open && pendingForm) clearConfirmation();
+  });
+  confirmDialog.querySelector('[data-dialog-confirm]').addEventListener('click', () => {
+    const form = pendingForm;
+    const submitter = pendingSubmitter;
+    if (!form) return;
+    confirmDialog.close();
+    clearConfirmation(false);
+    confirmedForms.add(form);
+    try {
+      if (submitter && form.contains(submitter)) form.requestSubmit(submitter);
+      else form.requestSubmit();
+    } finally {
+      confirmedForms.delete(form);
+    }
+  });
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted && pendingForm) {
+      confirmDialog.close();
+      clearConfirmation();
+    }
+  });
 }
 
 // Keep native submit controls enabled during form submission.
@@ -204,8 +251,8 @@ if (taskRoot) {
 }
 
 // Project menus close predictably without affecting document/version details.
-document.querySelectorAll('[data-project-menu]').forEach((menu) => {
-  const panel = menu.querySelector('[data-project-menu-panel]');
+document.querySelectorAll('[data-project-menu], [data-task-menu]').forEach((menu) => {
+  const panel = menu.querySelector('[data-project-menu-panel], [data-task-menu-panel]');
   const fitPanel = () => {
     if (!menu.open || !panel) return;
     const bounds = menu.getBoundingClientRect();
@@ -219,7 +266,7 @@ document.querySelectorAll('[data-project-menu]').forEach((menu) => {
   menu.addEventListener('toggle', fitPanel);
   window.addEventListener('resize', fitPanel);
   document.addEventListener('click', (event) => {
-    if (menu.open && !menu.contains(event.target)) menu.open = false;
+    if (menu.open && !menu.contains(event.target) && !event.target.closest('dialog')) menu.open = false;
   });
   menu.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && menu.open) {
@@ -234,6 +281,7 @@ document.querySelectorAll('[data-project-menu]').forEach((menu) => {
 document.querySelectorAll('[data-busy-form]').forEach((form) => {
   let submitting = false;
   form.addEventListener('submit', (event) => {
+    if (event.defaultPrevented) return;
     if (submitting) {
       event.preventDefault();
       return;

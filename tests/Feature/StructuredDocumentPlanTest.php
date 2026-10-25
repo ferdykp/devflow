@@ -153,4 +153,52 @@ MD;
         $this->get(route('projects.show', ['project' => $project, 'section' => 'tasks', 'plan' => $draft->id]))->assertNotFound();
         $this->assertDatabaseCount('tasks', 0);
     }
+
+    public function test_automatic_upload_accepts_one_thousand_tasks_without_truncation_and_keeps_page_order(): void
+    {
+        $project = Project::factory()->create();
+        $content = implode("\n", array_map(fn ($number) => '- Tugas '.$number, range(1, 1000)));
+        $response = $this->actingAs($project->workspace->user)->post(route('task-imports.store', $project), [
+            'mode' => 'automatic', 'document_file' => UploadedFile::fake()->createWithContent('large-plan.md', $content),
+        ])->assertSessionHasNoErrors()->assertRedirect();
+        $import = $project->taskImports()->sole();
+        $this->assertSame(1000, $import->created_count);
+        $this->assertDatabaseCount('tasks', 1000);
+        $this->assertSame('Tugas 1', $import->tasks()->orderBy('sort_order')->first()->title);
+        $this->assertSame('Tugas 1000', $import->tasks()->orderByDesc('sort_order')->first()->title);
+        $this->get($response->headers->get('Location'))->assertOk()->assertViewHas('tasks', fn ($tasks) => $tasks->count() === 60 && $tasks->first()->title === 'Tugas 1' && $tasks->last()->title === 'Tugas 60');
+        $this->get(route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list', 'plan' => $import->id, 'page' => 17]))->assertOk()->assertViewHas('tasks', fn ($tasks) => $tasks->count() === 40 && $tasks->first()->title === 'Tugas 961' && $tasks->last()->title === 'Tugas 1000');
+    }
+
+    public function test_large_review_is_paginated_and_confirming_from_page_two_creates_every_task_once(): void
+    {
+        $project = Project::factory()->create();
+        $content = implode("\n", array_map(fn ($number) => '- Tugas '.$number, range(1, 75)));
+        $this->actingAs($project->workspace->user)->post(route('task-imports.store', $project), ['mode' => 'review', 'content_markdown' => $content])->assertSessionHasNoErrors();
+        $import = $project->taskImports()->sole();
+        $url = route('task-imports.show', [$project, $import]);
+        $this->get($url)->assertOk()->assertSee('Buat semua 75 tugas')->assertViewHas('draftPages', fn ($drafts) => $drafts->count() === 25 && $drafts->first()['title'] === 'Tugas 1' && $drafts->last()['title'] === 'Tugas 25');
+        $this->get($url.'?page=2')->assertOk()->assertViewHas('draftPages', fn ($drafts) => $drafts->first()['title'] === 'Tugas 26' && $drafts->last()['title'] === 'Tugas 50');
+        $this->assertDatabaseCount('tasks', 0);
+        $this->patch(route('task-imports.update', [$project, $import]), ['confirm_all' => '0'])->assertSessionHasErrors('confirm_all');
+        $this->assertDatabaseCount('tasks', 0);
+        $this->patch(route('task-imports.update', [$project, $import]), ['confirm_all' => '1'])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertDatabaseCount('tasks', 75);
+        $this->assertSame(75, $import->fresh()->created_count);
+        $this->patch(route('task-imports.update', [$project, $import]), ['confirm_all' => '1'])->assertRedirect();
+        $this->assertDatabaseCount('tasks', 75);
+        $this->get($url)->assertOk()->assertViewHas('tasks', fn ($tasks) => $tasks->count() === 60);
+        $this->get($url.'?page=2')->assertOk()->assertViewHas('tasks', fn ($tasks) => $tasks->count() === 15 && $tasks->last()->title === 'Tugas 75');
+    }
+
+    public function test_file_parser_errors_mark_the_upload_instead_of_the_empty_text_field(): void
+    {
+        $project = Project::factory()->create();
+        $content = implode("\n", array_map(fn ($number) => '- Tugas '.$number, range(1, 1001)));
+        $this->actingAs($project->workspace->user)->from(route('task-imports.create', $project))->post(route('task-imports.store', $project), [
+            'mode' => 'automatic', 'document_file' => UploadedFile::fake()->createWithContent('too-many.md', $content),
+        ])->assertSessionHasErrors('document_file')->assertSessionDoesntHaveErrors('content_markdown');
+        $this->assertDatabaseCount('tasks', 0);
+        $this->assertDatabaseCount('document_task_imports', 0);
+    }
 }

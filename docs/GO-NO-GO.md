@@ -1,19 +1,19 @@
 # DevFlow v1.0 — keputusan GO / NO-GO
 
-Tanggal: 22 Oktober 2026. **NO-GO untuk production publik.** Perbaikan dan verifikasi lokal tidak menggantikan staging, TLS, pengujian integrasi nyata dan pemulihan infrastruktur.
+Tanggal: 24 Oktober 2026. **NO-GO untuk production publik.** Perbaikan dan verifikasi lokal tidak menggantikan staging, TLS, pengujian integrasi nyata dan pemulihan infrastruktur.
 
 Pengguna mengonfirmasi belum tersedia host/domain/SSH staging maupun kredensial GitHub App/AI khusus pengujian. Pekerjaan dilanjutkan pada source lokal, QA dan panduan operasi; tidak ada deployment atau pengeluaran layanan.
 
 | Area | Status | Dasar keputusan |
 |---|---|---|
-| Backend SQLite/MySQL | PASS | 78 tes / 424 assertions pada SQLite dan MySQL pengujian terpisah |
+| Backend SQLite/MySQL | PASS | 85 tes / 492 assertions pada SQLite dan MySQL pengujian terpisah |
 | Build frontend | PASS | Build produksi selesai tanpa warning CSS/font |
-| E2E wajib | PASS lokal | 30 lulus pada Chromium desktop/mobile, 6 dilewati sesuai cakupan; verifikasi akhir fitur tim empat skenario tambahan lulus. WebKit tidak diulang untuk perubahan ini |
+| E2E wajib | PASS lokal | 32 lulus pada Chromium desktop/mobile, 6 dilewati sesuai cakupan; termasuk unggahan Markdown otomatis, urutan, kelompok, checklist, dan kompatibilitas alur tinjau. WebKit tidak diulang untuk perubahan ini |
 | Keamanan source teridentifikasi | PASS terbatas | Temuan OAuth scope, API status, isolasi E2E dan header ditangani; audit dependency bersih; bukan penetration test |
 | UI/responsif | PASS terbatas | Kandidat screenshot dan pemeriksaan overflow pada lima viewport, beberapa screenshot diperiksa langsung |
 | Baseline visual disetujui | NOT TESTED | Perlu review/persetujuan pemilik sebelum snapshot dijadikan gate |
 | WCAG 2.2 AA menyeluruh | NOT TESTED | Tes keyboard/label/fokus parsial tidak cukup untuk klaim kepatuhan menyeluruh |
-| Database/migration | PASS lokal | Migrasi tambahan tim/impor diuji SQLite/MySQL dan diterapkan lokal; jumlah data sumber tetap sama. Restore drill sebelumnya belum diulang pada schema baru |
+| Database/migration | PASS lokal | Migrasi tim/impor dan urutan/checklist diuji SQLite/MySQL dan terverifikasi Ran di lokal. Restore drill sebelumnya belum diulang pada schema baru |
 | GitHub nyata | BLOCKED | Tidak ada kredensial/repository pengujian |
 | AI provider nyata | BLOCKED | Tidak ada kredensial/provider pengujian; fitur default nonaktif |
 | Queue | PASS lokal terbatas | Database job sintetis selesai; supervisi/retry provider nyata belum dibuktikan |
@@ -37,3 +37,14 @@ Pengguna mengonfirmasi belum tersedia host/domain/SSH staging maupun kredensial 
 Dokumen sumber: [audit](LAUNCH-AUDIT.md), [QA](QA-REPORT.md), [keamanan](SECURITY-REPORT.md), [deployment](DEPLOYMENT-GUIDE.md), [operasi](OPERATIONS-GUIDE.md), [catatan rilis](RELEASE-NOTES.md).
 
 Bukti fitur tim terbaru berada di `/tmp/devflow-small-team-evidence` (suite lengkap dan verifikasi akhir fitur tim). Arsip `/tmp/devflow-v1-qa-evidence.zip` adalah versi stabilisasi sebelumnya dan tidak mencakup fitur baru. Artefak temp perlu disimpan oleh pemilik sebelum dibersihkan sistem.
+
+
+Verifikasi to-do otomatis pada 24 Oktober 2026 tercatat pada `QA-REPORT.md`. Bukti browser terbaru: `/tmp/devflow-structured-evidence`. Gate deployment publik tetap NO-GO sampai akses dan pengujian staging tersedia.
+
+Perbaikan batas impor pada 24 Oktober: 1.000 tugas per dokumen, tinjauan besar per 25 tugas, tanpa migrasi tambahan. Suite SQLite terbaru 88 tes/527 assertions dan 8 tes browser terarah desktop/mobile lulus. Verifikasi MySQL dan matriks browser lengkap di atas merupakan run sebelum perbaikan batas.
+
+Redesign 25 Oktober: siap untuk uji coba penggunaan lokal tim kecil. SQLite 88 tes/530 assertions lulus; 36 kasus browser Chromium desktop/mobile lulus melalui run utama dan rerun empat kasus, enam dilewati sesuai cakupan. Staging, integrasi nyata dan pemulihan backup tetap belum terverifikasi, sehingga keputusan produksi tidak berubah.
+
+Pembaruan pengelolaan proyek 25 Oktober: 94 tes SQLite/588 assertions dan 6 tes MySQL pengelolaan/58 assertions lulus. Cakupan browser mencakup 41 kasus unik lulus melalui run utama dan rerun, 9 dilewati; layout 320–3840px diverifikasi. Penghapusan permanen hanya untuk pemilik ruang kerja. Status produksi tetap menunggu gate eksternal di atas.
+
+Perbaikan dialog 25 Oktober: 95 tes SQLite/598 assertions dan 55 kasus browser lulus, 9 dilewati sesuai cakupan. Posisi/fokus/pembatalan dialog diuji di Chromium serta WebKit desktop/mobile; staging dan gate produksi tetap terpisah dari hasil lokal.

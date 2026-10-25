@@ -24,7 +24,7 @@ class ProjectSectionQueryTest extends TestCase
         });
 
         $this->actingAs($user)
-            ->get(route('projects.show', $project))
+            ->get(route('projects.show', ['project' => $project, 'section' => 'overview']))
             ->assertOk()
             ->assertSee('Tugas berikutnya');
 

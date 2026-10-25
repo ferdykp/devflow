@@ -26,13 +26,14 @@ test('project lifecycle, task views, resume and focus', async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard/);
 
   await page.goto('/projects');
+  await page.getByRole('link', { name: 'Ruang kerja baru', exact: true }).click();
   const workspaceName = `E2E Workspace ${nonce}`;
   const workspaceForm = page.locator('form[action$="/workspaces"]');
   await expect(workspaceForm).toBeVisible();
   await workspaceForm.locator('input[name="name"]').fill(workspaceName);
   await expect(workspaceForm.locator('input[name="name"]')).toHaveValue(workspaceName);
   await Promise.all([
-    page.waitForURL(/\/projects(?:\?.*)?$/, { waitUntil: 'domcontentloaded' }),
+    page.waitForURL(/\/projects\/create\?workspace=\d+$/, { waitUntil: 'domcontentloaded' }),
     workspaceForm.getByRole('button', { name: 'Buat ruang kerja' }).click(),
   ]);
   await expect(page.getByText('Ruang kerja berhasil dibuat.')).toBeVisible();
@@ -58,7 +59,8 @@ test('project lifecycle, task views, resume and focus', async ({ page }) => {
   await expect(page).toHaveURL(/view=board/);
   await expect(page.getByText(`E2E Task ${nonce}`, { exact: true })).toBeVisible();
 
-  await page.getByRole('navigation', { name: 'Bagian proyek' }).getByRole('link', { name: 'Lanjutkan' }).click();
+  if (page.viewportSize()!.width < 640) await page.getByLabel('Menu proyek lainnya', { exact: true }).click();
+  await page.getByRole('navigation', { name: 'Bagian proyek' }).getByRole('link', { name: 'Lanjutkan', exact: true }).click();
   await expect(page).toHaveURL(/\/resume/);
   await expect(page.getByRole('navigation', { name: 'Bagian proyek' })).toBeVisible();
   // Resume deliberately shows the same task in Continue working and Open work.

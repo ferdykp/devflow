@@ -30,8 +30,8 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
-    ...(includeWebkit ? [{ name: 'desktop-webkit', testMatch: 'password-visibility.spec.ts', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-webkit', testMatch: 'password-visibility.spec.ts', use: { ...devices['iPhone 13'] } }] : []),
+    ...(includeWebkit ? [{ name: 'desktop-webkit', testMatch: /(?:password-visibility|dialog-safety)\.spec\.ts/, use: { ...devices['Desktop Safari'] } },
+    { name: 'mobile-webkit', testMatch: /(?:password-visibility|dialog-safety)\.spec\.ts/, use: { ...devices['iPhone 13'] } }] : []),
   ],
   webServer: {
     command: 'bash scripts/e2e-server.sh',
