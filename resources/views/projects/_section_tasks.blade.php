@@ -1,9 +1,9 @@
 @php
     $columns = [
-        'backlog' => 'Antrean tugas', 'todo' => 'Belum dikerjakan', 'in_progress' => 'Sedang dikerjakan',
-        'in_review' => 'Dalam peninjauan', 'blocked' => 'Terhambat', 'done' => 'Selesai',
+        'backlog' => 'Backlog', 'todo' => 'Akan dikerjakan', 'in_progress' => 'Sedang dikerjakan',
+        'in_review' => 'Ditinjau', 'blocked' => 'Terhambat', 'done' => 'Selesai',
     ];
-    $view = in_array(request('view'), ['list','board'], true) ? request('view') : 'list';
+    $view = in_array(request('view'), ['list','board'], true) ? request('view') : 'board';
 @endphp
 <div class="df-task-page" data-tasks-root>
  <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
@@ -18,7 +18,7 @@
   </div>
  </div>
  @if($taskPlan)
- <x-ui.panel class="mb-6"><div class="flex flex-wrap items-start justify-between gap-4"><div class="min-w-0"><p class="text-xs font-medium text-blue-700">To-do dari dokumen</p><h3 class="mt-1 break-words font-semibold">{{ $taskPlan->version?->document?->title ?? 'Rencana proyek' }}</h3><p class="mt-2 text-sm leading-6 text-zinc-500">{{ $taskPlan->created_count }} tugas disusun sesuai urutan dokumen. Buka tugas untuk mencentang checklist atau mengubah detailnya.</p></div><x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list'])" variant="secondary">Semua tugas</x-ui.button></div></x-ui.panel>
+ <x-ui.panel class="mb-6"><div class="flex flex-wrap items-start justify-between gap-4"><div class="min-w-0"><p class="text-xs font-medium text-blue-700">To-do dari dokumen</p><h3 class="mt-1 break-words font-semibold">{{ $taskPlan->version?->document?->title ?? 'Rencana proyek' }}</h3><p class="mt-2 text-sm leading-6 text-zinc-500">{{ $taskPlan->created_count }} tugas disusun sesuai urutan dokumen. Buka tugas untuk mencentang checklist atau mengubah detailnya.</p></div><x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks'])" variant="secondary">Semua tugas</x-ui.button></div></x-ui.panel>
  @endif
  <x-ui.panel class="mb-5" :padding="false">
   <form action="{{ route('tasks.store', $project) }}" method="POST" class="flex items-center gap-3 p-3 sm:p-4" aria-label="Tambah to-do cepat" data-busy-form>@csrf
@@ -44,17 +44,16 @@
 @if($editingTask) @include('projects._task_editor') @endif
  @include('projects._task_filters')
  @if($view==='board')
- <div class="df-board-viewport [overflow-x:auto] [overscroll-behavior-x:contain] [padding-bottom:20px]" aria-label="Papan tugas"><div class="df-board [display:grid] [grid-auto-flow:column] [grid-auto-columns:minmax(245px,1fr)] [gap:12px] [align-items:start] [min-width:810px] max-[650px]:[grid-auto-columns:270px]">
+ <p class="mb-3 text-xs text-zinc-500">Seret kartu ke kolom lain untuk mengubah status. Geser papan ke samping untuk melihat semua status.</p>
+ <div class="-mx-1 overflow-x-auto overscroll-x-contain px-1 pb-3" aria-label="Papan tugas, geser ke samping untuk melihat status lainnya"><div class="grid min-w-max grid-flow-col auto-cols-[280px] items-start gap-4">
   @foreach($columns as $status=>$label)
    @php($items = $tasks->getCollection()->where('status',$status))
-   <section class="df-board-column [border:1px_solid_#e7e8eb] [border-radius:11px] [background:#f2f3f5] [min-height:240px] [min-width:0]" aria-label="{{ $label }}" data-task-column="{{ $status }}">
-    <header class="df-board-column-heading [&_h3]:[font-size:12px] [&_h3]:[font-weight:700] [&_h3]:[white-space:nowrap] [padding:15px_14px_12px]"><div class="flex items-center gap-2"><span class="df-status-dot [width:9px] [height:9px] [border:2px_solid_#a8afb9] [border-radius:50%] [flex:none] [display:inline-block] df-status-{{ $status }}"></span><h3>{{ $label }}</h3><span class="df-column-count [font-size:10px] [color:#717783] [background:#e5e6ea] [border-radius:6px] [padding:2px_7px]">{{ $items->count() }}</span></div></header>
-    <div class="df-column-cards [min-height:175px] [padding:0_9px_10px] [display:flex] [flex-direction:column] [gap:9px] [transition:background_.18s] [&.is-over]:[background:#e6ecff] [&.is-over]:[outline:2px_dashed_#7295e9] [&.is-over]:[outline-offset:-4px] [&.is-over]:[border-radius:8px]" data-task-dropzone="{{ $status }}">
+   <section data-task-dropzone="{{ $status }}" data-task-column="{{ $status }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400" aria-label="{{ $label }}">
+    <header class="flex items-center justify-between gap-3 px-1 py-1"><h2 class="text-sm font-semibold text-zinc-800">{{ $label }}</h2><span title="Tugas pada halaman ini" class="rounded-full bg-white px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-500">{{ $items->count() }}</span></header>
      @foreach($items as $task)
       @include('projects._task_card',['task'=>$task,'columns'=>$columns])
      @endforeach
-     @if($items->isEmpty()) <p class="df-column-empty [padding:18px_8px] [color:#969ba4] [text-align:center] [font-size:11px]" data-column-empty>Geser tugas ke sini</p> @endif
-    </div>
+     @if($items->isEmpty()) <p class="rounded-xl border border-dashed border-zinc-300 px-3 py-5 text-center text-xs text-zinc-500">Lepas tugas di sini</p> @endif
    </section>
   @endforeach
  </div></div>

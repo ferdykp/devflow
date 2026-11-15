@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><title>DevFlow 2.0 Workspace</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-on-surface":"#eaf1ff","border-subtle":"#E2E7EE","on-secondary-fixed-variant":"#3c4857","text-dark":"#E9EDF5","danger":"#C43B40","canvas-light":"#F8F9FB","surface-variant":"#dae3f4","surface":"#f8f9ff","on-tertiary-fixed":"#360f00","surface-container-high":"#e0e9fa","surface-container":"#e6eeff","on-primary-container":"#eeefff","surface-container-low":"#eff4ff","secondary-container":"#d7e3f7","tertiary-fixed":"#ffdbcd","error":"#ba1a1a","border-dark":"#354154","surface-dim":"#d1daeb","secondary-fixed-dim":"#bbc7da","success":"#16835F","on-secondary-container":"#596576","error-container":"#ffdad6","surface-light":"#FFFFFF","on-secondary-fixed":"#101c2a","background":"#f8f9ff","on-primary-fixed-variant":"#003ea7","primary":"#004bc6","primary-container":"#2463eb","on-tertiary-fixed-variant":"#7d2d00","on-surface-variant":"#434655","on-error":"#ffffff","surface-container-lowest":"#ffffff","inverse-surface":"#28313e","on-primary":"#ffffff","secondary":"#535f70","on-tertiary":"#ffffff","warning":"#A96716","surface-dark":"#1B2430","tertiary":"#943700","on-surface":"#131c28","tertiary-fixed-dim":"#ffb596","primary-hover":"#194BC0","primary-fixed":"#dbe1ff","surface-container-highest":"#dae3f4","focus-ring":"#93B4FF","secondary-fixed":"#d7e3f7","on-primary-fixed":"#00174b","surface-muted":"#F1F4F8","outline-variant":"#c3c6d7","on-background":"#131c28","canvas-dark":"#111720","primary-fixed-dim":"#b4c5ff","surface-bright":"#f8f9ff","inverse-primary":"#b4c5ff","on-error-container":"#93000a","on-tertiary-container":"#ffede6","surface-tint":"#0053da","on-secondary":"#ffffff","outline":"#737686","tertiary-container":"#bc4800"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"margin-desktop":"2rem","margin":"1rem","space-sm":"0.5rem","space-md":"0.75rem","space-xl":"1.5rem","gutter-desktop":"1.5rem","gutter":"1rem","space-lg":"1rem","space-2xl":"2rem","space-xs":"0.25rem"},fontFamily:{"headline-sm":["Geist"],"body-sm":["Geist"],"headline-lg-mobile":["Geist"],"label-tag":["Geist"],"label-code-sm":["JetBrains Mono"],"label-code-md":["JetBrains Mono"],"body-md":["Geist"],"headline-md":["Geist"],"headline-lg":["Geist"],"body-lg":["Geist"]},fontSize:{"headline-sm":["20px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"16px",fontWeight:"400"}],"headline-lg-mobile":["26px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"600"}],"label-tag":["12px",{lineHeight:"16px",letterSpacing:"0.01em",fontWeight:"500"}],"label-code-sm":["12px",{lineHeight:"16px",fontWeight:"500"}],"label-code-md":["14px",{lineHeight:"20px",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"400"}],"headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"400"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-[76px] bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col items-center py-space-md justify-between select-none"><div class="flex flex-col items-center w-full gap-space-sm"><div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary font-headline-sm text-headline-sm font-bold shadow-[0_1px_8px_rgba(0,0,0,0.04)]">D</div><div class="w-8 h-[1px] bg-surface-container-high my-space-xs"></div><nav class="flex flex-col items-center gap-space-xs w-full px-space-xs overflow-y-auto max-h-[calc(100vh-140px)]" data-active-classes="bg-primary-container text-on-primary"><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="hari-ini" href="#" title="Hari Ini"><span class="material-symbols-outlined text-[20px]">today</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="ikhtisar" href="#" title="Ikhtisar"><span class="material-symbols-outlined text-[20px]">grid_view</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="kotak-masuk" href="#" title="Kotak Masuk"><span class="material-symbols-outlined text-[20px]">inbox</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="tugas" href="#" title="Tugas"><span class="material-symbols-outlined text-[20px]">check_circle</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="perencana" href="#" title="Perencana"><span class="material-symbols-outlined text-[20px]">calendar_month</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="rutinitas" href="#" title="Rutinitas"><span class="material-symbols-outlined text-[20px]">repeat</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="sasaran" href="#" title="Sasaran"><span class="material-symbols-outlined text-[20px]">flag</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="belajar" href="#" title="Belajar"><span class="material-symbols-outlined text-[20px]">school</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="catatan" href="#" title="Catatan"><span class="material-symbols-outlined text-[20px]">description</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="review" href="#" title="Review"><span class="material-symbols-outlined text-[20px]">rate_review</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="coach" href="#" title="Coach"><span class="material-symbols-outlined text-[20px]">smart_toy</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="proyek" href="#" title="Proyek"><span class="material-symbols-outlined text-[20px]">folder</span></a></nav></div><div class="flex flex-col items-center gap-space-xs w-full px-space-xs pt-space-xs"><a class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="workspace-and-members" href="#" title="Workspace"><span class="material-symbols-outlined text-[20px]">corporate_fare</span></a><a class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="profile-and-preferences" href="#" title="Pengaturan"><span class="material-symbols-outlined text-[20px]">settings</span></a></div></aside><div class="pl-[76px]"><header class="fixed top-0 left-[76px] right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] text-on-surface font-body-md text-body-md font-medium cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-primary text-[18px]">corporate_fare</span><span>Workspace: <strong class="font-semibold">Core Engineering</strong></span><span class="material-symbols-outlined text-on-surface-variant text-[16px]">expand_more</span></div><div class="hidden md:flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container-low text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">search</span><span class="font-body-sm text-body-sm">Cari apa saja...</span><kbd class="font-label-code-sm text-label-code-sm bg-surface-container-lowest px-space-xs py-0.5 rounded shadow-[0_1px_8px_rgba(0,0,0,0.04)] text-on-surface-variant">⌘K</kbd></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs bg-primary hover:bg-primary-hover text-on-primary px-space-md py-space-xs rounded-lg font-body-md text-body-md font-medium transition-colors shadow-[0_1px_8px_rgba(0,0,0,0.04)]" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>Tambah</span></button><button class="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors relative" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary"></span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-16 w-full min-h-screen bg-surface"><div class="flex flex-col w-full">
+<div class="px-margin-desktop py-space-xl flex flex-col gap-space-xl">
+<!-- Breadcrumb & Status Pill -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<nav class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="hover:text-primary cursor-pointer transition-colors">Workspace</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Pengaturan Organisasi</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface font-medium">Ruang Kerja &amp; Anggota Tim</span>
+</nav>
+<div class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-tag text-label-tag">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span>Sinkronisasi Otentikasi: SSO Aktif (Okta v2.4)</span>
+</div>
+</div>
+<!-- Header Section -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xs max-w-2xl">
+<div class="flex items-center gap-space-xs text-primary font-label-code-sm text-label-code-sm">
+<span>GATE_D04 // FLOW_F12</span>
+<span>•</span>
+<span>ACCESS_GOVERNANCE</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Ruang Kerja &amp; Manajemen Anggota
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Kelola akses anggota tim, undangan kolaborasi, dan pembagian peran pada ruang kerja <strong class="font-semibold text-on-surface">Core Engineering</strong>.
+        </p>
+</div>
+<!-- Header Quick Actions -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<div class="relative min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full pl-9 pr-space-md py-2 bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant text-body-sm font-body-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-focus-ring shadow-sm transition-all" id="memberSearchInput" placeholder="Cari nama, email, atau peran..." type="text"/>
+</div>
+<button class="flex items-center gap-space-xs bg-primary hover:bg-primary-hover text-on-primary font-body-md text-body-md font-medium px-4 py-2 rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-focus-ring" onclick="openInviteModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+<span>+ Undang Anggota Baru</span>
+</button>
+</div>
+</div>
+<!-- KPI Metric Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
+<!-- Card 1 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Total Anggota Aktif</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-primary material-symbols-outlined text-[18px]">group</span>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">8 Rekan</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">3 Lead/Maintainer, 5 Contributor</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Undangan Menunggu</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-warning material-symbols-outlined text-[18px]">forward_to_inbox</span>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">2 Undangan</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Tenggat validitas 7 hari ke depan</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-warning h-full rounded-full" style="width: 40%;"></div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Repositori Terhubung</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-primary material-symbols-outlined text-[18px]">source</span>
+</div>
+<div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">4 Proyek</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Akses branch &amp; pipeline terdelegasi</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-success h-full rounded-full" style="width: 80%;"></div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Kapasitas Kursi</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-primary-container text-on-primary material-symbols-outlined text-[18px]">chair</span>
+</div>
+<div>
+<div class="flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-on-surface font-semibold">8 / 15 Kursi</span>
+<span class="font-label-tag text-label-tag px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed">Enterprise</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">7 kursi tersedia untuk ekspansi</p>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 53.3%;"></div>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs & Table Filter Container -->
+<div class="flex flex-col gap-space-md">
+<div class="flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-lowest p-space-xs rounded-xl shadow-sm">
+<div class="flex items-center gap-space-xs overflow-x-auto">
+<button class="px-space-md py-2 rounded-lg font-body-md text-body-md font-medium text-on-primary bg-primary shadow-sm flex items-center gap-space-xs transition-colors" id="tab-btn-members" onclick="switchTab('members')" type="button">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+<span>Semua Anggota</span>
+<span class="ml-1 px-1.5 py-0.5 rounded-full text-label-code-sm text-label-code-sm bg-primary-hover text-on-primary">8</span>
+</button>
+<button class="px-space-md py-2 rounded-lg font-body-md text-body-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-space-xs" id="tab-btn-pending" onclick="switchTab('pending')" type="button">
+<span class="material-symbols-outlined text-[16px]">hourglass_empty</span>
+<span>Undangan Tertunda</span>
+<span class="ml-1 px-1.5 py-0.5 rounded-full text-label-code-sm text-label-code-sm bg-surface-container-high text-on-surface">2</span>
+</button>
+<button class="px-space-md py-2 rounded-lg font-body-md text-body-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-space-xs" id="tab-btn-roles" onclick="switchTab('roles')" type="button">
+<span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+<span>Tingkat Peran &amp; Izin</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xs pr-space-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant hidden sm:inline">Role Filter:</span>
+<select class="bg-surface-container text-on-surface text-body-sm font-body-sm rounded-lg px-space-sm py-1.5 focus:outline-none cursor-pointer">
+<option>Semua Peran</option>
+<option>Owner</option>
+<option>Maintainer</option>
+<option>Engineer</option>
+<option>QA</option>
+<option>DevOps</option>
+</select>
+</div>
+</div>
+<!-- VIEW TAB 1: Semua Anggota (Data Table Gate G04 & G05 Compliant) -->
+<div class="flex flex-col bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden" id="tab-content-members">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-tag text-label-tag uppercase tracking-wider">
+<th class="py-space-md px-space-lg">Nama &amp; Akun</th>
+<th class="py-space-md px-space-lg">Peran / Role</th>
+<th class="py-space-md px-space-lg">Akses Repositori</th>
+<th class="py-space-md px-space-lg">Status Aktivitas</th>
+<th class="py-space-md px-space-lg text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 text-on-surface font-body-md text-body-md">
+<!-- Row 1: Farhan Pratama (Owner) -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-code-md text-label-code-md font-semibold">
+                      FP
+                    </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-semibold text-on-surface">Farhan Pratama</span>
+<span class="font-label-code-sm text-label-code-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant">Anda</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">farhan@devflow.id</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-tag text-label-tag font-semibold">
+<span class="material-symbols-outlined text-[14px]">shield_person</span>
+                    Pemilik (Owner)
+                  </span>
+</td>
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="font-body-md text-body-md text-on-surface">Semua Repositori</span>
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-medium">Full Access</span>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Aktif sekarang</span>
+</div>
+</td>
+<td class="py-3 px-space-lg text-right">
+<div class="relative inline-block text-left">
+<button aria-label="Opsi Farhan" class="w-8 h-8 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleRowMenu('menu-r1')" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-48 bg-surface-container-lowest rounded-xl shadow-lg z-20 py-1 text-left" id="menu-r1">
+<a class="flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined text-[16px]">account_box</span> Profil Pengguna
+                      </a>
+<a class="flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined text-[16px]">history</span> Riwayat Aktivitas Audit
+                      </a>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2: Adit Pratama (Maintainer) -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-label-code-md text-label-code-md font-semibold">
+                      AP
+                    </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Adit Pratama</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">adit@growpos.com</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="relative inline-block">
+<select class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-body-sm font-medium py-1 px-2.5 rounded-lg focus:outline-none cursor-pointer">
+<option selected="">Maintainer</option>
+<option>Software Engineer</option>
+<option>QA &amp; Automation</option>
+<option>Guest / Reviewer</option>
+</select>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">core-api</span>
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">pos-web</span>
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">+1 Lainnya</span>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">25m yang lalu</span>
+</td>
+<td class="py-3 px-space-lg text-right">
+<div class="relative inline-block text-left">
+<button aria-label="Opsi Adit" class="w-8 h-8 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleRowMenu('menu-r2')" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-48 bg-surface-container-lowest rounded-xl shadow-lg z-20 py-1 text-left" id="menu-r2">
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[16px]">rule_settings</span> Ubah Batasan Scope
+                      </button>
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-danger hover:bg-surface-container" onclick="confirmRevoke('Adit Pratama', 'Maintainer')" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span> Keluarkan dari Tim
+                      </button>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3: Maya R. (Software Engineer) -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-code-md text-label-code-md font-semibold">
+                      MR
+                    </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Maya R.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">maya@devflow.id</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="relative inline-block">
+<select class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-body-sm font-medium py-1 px-2.5 rounded-lg focus:outline-none cursor-pointer">
+<option>Maintainer</option>
+<option selected="">Software Engineer (Member)</option>
+<option>QA &amp; Automation</option>
+<option>Guest / Reviewer</option>
+</select>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">GrowPOS</span>
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">DevFlow App</span>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">1j yang lalu</span>
+</td>
+<td class="py-3 px-space-lg text-right">
+<div class="relative inline-block text-left">
+<button aria-label="Opsi Maya" class="w-8 h-8 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleRowMenu('menu-r3')" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-48 bg-surface-container-lowest rounded-xl shadow-lg z-20 py-1 text-left" id="menu-r3">
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[16px]">folder_shared</span> Kelola Hak Branch
+                      </button>
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-danger hover:bg-surface-container" onclick="confirmRevoke('Maya R.', 'Software Engineer')" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span> Keluarkan dari Tim
+                      </button>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 4: Citra Dewi (QA & Automation) -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-code-md text-label-code-md font-semibold">
+                      CD
+                    </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Citra Dewi</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">citra@devflow.id</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="relative inline-block">
+<select class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-body-sm font-medium py-1 px-2.5 rounded-lg focus:outline-none cursor-pointer">
+<option>Maintainer</option>
+<option>Software Engineer (Member)</option>
+<option selected="">QA &amp; Automation</option>
+<option>Guest / Reviewer</option>
+</select>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Semua Repositori (Read/Write Test)</span>
+</td>
+<td class="py-3 px-space-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Kemarin 16:40</span>
+</td>
+<td class="py-3 px-space-lg text-right">
+<div class="relative inline-block text-left">
+<button aria-label="Opsi Citra" class="w-8 h-8 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleRowMenu('menu-r4')" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-48 bg-surface-container-lowest rounded-xl shadow-lg z-20 py-1 text-left" id="menu-r4">
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span> Lihat Hasil Test Suite
+                      </button>
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-danger hover:bg-surface-container" onclick="confirmRevoke('Citra Dewi', 'QA &amp; Automation')" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span> Keluarkan dari Tim
+                      </button>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 5: Bagus D. (DevOps / SRE) -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="py-3 px-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center font-label-code-md text-label-code-md font-semibold">
+                      BD
+                    </div>
+<div class="flex flex-col">
+<span class="font-semibold text-on-surface">Bagus D.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">bagus@infra.dev</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<div class="relative inline-block">
+<select class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-body-sm font-medium py-1 px-2.5 rounded-lg focus:outline-none cursor-pointer">
+<option>Maintainer</option>
+<option>Software Engineer (Member)</option>
+<option>QA &amp; Automation</option>
+<option selected="">DevOps / SRE</option>
+<option>Guest / Reviewer</option>
+</select>
+</div>
+</td>
+<td class="py-3 px-space-lg">
+<span class="font-label-code-sm text-label-code-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-medium">K8s Infra Only (Cluster-Admin)</span>
+</td>
+<td class="py-3 px-space-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">3 hari yang lalu</span>
+</td>
+<td class="py-3 px-space-lg text-right">
+<div class="relative inline-block text-left">
+<button aria-label="Opsi Bagus" class="w-8 h-8 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleRowMenu('menu-r5')" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-48 bg-surface-container-lowest rounded-xl shadow-lg z-20 py-1 text-left" id="menu-r5">
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[16px]">vpn_key</span> Rotasi Kredensial K8s
+                      </button>
+<button class="w-full flex items-center gap-2 px-space-md py-2 font-body-sm text-body-sm text-danger hover:bg-surface-container" onclick="confirmRevoke('Bagus D.', 'DevOps / SRE')" type="button">
+<span class="material-symbols-outlined text-[16px]">person_remove</span> Keluarkan dari Tim
+                      </button>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footnote & Count -->
+<div class="px-space-lg py-space-sm bg-surface-container-low flex flex-wrap items-center justify-between gap-space-sm font-body-sm text-body-sm text-on-surface-variant">
+<span>Menampilkan 5 dari 8 anggota aktif terdaftar</span>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container disabled:opacity-50" disabled="" type="button">Sebelumnya</button>
+<button class="px-2 py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container" type="button">Selanjutnya</button>
+</div>
+</div>
+</div>
+<!-- VIEW TAB 2: Roles Breakdown (Hidden by default, shown via Tab) -->
+<div class="hidden flex-col gap-space-md" id="tab-content-roles">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Owner</span>
+<span class="material-symbols-outlined text-primary">verified_user</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Kontrol penuh ruang kerja, penagihan, SSO, dan penghapusan repositori.</p>
+<ul class="text-body-sm font-body-sm text-on-surface flex flex-col gap-1.5">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Billing &amp; Invoicing</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Invite &amp; Revoke All</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Integrasi Kunci Webhook</li>
+</ul>
+</div>
+<span class="mt-space-md text-label-code-sm font-label-code-sm text-primary font-medium">1 Anggota Terdaftar</span>
+</div>
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Maintainer</span>
+<span class="material-symbols-outlined text-primary-container">shield</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Pengelolaan repositori proyek, branch protection, dan merge pull request utama.</p>
+<ul class="text-body-sm font-body-sm text-on-surface flex flex-col gap-1.5">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Push ke protected branch</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Deploy ke Staging/Production</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-on-surface-variant text-[16px]">close</span> Tidak dapat ubah SSO/Billing</li>
+</ul>
+</div>
+<span class="mt-space-md text-label-code-sm font-label-code-sm text-primary font-medium">2 Anggota Terdaftar</span>
+</div>
+<div class="p-space-lg bg-surface-container-lowest rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Member / Contributor</span>
+<span class="material-symbols-outlined text-secondary">code</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">Bekerja pada task sprint, open PR, dan logging harian tanpa akses setelan global.</p>
+<ul class="text-body-sm font-body-sm text-on-surface flex flex-col gap-1.5">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Commit ke feature branch</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-success text-[16px]">check</span> Akses sprint board tim</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-on-surface-variant text-[16px]">close</span> Butuh review untuk merge</li>
+</ul>
+</div>
+<span class="mt-space-md text-label-code-sm font-label-code-sm text-primary font-medium">5 Anggota Terdaftar</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Section: Tabel Undangan Tertunda (Pending Invitations Box) -->
+<div class="flex flex-col gap-space-md" id="pending-invitations-section">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-warning text-[20px]">mark_email_unread</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Undangan Kolaborasi Menunggu Konfirmasi</h2>
+<span class="px-2 py-0.5 rounded-full text-label-code-sm font-label-code-sm bg-warning/15 text-warning font-semibold">2 Pending</span>
+</div>
+<button class="font-body-sm text-body-sm text-primary hover:underline font-medium flex items-center gap-1" onclick="openInviteModal()" type="button">
+<span>Kirim Undangan Tambahan</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<div class="divide-y divide-surface-container-high">
+<!-- Row A: rizky@external-audit.io -->
+<div class="p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-semibold text-on-surface font-label-code-md text-label-code-md">rizky@external-audit.io</span>
+<span class="px-2 py-0.5 rounded-full text-label-tag font-label-tag bg-surface-container-high text-on-surface">Guest / Reviewer</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tautan aktivasi dikirim pada 12 Nov 2026 • Berakhir dalam 5 hari</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container text-on-surface font-body-sm text-body-sm font-medium hover:bg-surface-container-high transition-colors flex items-center gap-1.5" onclick="resendInvitation('rizky@external-audit.io')" type="button">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span>Kirim Ulang Undangan</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm font-medium hover:bg-danger hover:text-on-error transition-colors flex items-center gap-1.5" onclick="revokeInvitation('rizky@external-audit.io')" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+<span>Cabut Akses</span>
+</button>
+</div>
+</div>
+<!-- Row B: tania@devflow.id -->
+<div class="p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-semibold text-on-surface font-label-code-md text-label-code-md">tania@devflow.id</span>
+<span class="px-2 py-0.5 rounded-full text-label-tag font-label-tag bg-surface-container-high text-on-surface">Engineer</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tautan aktivasi dikirim pada 14 Nov 2026 • Berakhir dalam 7 hari</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container text-on-surface font-body-sm text-body-sm font-medium hover:bg-surface-container-high transition-colors flex items-center gap-1.5" onclick="resendInvitation('tania@devflow.id')" type="button">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span>Kirim Ulang Undangan</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm font-medium hover:bg-danger hover:text-on-error transition-colors flex items-center gap-1.5" onclick="revokeInvitation('tania@devflow.id')" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+<span>Cabut Akses</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Principle Callout (Gate D03 & D04 Privacy Boundary) -->
+<div class="p-space-lg bg-surface-container rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-start gap-space-md">
+<div class="p-2 rounded-lg bg-primary text-on-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">lock</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-code-sm text-label-code-sm text-primary uppercase tracking-wider font-semibold">
+            PRINSIP PRIVASI RUANG KERJA (GATE D03 &amp; D04)
+          </span>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed max-w-4xl">
+<strong class="font-semibold">Batas Privasi Ruang Kerja:</strong> Anggota ruang kerja hanya dapat melihat repositori dan tugas proyek bersama. Jadwal agenda pribadi (<em class="not-italic text-primary font-medium">Hari Ini</em>), jurnal sasaran, dan refleksi mingguan setiap anggota bersifat sepenuhnya privat dan tidak dapat diakses oleh rekan tim.
+          </p>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-space-xs">
+<a class="px-space-md py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm font-medium hover:bg-surface-container-high transition-colors" href="#">
+          Pelajari Model RBAC
+        </a>
+</div>
+</div>
+</div>
+<!-- MODAL: Invite Member (Flow F12) -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-sm hidden flex items-center justify-center p-space-md" id="inviteModal">
+<div class="bg-surface-container-lowest rounded-xl max-w-lg w-full p-space-xl shadow-xl flex flex-col gap-space-lg">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed material-symbols-outlined text-[20px]">person_add</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Undang Anggota ke Tim</h3>
+</div>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center" onclick="closeInviteModal()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<form class="flex flex-col gap-space-md" id="inviteForm" onsubmit="handleInviteSubmit(event)">
+<div class="flex flex-col gap-1">
+<label class="font-label-tag text-label-tag text-on-surface font-medium">Alamat Email Tim</label>
+<input class="px-space-md py-2 rounded-lg bg-surface-container-low text-on-surface text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-focus-ring" placeholder="developer@perusahaan.com" required="" type="email"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tag text-label-tag text-on-surface font-medium">Tingkat Hak Akses / Peran</label>
+<select class="px-space-md py-2 rounded-lg bg-surface-container-low text-on-surface text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-focus-ring">
+<option value="member">Software Engineer (Member)</option>
+<option value="maintainer">Maintainer / Team Lead</option>
+<option value="qa">QA &amp; Automation Engineer</option>
+<option value="devops">DevOps / SRE Specialist</option>
+<option value="reviewer">Guest / Auditor (Read-only)</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-tag text-label-tag text-on-surface font-medium">Delegasi Repositori</label>
+<div class="p-space-md bg-surface-container-low rounded-lg flex flex-col gap-2 max-h-36 overflow-y-auto">
+<label class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer">
+<input checked="" class="w-4 h-4 accent-primary rounded" type="checkbox"/>
+<span>core-api (Backend Golang)</span>
+</label>
+<label class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer">
+<input checked="" class="w-4 h-4 accent-primary rounded" type="checkbox"/>
+<span>pos-web (Next.js Application)</span>
+</label>
+<label class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer">
+<input class="w-4 h-4 accent-primary rounded" type="checkbox"/>
+<span>infra-k8s (Terraform &amp; Helm)</span>
+</label>
+</div>
+</div>
+<div class="p-space-sm bg-surface-container rounded-lg flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary">info</span>
+<span>Undangan ini menggunakan 1 slot dari 7 alokasi kursi tersedia.</span>
+</div>
+<div class="flex items-center justify-end gap-space-sm mt-space-sm">
+<button class="px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container transition-colors" onclick="closeInviteModal()" type="button">
+            Batal
+          </button>
+<button class="px-space-lg py-2 rounded-lg bg-primary hover:bg-primary-hover text-on-primary font-body-md text-body-md font-medium transition-colors shadow-sm" type="submit">
+            Kirim Tautan Undangan
+          </button>
+</div>
+</form>
+</div>
+</div>
+<!-- TOAST FEEDBACK NOTIFICATION -->
+<div class="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-space-lg py-space-md rounded-xl shadow-xl flex items-center gap-space-md transform translate-y-24 opacity-0 transition-all duration-300" id="toastNotification">
+<span class="material-symbols-outlined text-success text-[20px]" id="toastIcon">check_circle</span>
+<span class="font-body-md text-body-md" id="toastMessage">Aksi berhasil dijalankan.</span>
+</div>
+</div>
+<script>
+  function switchTab(tabKey) {
+    const btnMembers = document.getElementById('tab-btn-members');
+    const btnPending = document.getElementById('tab-btn-pending');
+    const btnRoles = document.getElementById('tab-btn-roles');
+    
+    const contentMembers = document.getElementById('tab-content-members');
+    const contentRoles = document.getElementById('tab-content-roles');
+    const pendingSection = document.getElementById('pending-invitations-section');
+
+    const defaultBtnClass = 'px-space-md py-2 rounded-lg font-body-md text-body-md font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-space-xs';
+    const activeBtnClass = 'px-space-md py-2 rounded-lg font-body-md text-body-md font-medium text-on-primary bg-primary shadow-sm flex items-center gap-space-xs transition-colors';
+
+    btnMembers.className = defaultBtnClass;
+    btnPending.className = defaultBtnClass;
+    btnRoles.className = defaultBtnClass;
+
+    if (tabKey === 'members') {
+      btnMembers.className = activeBtnClass;
+      contentMembers.classList.remove('hidden');
+      contentRoles.classList.add('hidden');
+      pendingSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else if (tabKey === 'pending') {
+      btnPending.className = activeBtnClass;
+      contentMembers.classList.add('hidden');
+      contentRoles.classList.add('hidden');
+      pendingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (tabKey === 'roles') {
+      btnRoles.className = activeBtnClass;
+      contentMembers.classList.add('hidden');
+      contentRoles.classList.remove('hidden');
+    }
+  }
+
+  function toggleRowMenu(menuId) {
+    const target = document.getElementById(menuId);
+    const allMenus = document.querySelectorAll('[id^="menu-r"]');
+    allMenus.forEach(m => {
+      if (m.id !== menuId) m.classList.add('hidden');
+    });
+    target.classList.toggle('hidden');
+  }
+
+  // Close menus when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('[id^="menu-r"]') && !e.target.closest('button[onclick^="toggleRowMenu"]')) {
+      document.querySelectorAll('[id^="menu-r"]').forEach(m => m.classList.add('hidden'));
+    }
+  });
+
+  function openInviteModal() {
+    document.getElementById('inviteModal').classList.remove('hidden');
+  }
+
+  function closeInviteModal() {
+    document.getElementById('inviteModal').classList.add('hidden');
+  }
+
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toastNotification');
+    const toastMsg = document.getElementById('toastMessage');
+    const toastIcon = document.getElementById('toastIcon');
+
+    toastMsg.textContent = message;
+    if (isError) {
+      toastIcon.textContent = 'warning';
+      toastIcon.className = 'material-symbols-outlined text-danger text-[20px]';
+    } else {
+      toastIcon.textContent = 'check_circle';
+      toastIcon.className = 'material-symbols-outlined text-success text-[20px]';
+    }
+
+    toast.classList.remove('translate-y-24', 'opacity-0');
+    setTimeout(() => {
+      toast.classList.add('translate-y-24', 'opacity-0');
+    }, 3500);
+  }
+
+  function handleInviteSubmit(e) {
+    e.preventDefault();
+    closeInviteModal();
+    showToast('Tautan undangan berhasil dikirimkan ke alamat email.');
+  }
+
+  function resendInvitation(email) {
+    showToast(`Undangan untuk ${email} berhasil dikirim ulang.`);
+  }
+
+  function revokeInvitation(email) {
+    if (confirm(`Apakah Anda yakin ingin membatalkan undangan untuk ${email}?`)) {
+      showToast(`Undangan untuk ${email} telah dicabut.`, true);
+    }
+  }
+
+  function confirmRevoke(name, role) {
+    if (confirm(`Keluarkan ${name} (${role}) dari ruang kerja Core Engineering? Akses repositori dan branch akan dinonaktifkan.`)) {
+      showToast(`Akses untuk ${name} telah dinonaktifkan.`, true);
+    }
+  }
+
+  // Filter Table in-memory
+  const searchInput = document.getElementById('memberSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      const q = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#tab-content-members tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    });
+  }
+</script></main></div></body></html>

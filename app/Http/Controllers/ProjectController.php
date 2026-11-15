@@ -15,14 +15,21 @@ class ProjectController extends Controller
 {
     public function index(Request $request)
     {
-        $filters = $request->validate(['search' => ['nullable', 'string', 'max:200']]);
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:200'],
+            'workspace_id' => ['nullable', 'integer', 'min:1'],
+        ]);
         $workspaces = Workspace::query()->accessibleTo($request->user()->id)->with('user')->orderBy('name')->get();
+        if (isset($filters['workspace_id'])) {
+            abort_unless($workspaces->contains('id', (int) $filters['workspace_id']), 404);
+        }
         $projects = Project::whereHas('workspace', fn ($q) => $q->accessibleTo($request->user()->id))
             ->with('workspace')->withCount('tasks')
             ->when($filters['search'] ?? null, fn ($q, $v) => $q->where('name', 'like', '%'.addcslashes($v, '%_\\').'%'))
+            ->when($filters['workspace_id'] ?? null, fn ($q, $workspaceId) => $q->where('workspace_id', $workspaceId))
             ->latest()->paginate(12)->withQueryString();
 
-        return view('projects.index', compact('workspaces', 'projects'));
+        return view('projects.index', compact('workspaces', 'projects', 'filters'));
     }
 
     public function create(Request $request): View

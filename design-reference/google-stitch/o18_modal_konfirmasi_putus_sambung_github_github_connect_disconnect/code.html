@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><title>DevFlow 2.0 Workspace</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-on-surface":"#eaf1ff","border-subtle":"#E2E7EE","on-secondary-fixed-variant":"#3c4857","text-dark":"#E9EDF5","danger":"#C43B40","canvas-light":"#F8F9FB","surface-variant":"#dae3f4","surface":"#f8f9ff","on-tertiary-fixed":"#360f00","surface-container-high":"#e0e9fa","surface-container":"#e6eeff","on-primary-container":"#eeefff","surface-container-low":"#eff4ff","secondary-container":"#d7e3f7","tertiary-fixed":"#ffdbcd","error":"#ba1a1a","border-dark":"#354154","surface-dim":"#d1daeb","secondary-fixed-dim":"#bbc7da","success":"#16835F","on-secondary-container":"#596576","error-container":"#ffdad6","surface-light":"#FFFFFF","on-secondary-fixed":"#101c2a","background":"#f8f9ff","on-primary-fixed-variant":"#003ea7","primary":"#004bc6","primary-container":"#2463eb","on-tertiary-fixed-variant":"#7d2d00","on-surface-variant":"#434655","on-error":"#ffffff","surface-container-lowest":"#ffffff","inverse-surface":"#28313e","on-primary":"#ffffff","secondary":"#535f70","on-tertiary":"#ffffff","warning":"#A96716","surface-dark":"#1B2430","tertiary":"#943700","on-surface":"#131c28","tertiary-fixed-dim":"#ffb596","primary-hover":"#194BC0","primary-fixed":"#dbe1ff","surface-container-highest":"#dae3f4","focus-ring":"#93B4FF","secondary-fixed":"#d7e3f7","on-primary-fixed":"#00174b","surface-muted":"#F1F4F8","outline-variant":"#c3c6d7","on-background":"#131c28","canvas-dark":"#111720","primary-fixed-dim":"#b4c5ff","surface-bright":"#f8f9ff","inverse-primary":"#b4c5ff","on-error-container":"#93000a","on-tertiary-container":"#ffede6","surface-tint":"#0053da","on-secondary":"#ffffff","outline":"#737686","tertiary-container":"#bc4800"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"margin-desktop":"2rem","margin":"1rem","space-sm":"0.5rem","space-md":"0.75rem","space-xl":"1.5rem","gutter-desktop":"1.5rem","gutter":"1rem","space-lg":"1rem","space-2xl":"2rem","space-xs":"0.25rem"},fontFamily:{"headline-sm":["Geist"],"body-sm":["Geist"],"headline-lg-mobile":["Geist"],"label-tag":["Geist"],"label-code-sm":["JetBrains Mono"],"label-code-md":["JetBrains Mono"],"body-md":["Geist"],"headline-md":["Geist"],"headline-lg":["Geist"],"body-lg":["Geist"]},fontSize:{"headline-sm":["20px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"16px",fontWeight:"400"}],"headline-lg-mobile":["26px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"600"}],"label-tag":["12px",{lineHeight:"16px",letterSpacing:"0.01em",fontWeight:"500"}],"label-code-sm":["12px",{lineHeight:"16px",fontWeight:"500"}],"label-code-md":["14px",{lineHeight:"20px",fontWeight:"500"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"400"}],"headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],"headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"400"}]}}}};</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-[76px] bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col items-center py-space-md justify-between select-none"><div class="flex flex-col items-center w-full gap-space-sm"><div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary font-headline-sm text-headline-sm font-bold shadow-[0_1px_8px_rgba(0,0,0,0.04)]">D</div><div class="w-8 h-[1px] bg-surface-container-high my-space-xs"></div><nav class="flex flex-col items-center gap-space-xs w-full px-space-xs overflow-y-auto max-h-[calc(100vh-140px)]" data-active-classes="bg-primary-container text-on-primary"><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="hari-ini" href="#" title="Hari Ini"><span class="material-symbols-outlined text-[20px]">today</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="ikhtisar" href="#" title="Ikhtisar"><span class="material-symbols-outlined text-[20px]">grid_view</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="kotak-masuk" href="#" title="Kotak Masuk"><span class="material-symbols-outlined text-[20px]">inbox</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="tugas" href="#" title="Tugas"><span class="material-symbols-outlined text-[20px]">check_circle</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="perencana" href="#" title="Perencana"><span class="material-symbols-outlined text-[20px]">calendar_month</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="rutinitas" href="#" title="Rutinitas"><span class="material-symbols-outlined text-[20px]">repeat</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="sasaran" href="#" title="Sasaran"><span class="material-symbols-outlined text-[20px]">flag</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="belajar" href="#" title="Belajar"><span class="material-symbols-outlined text-[20px]">school</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="catatan" href="#" title="Catatan"><span class="material-symbols-outlined text-[20px]">description</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="review" href="#" title="Review"><span class="material-symbols-outlined text-[20px]">rate_review</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="coach" href="#" title="Coach"><span class="material-symbols-outlined text-[20px]">smart_toy</span></a><a class="w-11 h-11 flex flex-col items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="proyek" href="#" title="Proyek"><span class="material-symbols-outlined text-[20px]">folder</span></a></nav></div><div class="flex flex-col items-center gap-space-xs w-full px-space-xs pt-space-xs"><a class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="workspace-and-members" href="#" title="Workspace"><span class="material-symbols-outlined text-[20px]">corporate_fare</span></a><a class="w-11 h-11 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="profile-and-preferences" href="#" title="Pengaturan"><span class="material-symbols-outlined text-[20px]">settings</span></a></div></aside><div class="pl-[76px]"><header class="fixed top-0 left-[76px] right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] text-on-surface font-body-md text-body-md font-medium cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-primary text-[18px]">corporate_fare</span><span>Workspace: <strong class="font-semibold">Core Engineering</strong></span><span class="material-symbols-outlined text-on-surface-variant text-[16px]">expand_more</span></div><div class="hidden md:flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container-low text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">search</span><span class="font-body-sm text-body-sm">Cari apa saja...</span><kbd class="font-label-code-sm text-label-code-sm bg-surface-container-lowest px-space-xs py-0.5 rounded shadow-[0_1px_8px_rgba(0,0,0,0.04)] text-on-surface-variant">⌘K</kbd></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs bg-primary hover:bg-primary-hover text-on-primary px-space-md py-space-xs rounded-lg font-body-md text-body-md font-medium transition-colors shadow-[0_1px_8px_rgba(0,0,0,0.04)]" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>Tambah</span></button><button class="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors relative" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary"></span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-16 w-full min-h-screen bg-surface"><div class="flex flex-col w-full relative min-h-[calc(100vh-4rem)]">
+<!-- S38 GitHub Repositories Page (Underlying Context Preview - Frosted & Blurred) -->
+<div class="w-full px-margin-desktop py-space-xl opacity-40 blur-[2px] pointer-events-none select-none transition-all duration-300">
+<!-- Header of Underlying Page -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-2xl">
+<div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-tag text-label-tag uppercase tracking-wider mb-space-xs">
+<span>Pengaturan Proyek</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Integrasi Eksternal</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">GitHub VCS &amp; Webhooks</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Repositori Terhubung</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Kelola webhook, pemetaan commit otomatis, dan otorisasi personal access token.</p>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="px-space-md py-space-xs bg-surface-container text-on-surface font-body-md text-body-md rounded-lg flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+<span>Sinkronkan Semua</span>
+</button>
+<button class="px-space-md py-space-xs bg-primary text-on-primary font-body-md text-body-md rounded-lg flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px]">add_link</span>
+<span>Hubungkan Repositori Baru</span>
+</button>
+</div>
+</div>
+<!-- Underlying Repo Cards Mock Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">folder_code</span>
+<span class="font-headline-sm text-headline-sm">growpos-engine</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-success/10 text-success font-label-tag text-label-tag">Aktif</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Backend Core Service API &amp; Webhook processor.</p>
+</div>
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">folder_code</span>
+<span class="font-headline-sm text-headline-sm">growpos-web-fe</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-success/10 text-success font-label-tag text-label-tag">Aktif</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Next.js Client portal &amp; tenant dashboard.</p>
+</div>
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">folder_code</span>
+<span class="font-headline-sm text-headline-sm">devops-infra-iac</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-secondary/15 text-secondary font-label-tag text-label-tag">Dijeda</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Terraform manifests &amp; AWS ECS configurations.</p>
+</div>
+</div>
+</div>
+<!-- MODAL BACKDROP OVERLAY (Dimmed & Blur) -->
+<div class="fixed inset-0 top-16 left-[76px] bg-canvas-dark/45 backdrop-blur-md z-50 flex items-center justify-center p-space-md sm:p-space-xl overflow-y-auto" id="modal-backdrop">
+<!-- MODAL CONTAINER (Calm Precision aesthetic, card elevated) -->
+<div class="w-full max-w-3xl bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden flex flex-col my-auto transition-transform duration-200">
+<!-- MODAL HEADER -->
+<div class="px-space-xl pt-space-xl pb-space-lg bg-surface-container-low flex items-start justify-between">
+<div class="flex items-start gap-space-md">
+<!-- Octocat / Git Badge Icon -->
+<div class="w-12 h-12 rounded-xl bg-canvas-dark text-text-dark flex items-center justify-center shadow-sm shrink-0">
+<svg aria-hidden="true" class="w-6 h-6 fill-current" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Kelola Sambungan Repositori GitHub</h2>
+<span class="px-space-xs py-0.5 rounded bg-primary/10 text-primary font-label-tag text-label-tag font-semibold">VCS Integrasi</span>
+</div>
+<!-- Subtitle and Meta Pills -->
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm mt-1 flex-wrap">
+<span class="flex items-center gap-1 font-label-code-sm text-label-code-sm text-on-surface bg-surface-container px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">account_tree</span>
+                farhandev/growpos-engine
+              </span>
+<span>•</span>
+<span class="flex items-center gap-1 font-label-code-sm text-label-code-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px]">fork_right</span>
+                branch: main
+              </span>
+<span>•</span>
+<span class="text-on-surface-variant">DevFlow Proyek: Core Engineering</span>
+</div>
+</div>
+</div>
+<!-- Close Button -->
+<button class="w-8 h-8 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high flex items-center justify-center transition-colors" id="btn-close-modal" title="Tutup Dialog (Esc)" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- MODAL BODY CONTENT -->
+<div class="p-space-xl flex flex-col gap-space-xl max-h-[calc(100vh-260px)] overflow-y-auto">
+<!-- 1. STATUS SAMBUNGAN SAAT INI (Current Sync State) -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-secondary font-semibold">1. Status Telemetri Sambungan Saat Ini</span>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">App ID: gh-int-4491</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Left Info Panel -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Tersambung Aktif (Sync OK)</span>
+<span class="px-space-xs py-0.5 bg-success/15 text-success rounded text-[11px] font-medium uppercase">Live Stream</span>
+</div>
+<div class="text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1.5 mt-0.5">
+<span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+<span>Sinkronisasi Terakhir: <strong class="text-on-surface font-medium">12 menit yang lalu</strong></span>
+<span class="font-label-code-sm text-label-code-sm bg-surface-container px-1.5 py-0.5 rounded text-on-surface">Commit 4a9f12c</span>
+</div>
+<div class="text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-success">check_circle</span>
+<span>Webhook Health: <strong class="text-success font-medium">HTTP 200 OK</strong> (Latensi 68ms)</span>
+</div>
+</div>
+<!-- Right Mapping Metrics -->
+<div class="bg-surface-container-lowest p-space-sm rounded-lg flex flex-col justify-between shadow-sm">
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span>Relasi Tiket Terpetakan</span>
+<span class="font-label-code-sm text-label-code-sm font-semibold text-on-surface">38 Tiket DEV</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm mt-1">
+<span>Pull Requests Tertaut</span>
+<span class="font-label-code-sm text-label-code-sm font-semibold text-on-surface">14 PR Terbuka</span>
+</div>
+<div class="mt-2 pt-2 bg-surface-container-low -mx-space-sm -mb-space-sm px-space-sm py-1.5 rounded-b-lg flex items-center justify-between">
+<span class="text-[11px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">key</span>
+                  Akses Cakupan: <code class="font-label-code-sm text-[11px] text-primary">repo, read:org, workflow</code>
+</span>
+<span class="text-[11px] text-secondary font-medium">Kedaluwarsa dlm 45 hari</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. KONSEKUENSI PEMUTUSAN SAMBUNGAN (Gate D02 & G05 Data Integrity Impact) -->
+<section class="flex flex-col gap-space-xs">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-danger font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+            2. Analisis Integritas &amp; Konsekuensi Pemutusan Sambungan
+          </span>
+<div class="bg-error-container/35 rounded-xl p-space-md">
+<div class="flex items-start gap-space-md">
+<div class="w-9 h-9 rounded-lg bg-danger/10 text-danger flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">warning</span>
+</div>
+<div class="flex flex-col gap-space-xs w-full">
+<h4 class="font-body-md text-body-md font-semibold text-on-surface">
+                  Pahami dampak sebelum mencabut otorisasi repositori ini:
+                </h4>
+<ul class="flex flex-col gap-2 mt-1 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-danger text-[18px] shrink-0 mt-0.5">cancel</span>
+<span><strong>Automasi Commit Terhenti:</strong> Sinkronisasi otomatis tiket tugas (<code class="font-label-code-sm text-label-code-sm text-danger bg-danger/10 px-1 py-0.5 rounded">DEV-xxx</code>) dengan commit baru akan seketika dihentikan.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-danger text-[18px] shrink-0 mt-0.5">cancel</span>
+<span><strong>Webhook PR Non-aktif:</strong> Webhook Pull Request otomatis ke papan sprint tidak akan memperbarui status kartu lagi.</span>
+</li>
+<li class="flex items-start gap-2 text-on-surface bg-surface-container-lowest/80 p-2 rounded-lg">
+<span class="material-symbols-outlined text-success text-[18px] shrink-0 mt-0.5">verified_user</span>
+<span><strong class="text-success">JAMINAN INTEGRITAS:</strong> Seluruh riwayat commit masa lalu, catatan ADR (Architecture Decision Record), dan bukti deployment milestone yang sudah tersimpan sebelumnya <strong>TIDAK akan dihapus</strong> dari DevFlow.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">info</span>
+<span>Repositori asli Anda di GitHub remote (<code class="font-label-code-sm text-label-code-sm text-primary bg-primary/10 px-1 py-0.5 rounded">farhandev/growpos-engine</code>) tidak akan terpengaruh sama sekali.</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. OPSI TINDAKAN SAMBUNGAN ULANG ATAU ALTERNATIF (Action Mode Selection) -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-secondary font-semibold">3. Pilih Model Tindakan Sambungan</span>
+<span class="text-on-surface-variant text-[11px]">Pilih salah satu metode</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm" id="action-radio-group">
+<!-- Option A: Jeda Sinkronisasi (Pause) -->
+<label class="relative flex flex-col p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer group">
+<input class="sr-only peer" name="action_mode" type="radio" value="pause"/>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="material-symbols-outlined text-warning text-[24px]">pause_circle</span>
+<span class="w-4 h-4 rounded-full bg-surface-container-highest peer-checked:bg-primary flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest opacity-0 peer-checked:opacity-100"></span>
+</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Jeda Sinkronisasi</span>
+<span class="font-label-tag text-[11px] text-secondary mt-0.5">Pause Sync Sementara</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs">Hentikan penerimaan webhook event tanpa mencabut kunci token kredensial OAuth.</p>
+</label>
+<!-- Option B: Perbarui Token (Refresh) -->
+<label class="relative flex flex-col p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer group">
+<input class="sr-only peer" name="action_mode" type="radio" value="refresh"/>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="material-symbols-outlined text-primary text-[24px]">published_with_changes</span>
+<span class="w-4 h-4 rounded-full bg-surface-container-highest peer-checked:bg-primary flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest opacity-0 peer-checked:opacity-100"></span>
+</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Perbarui Otorisasi</span>
+<span class="font-label-tag text-[11px] text-secondary mt-0.5">Refresh OAuth &amp; Resync</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs">Sinkronkan ulang scope bila terjadi mismatch hak akses organization atau PAT baru.</p>
+</label>
+<!-- Option C: Putuskan Penuh (Disconnect Destructive - Selected Default) -->
+<label class="relative flex flex-col p-space-md rounded-xl bg-surface-container-low hover:bg-error-container/40 transition-all cursor-pointer group peer-checked-danger" id="label-option-disconnect">
+<input checked="" class="sr-only peer" name="action_mode" type="radio" value="disconnect"/>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="material-symbols-outlined text-danger text-[24px]">link_off</span>
+<span class="w-4 h-4 rounded-full bg-danger flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+</span>
+</div>
+<span class="font-body-md text-body-md font-semibold text-danger">Putus Sambungan</span>
+<span class="font-label-tag text-[11px] text-danger mt-0.5">Full Disconnect</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs">Hapus webhook remote dari GitHub dan cabut seluruh relasi event pipeline.</p>
+</label>
+</div>
+</section>
+</div>
+<!-- MODAL FOOTER & DUAL CONFIRMATION CHECK -->
+<div class="px-space-xl py-space-md bg-surface-container-low flex flex-col gap-space-md">
+<!-- Checkbox Dual Confirmation Rule -->
+<label class="flex items-center gap-space-sm cursor-pointer select-none">
+<input class="w-4 h-4 rounded bg-surface-container-lowest text-danger focus:ring-focus-ring cursor-pointer" id="check-consent" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">
+            Saya memahami konsekuensi ini dan mengonfirmasi pencopotan integrasi webhook PR otomatis untuk repositori ini.
+          </span>
+</label>
+<!-- Action Buttons Bar -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-xs">
+<!-- Left auxiliary test ping button -->
+<button class="w-full sm:w-auto px-space-md py-space-xs rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-md text-body-md font-medium flex items-center justify-center gap-space-xs transition-colors" id="btn-test-ping" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">network_ping</span>
+<span>Uji Sambungan Webhook (Test Ping)</span>
+</button>
+<!-- Right Action Controls -->
+<div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
+<button class="px-space-md py-space-xs rounded-lg bg-transparent hover:bg-surface-container text-secondary hover:text-on-surface font-body-md text-body-md font-medium transition-colors" id="btn-cancel" type="button">
+              Batal (Esc)
+            </button>
+<button class="px-space-lg py-space-xs rounded-lg bg-danger/40 text-on-primary font-body-md text-body-md font-semibold flex items-center justify-center gap-space-xs transition-all cursor-not-allowed shadow-sm" disabled="" id="btn-destructive-action" type="button">
+<span class="material-symbols-outlined text-[18px]">link_off</span>
+<span id="btn-action-text">Putuskan Sambungan GitHub</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Inline Vanilla Interactive Logic -->
+<script>
+    (function () {
+      const consentCheck = document.getElementById('check-consent');
+      const actionBtn = document.getElementById('btn-destructive-action');
+      const actionBtnText = document.getElementById('btn-action-text');
+      const testPingBtn = document.getElementById('btn-test-ping');
+      const cancelBtn = document.getElementById('btn-cancel');
+      const closeModalBtn = document.getElementById('btn-close-modal');
+      const radioInputs = document.querySelectorAll('input[name="action_mode"]');
+
+      let currentMode = 'disconnect';
+
+      // Radio Selection State Manager
+      radioInputs.forEach(input => {
+        input.addEventListener('change', (e) => {
+          currentMode = e.target.value;
+          updateButtonState();
+        });
+      });
+
+      function updateButtonState() {
+        const isConsentChecked = consentCheck.checked;
+
+        if (currentMode === 'disconnect') {
+          actionBtnText.textContent = 'Putuskan Sambungan GitHub';
+          actionBtn.classList.remove('bg-primary', 'hover:bg-primary-hover', 'bg-warning', 'text-on-surface');
+          
+          if (isConsentChecked) {
+            actionBtn.disabled = false;
+            actionBtn.className = 'px-space-lg py-space-xs rounded-lg bg-danger hover:bg-danger/90 text-on-primary font-body-md text-body-md font-semibold flex items-center justify-center gap-space-xs transition-all shadow-sm cursor-pointer';
+          } else {
+            actionBtn.disabled = true;
+            actionBtn.className = 'px-space-lg py-space-xs rounded-lg bg-danger/40 text-on-primary font-body-md text-body-md font-semibold flex items-center justify-center gap-space-xs transition-all cursor-not-allowed shadow-sm';
+          }
+        } else if (currentMode === 'pause') {
+          actionBtnText.textContent = 'Jeda Webhook Sementara';
+          actionBtn.disabled = false;
+          actionBtn.className = 'px-space-lg py-space-xs rounded-lg bg-warning hover:bg-warning/90 text-surface-container-lowest font-body-md text-body-md font-semibold flex items-center justify-center gap-space-xs transition-all shadow-sm cursor-pointer';
+        } else if (currentMode === 'refresh') {
+          actionBtnText.textContent = 'Perbarui & Sinkronkan Ulang';
+          actionBtn.disabled = false;
+          actionBtn.className = 'px-space-lg py-space-xs rounded-lg bg-primary hover:bg-primary-hover text-on-primary font-body-md text-body-md font-semibold flex items-center justify-center gap-space-xs transition-all shadow-sm cursor-pointer';
+        }
+      }
+
+      consentCheck.addEventListener('change', updateButtonState);
+
+      // Ping simulation
+      testPingBtn.addEventListener('click', () => {
+        const originalContent = testPingBtn.innerHTML;
+        testPingBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin text-primary">progress_activity</span><span>Memeriksa Webhook...</span>';
+        testPingBtn.disabled = true;
+
+        setTimeout(() => {
+          testPingBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-success">check_circle</span><span class="text-success font-medium">Pong! 200 OK (52ms)</span>';
+          setTimeout(() => {
+            testPingBtn.innerHTML = originalContent;
+            testPingBtn.disabled = false;
+          }, 3000);
+        }, 850);
+      });
+
+      // Dismissal actions
+      function dismissDialog() {
+        const backdrop = document.getElementById('modal-backdrop');
+        if (backdrop) {
+          backdrop.style.opacity = '0';
+          backdrop.style.pointerEvents = 'none';
+          setTimeout(() => {
+            backdrop.style.display = 'none';
+          }, 200);
+        }
+      }
+
+      cancelBtn.addEventListener('click', dismissDialog);
+      closeModalBtn.addEventListener('click', dismissDialog);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          dismissDialog();
+        }
+      });
+    })();
+  </script>
+</div></main></div></body></html>

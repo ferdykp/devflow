@@ -29,5 +29,16 @@ class LoginRequest extends FormRequest
                 'email' => __('auth.failed'),
             ]);
         }
+
+        $user = Auth::user();
+
+        if ($user !== null && $user->email_verified_at === null) {
+            $this->session()->put('pending_email_verification_user_id', $user->getAuthIdentifier());
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Verifikasi email terlebih dahulu sebelum masuk ke DevFlow.',
+            ]);
+        }
     }
 }

@@ -41,6 +41,8 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'e2e_isolated' => (bool) env('DEVFLOW_E2E_ISOLATED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL

@@ -6,6 +6,7 @@ use App\Models\FocusItem;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,7 +19,7 @@ class ProjectManagementTest extends TestCase
         $project = Project::factory()->create();
         $this->actingAs($project->workspace->user)->get(route('projects.index'))
             ->assertOk()->assertSee($project->name)->assertSee(route('projects.create'))
-            ->assertDontSee('name="workspace_id"', false)->assertDontSee('id="workspace_name"', false);
+            ->assertSee('id="project-workspace"', false)->assertDontSee('id="workspace_name"', false);
         $this->get(route('projects.create', ['workspace' => $project->workspace_id]))->assertOk()
             ->assertSee('Mulai proyek baru')->assertViewHas('selectedWorkspace', $project->workspace_id);
         $this->get(route('workspaces.create'))->assertOk()->assertSee('id="workspace_name"', false);
@@ -33,6 +34,21 @@ class ProjectManagementTest extends TestCase
         $this->get(route('projects.index', ['search' => str_repeat('a', 201)]))
             ->assertRedirect(route('projects.index'))->assertSessionHasErrors('search');
         $this->get(route('projects.index', ['search' => $project->name]))->assertOk()->assertSee($project->name);
+    }
+
+    public function test_project_list_filters_by_an_accessible_workspace_without_leaking_other_projects(): void
+    {
+        $user = User::factory()->create();
+        $selectedWorkspace = Workspace::factory()->for($user)->create(['name' => 'Studio Utama']);
+        $otherWorkspace = Workspace::factory()->for($user)->create(['name' => 'Lab Sampingan']);
+        $selectedProject = Project::factory()->for($selectedWorkspace)->create(['name' => 'Editor Baru']);
+        $otherProject = Project::factory()->for($otherWorkspace)->create(['name' => 'API Cadangan']);
+
+        $this->actingAs($user)->get(route('projects.index', ['workspace_id' => $selectedWorkspace->id]))
+            ->assertOk()->assertSee($selectedProject->name)->assertDontSee($otherProject->name);
+
+        $this->actingAs(User::factory()->create())->get(route('projects.index', ['workspace_id' => $selectedWorkspace->id]))
+            ->assertNotFound();
     }
 
     public function test_guests_cannot_open_management_pages_or_delete_projects(): void

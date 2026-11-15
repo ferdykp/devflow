@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Notifications\EmailVerificationCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -21,17 +23,21 @@ class AuthenticationTest extends TestCase
         $this->get('/dashboard')->assertRedirect(route('login'));
     }
 
-    public function test_user_can_register_and_become_authenticated(): void
+    public function test_user_registration_sends_an_otp_and_waits_for_email_verification(): void
     {
+        Notification::fake();
+
         $this->post('/register', [
             'name' => 'DevFlow User',
             'email' => 'user@example.test',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ])->assertRedirect('/dashboard');
+        ])->assertRedirect(route('verification.notice'));
 
-        $this->assertAuthenticated();
-        $this->assertDatabaseHas('users', ['email' => 'user@example.test']);
+        $this->assertGuest();
+        $user = User::query()->where('email', 'user@example.test')->firstOrFail();
+        $this->assertNull($user->email_verified_at);
+        Notification::assertSentTo($user, EmailVerificationCode::class);
     }
 
     public function test_user_can_login_and_logout_using_post(): void
@@ -48,6 +54,17 @@ class AuthenticationTest extends TestCase
     {
         $this->post('/login', ['email' => 'missing@example.test', 'password' => 'wrong'])
             ->assertSessionHasErrors('email');
+        $this->assertGuest();
+    }
+
+    public function test_unverified_user_cannot_login_with_a_password(): void
+    {
+        $user = User::factory()->unverified()->create(['password' => 'password123']);
+
+        $response = $this->post('/login', ['email' => $user->email, 'password' => 'password123']);
+
+        $response->assertSessionHasErrors('email');
+        $response->assertSessionHas('pending_email_verification_user_id', $user->id);
         $this->assertGuest();
     }
 }

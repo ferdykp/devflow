@@ -7,7 +7,7 @@
     <x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list', 'edit' => $task->id])" variant="secondary">Ubah tugas</x-ui.button>
     <x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list'])" variant="secondary">Kembali ke tugas</x-ui.button>
 </x-ui.page-heading>
-<div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+<div class="space-y-6">
     <div class="min-w-0 space-y-6">
         <x-ui.panel><h2 class="font-semibold">Deskripsi</h2><p class="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-zinc-600">{{ $task->description ?: 'Belum ada deskripsi.' }}</p>
             @if($task->taskImport?->version)

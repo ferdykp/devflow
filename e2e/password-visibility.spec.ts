@@ -49,7 +49,10 @@ for (const route of ['/login', '/register']) {
 
       const inputBox = await field.boundingBox();
       const buttonBox = await button.boundingBox();
-      expect(inputBox!.x + inputBox!.width).toBeLessThanOrEqual(buttonBox!.x);
+      expect(buttonBox!.x).toBeGreaterThan(inputBox!.x);
+      expect(buttonBox!.x + buttonBox!.width).toBeLessThanOrEqual(inputBox!.x + inputBox!.width);
+      expect(buttonBox!.y).toBeGreaterThanOrEqual(inputBox!.y);
+      expect(buttonBox!.y + buttonBox!.height).toBeLessThanOrEqual(inputBox!.y + inputBox!.height);
       expect(buttonBox!.width).toBeGreaterThanOrEqual(44);
     }
 

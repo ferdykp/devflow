@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { completeOnboarding } from './onboarding';
 import type { Page } from '@playwright/test';
 
 async function createProject(page: Page) {
@@ -8,7 +9,7 @@ async function createProject(page: Page) {
   await page.getByLabel('Kata sandi', { exact: true }).fill('DialogAman123!');
   await page.getByLabel('Ulangi kata sandi').fill('DialogAman123!');
   await page.getByRole('button', { name: /Buat akun/ }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await completeOnboarding(page);
   await page.goto('/projects/create');
   await page.getByLabel('Nama proyek', { exact: true }).fill('Proyek '+ 'A'.repeat(143));
   await page.getByRole('button', { name: 'Buat proyek', exact: true }).click();

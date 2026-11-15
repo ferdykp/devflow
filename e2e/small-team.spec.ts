@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { completeOnboarding } from './onboarding';
 import type { Page, TestInfo } from '@playwright/test';
 
 const password = 'TimKecil123!';
@@ -10,7 +11,7 @@ async function register(page: Page, name: string, email: string) {
   await page.getByLabel('Kata sandi', { exact: true }).fill(password);
   await page.getByLabel('Ulangi kata sandi').fill(password);
   await page.getByRole('button', { name: /Buat akun/ }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await completeOnboarding(page);
 }
 
 async function createProject(page: Page) {
@@ -184,7 +185,8 @@ test('dokumen besar ditinjau per halaman dan seluruh tugas dibuat sesuai urutan'
 
 test('to-do cepat cukup judul dan selesai dapat dibatalkan setelah refresh', async ({ page }, testInfo) => {
   const { project } = await createProject(page);
-  await expect(page.getByRole('link', { name: 'Daftar', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: 'Papan', exact: true })).toHaveAttribute('aria-current', 'page');
+  await page.getByRole('link', { name: 'Daftar', exact: true }).click();
   const quick = page.getByRole('form', { name: 'Tambah to-do cepat', exact: true });
   await expect(quick).toBeVisible();
   await quick.getByRole('textbox', { name: 'Tambah to-do', exact: true }).fill('Kirim rancangan ke tim');
@@ -212,7 +214,7 @@ test('halaman pembuatan terpisah, proyek bisa diedit dan hapus perlu konfirmasi'
   const { project } = await createProject(page);
   await page.getByRole('form', { name: 'Tambah to-do cepat' }).getByRole('textbox').fill('Tugas yang tetap tersimpan');
   await page.getByRole('form', { name: 'Tambah to-do cepat' }).getByRole('textbox').press('Enter');
-  await expect(page.locator('.df-task-row')).toHaveCount(1);
+  await expect(page.locator('[data-task-card]')).toHaveCount(1);
   await page.goto('/projects');
   await expect(page.locator('form[action$="/projects"][method="POST"]')).toHaveCount(0);
   await expect(page.locator('form[action$="/workspaces"][method="POST"]')).toHaveCount(0);
@@ -237,7 +239,7 @@ test('halaman pembuatan terpisah, proyek bisa diedit dan hapus perlu konfirmasi'
   await dialog.getByRole('button', { name: 'Batal', exact: true }).click();
   await page.getByRole('link', { name: 'Kembali ke tugas', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Rencana tim diperbarui', exact: true })).toBeVisible();
-  await expect(page.locator('.df-task-row')).toHaveCount(1);
+  await expect(page.locator('[data-task-card]')).toHaveCount(1);
   await page.getByRole('link', { name: 'Edit proyek', exact: true }).click();
   await page.getByRole('button', { name: 'Hapus proyek', exact: true }).click();
   await dialog.getByRole('button', { name: 'Lanjutkan', exact: true }).click();

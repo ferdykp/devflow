@@ -1,9 +1,34 @@
-<article class="df-task-card [background:#fff] [border:1px_solid_#e2e4e8] [border-radius:9px] [padding:14px] [box-shadow:0_1px_2px_#11111105] [cursor:grab] [min-width:0] hover:[border-color:#b8c0d1] hover:[box-shadow:0_5px_15px_#171a200d] active:[cursor:grabbing] [&.is-dragging]:[opacity:.5]" draggable="true" data-task-card data-task-id="{{ $task->id }}" data-task-update-url="{{ route('tasks.update',[$project,$task]) }}" tabindex="0" aria-label="{{ $task->title }}. Geser ke kolom lain atau ubah status melalui pilihan status.">
- <a href="{{ route('tasks.show', [$project, $task]) }}" draggable="false" class="block df-task-title [font-size:13px] [line-height:1.5] [font-weight:650] [overflow-wrap:anywhere] {{ $task->status==='done'?'line-through text-zinc-400':'' }} hover:text-blue-700">{{ $task->title }}</a>
- @if($task->description)<p class="df-task-description [font-size:11px] [line-height:1.55] [color:#717783] [margin-top:7px] [white-space:pre-line] [overflow-wrap:anywhere]">{{ Str::limit($task->description,110) }}</p>@endif
- <div class="df-card-meta [display:flex] [align-items:center] [gap:12px] [flex-wrap:wrap] [font-size:10px] [color:#7b808a] [margin-top:13px]"><span class="df-priority [display:inline-flex] [align-items:center] [gap:5px] df-priority-{{ $task->priority }}"><i class="fa-solid fa-flag" aria-hidden="true"></i> {{ \App\Support\UiLabel::priority($task->priority) }}</span>@if($task->due_date)<span><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ $task->due_date->format('M j') }}</span>@endif</div>
- @if($task->assignee)<p class="mt-3 break-words text-xs text-zinc-500"><i class="fa-regular fa-user mr-1" aria-hidden="true"></i>{{ $task->assignee->name }}</p>@endif
- @if($task->milestone)<p class="mt-3 break-words text-xs font-medium text-blue-700">{{ $task->milestone->title }}</p>@endif
- @if($task->checklist)<p class="mt-2 text-xs text-zinc-500">Checklist {{ collect($task->checklist)->where('done', true)->count() }}/{{ count($task->checklist) }}</p>@endif
- @include('projects._task_actions',['task'=>$task,'columns'=>$columns])
+<article data-task-card data-task-id="{{ $task->id }}" data-task-status="{{ $task->status }}" data-task-update-url="{{ route('tasks.update', [$project, $task]) }}" draggable="true" tabindex="0" aria-label="Tugas {{ $task->title }}. Seret ke kolom status lain." class="group relative min-w-0 cursor-grab rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-blue-300 hover:shadow-sm active:cursor-grabbing [&.is-dragging]:opacity-50">
+    <div class="flex min-w-0 flex-wrap items-center gap-2">
+        @if($task->priority === 'high')
+            <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-700"><i class="fa-solid fa-flag" aria-hidden="true"></i>Prioritas tinggi</span>
+        @elseif($task->priority === 'low')
+            <span class="rounded-full bg-zinc-100 px-2 py-1 text-[10px] font-medium text-zinc-600">Prioritas rendah</span>
+        @endif
+        @if($task->due_date && $task->due_date->isPast() && $task->status !== 'done')
+            <span class="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700">Terlambat</span>
+        @endif
+    </div>
+
+    <h3 class="mt-2 min-w-0 break-words pr-32 text-sm font-semibold leading-5 [overflow-wrap:anywhere] {{ $task->status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-900' }}"><a draggable="false" href="{{ route('tasks.show', [$project, $task]) }}" class="rounded-sm hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600">{{ $task->title }}</a></h3>
+
+    @if($task->description)
+        <p class="mt-2 line-clamp-2 break-words text-xs leading-5 text-zinc-600 [overflow-wrap:anywhere]">{{ $task->description }}</p>
+    @endif
+
+    <div class="mt-3 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-500">
+        <span>{{ \App\Support\UiLabel::priority($task->priority) }}</span>
+        @if($task->due_date)<span class="inline-flex items-center gap-1"><i class="fa-regular fa-calendar" aria-hidden="true"></i>{{ $task->due_date->format('d/m/Y') }}</span>@endif
+        @if($task->comments_count)<span class="inline-flex items-center gap-1"><i class="fa-regular fa-comment" aria-hidden="true"></i>{{ $task->comments_count }}</span>@endif
+        @if($task->checklist)<span>Checklist {{ collect($task->checklist)->where('done', true)->count() }}/{{ count($task->checklist) }}</span>@endif
+    </div>
+
+    @if($task->assignee || $task->milestone)
+        <div class="mt-3 space-y-1 text-[11px] text-zinc-500">
+            @if($task->assignee)<p class="truncate"><i class="fa-regular fa-user mr-1" aria-hidden="true"></i>{{ $task->assignee->name }}</p>@endif
+            @if($task->milestone)<p class="truncate font-medium text-blue-700"><i class="fa-solid fa-flag-checkered mr-1" aria-hidden="true"></i>{{ $task->milestone->title }}</p>@endif
+        </div>
+    @endif
+
+    @include('projects._task_actions', ['task' => $task, 'columns' => $columns, 'board' => true])
 </article>

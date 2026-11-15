@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-tertiary-fixed-variant":"#7d2d00","surface-dim":"#d1daeb","primary":"#004bc6","warning":"#A96716","on-secondary-fixed-variant":"#3c4857","on-error-container":"#93000a","inverse-on-surface":"#eaf1ff","secondary-fixed-dim":"#bbc7da","inverse-primary":"#b4c5ff","surface-container-high":"#e0e9fa","error":"#ba1a1a","on-tertiary-container":"#ffede6","inverse-surface":"#28313e","on-primary-container":"#eeefff","tertiary-fixed":"#ffdbcd","on-tertiary-fixed":"#360f00","surface-container-highest":"#dae3f4","tertiary-fixed-dim":"#ffb596","on-tertiary":"#ffffff","error-container":"#ffdad6","outline":"#737686","secondary-container":"#d7e3f7","on-error":"#ffffff","surface-variant":"#dae3f4","secondary":"#535f70","on-surface-variant":"#434655","danger":"#C43B40","focus-ring":"#93B4FF","surface":"#f8f9ff","text-dark":"#E9EDF5","surface-muted":"#F1F4F8","surface-light":"#FFFFFF","on-secondary":"#ffffff","primary-container":"#2463eb","on-primary":"#ffffff","surface-dark":"#1B2430","border-dark":"#354154","surface-container":"#e6eeff","on-surface":"#131c28","surface-container-low":"#eff4ff","primary-fixed-dim":"#b4c5ff","surface-bright":"#f8f9ff","tertiary-container":"#bc4800","on-background":"#131c28","primary-hover":"#194BC0","background":"#f8f9ff","surface-tint":"#0053da","on-secondary-container":"#596576","tertiary":"#943700","on-primary-fixed-variant":"#003ea7","primary-fixed":"#dbe1ff","on-primary-fixed":"#00174b","surface-container-lowest":"#ffffff","canvas-light":"#F8F9FB","border-subtle":"#E2E7EE","on-secondary-fixed":"#101c2a","secondary-fixed":"#d7e3f7","outline-variant":"#c3c6d7","canvas-dark":"#111720","success":"#16835F"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-desktop":"2rem","space-2xl":"2rem","space-lg":"1rem","space-xl":"1.5rem","gutter-desktop":"1.5rem","space-xs":"0.25rem","space-sm":"0.5rem","margin":"1rem","space-md":"0.75rem","gutter":"1rem"},"fontFamily":{"headline-lg":["Geist"],"body-lg":["Geist"],"body-md":["Geist"],"headline-lg-mobile":["Geist"],"label-code-sm":["JetBrains Mono"],"label-tag":["Geist"],"body-sm":["Geist"],"headline-sm":["Geist"],"label-code-md":["JetBrains Mono"],"headline-md":["Geist"]},"fontSize":{"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg-mobile":["26px",{"lineHeight":"34px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-code-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"label-tag":["12px",{"lineHeight":"16px","letterSpacing":"0.01em","fontWeight":"500"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["20px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"label-code-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.015em","fontWeight":"600"}]}}}}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container"><aside class="fixed left-0 top-0 h-screen w-[76px] bg-surface-light border-r border-border-subtle z-50 flex flex-col items-center justify-between py-space-md select-none"><div class="flex flex-col items-center w-full gap-space-sm"><div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm cursor-pointer group transition-transform active:scale-95"><span class="material-symbols-outlined text-[22px]">terminal</span></div><div class="relative group my-space-xs"><button class="w-10 h-10 rounded-lg bg-surface-muted hover:bg-surface-container transition-colors flex items-center justify-center text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-focus-ring" type="button"><span class="material-symbols-outlined text-[18px]">corporate_fare</span></button><div class="absolute left-full ml-space-sm top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-md py-space-xs rounded shadow-lg whitespace-nowrap z-50 pointer-events-none"><span class="font-label-tag font-semibold text-primary-fixed">Core Engineering</span><span class="text-outline-variant font-body-sm text-body-sm">Workspace • Pribadi</span></div></div><div class="w-8 h-[1px] bg-border-subtle my-space-xs"></div><nav class="flex flex-col items-center gap-space-xs w-full px-space-xs" data-active-classes="bg-primary-container text-on-primary shadow-sm"><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="hari-ini" href="#"><span class="material-symbols-outlined text-[20px]">today</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Hari Ini</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="ikhtisar" href="#"><span class="material-symbols-outlined text-[20px]">analytics</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Ikhtisar</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="kotak-masuk" href="#"><span class="material-symbols-outlined text-[20px]">inbox</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Kotak Masuk</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="tugas" href="#"><span class="material-symbols-outlined text-[20px]">check_circle</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Tugas</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="perencana" href="#"><span class="material-symbols-outlined text-[20px]">calendar_month</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Perencana</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="rutinitas" href="#"><span class="material-symbols-outlined text-[20px]">repeat</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Rutinitas</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="sasaran" href="#"><span class="material-symbols-outlined text-[20px]">flag</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Sasaran</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="belajar" href="#"><span class="material-symbols-outlined text-[20px]">school</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Belajar</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="catatan" href="#"><span class="material-symbols-outlined text-[20px]">note_alt</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Catatan</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="review" href="#"><span class="material-symbols-outlined text-[20px]">rate_review</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Review</span></a><a aria-current="page" class="relative group flex items-center justify-center w-11 h-11 rounded-lg transition-all bg-primary-container text-on-primary shadow-sm" data-path="coach" href="#"><span class="material-symbols-outlined text-[20px]">psychology</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Coach</span></a><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="proyek" href="#"><span class="material-symbols-outlined text-[20px]">folder_code</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Proyek</span></a></nav></div><div class="flex flex-col items-center w-full gap-space-xs pt-space-xs border-t border-border-subtle"><nav class="flex flex-col items-center w-full px-space-xs" data-active-classes="bg-primary-container text-on-primary shadow-sm"><a class="relative group flex items-center justify-center w-11 h-11 rounded-lg text-on-surface-variant hover:bg-surface-muted hover:text-on-surface transition-all" data-path="pengaturan" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span class="absolute left-full ml-space-sm hidden group-hover:block bg-surface-dark text-text-dark font-body-sm text-body-sm px-space-sm py-space-xs rounded whitespace-nowrap shadow-lg z-50 pointer-events-none">Pengaturan</span></a></nav></div></aside><div class="pl-[76px] flex flex-col min-h-screen bg-canvas-light"><header class="fixed top-0 left-[76px] right-0 h-14 bg-surface-light border-b border-border-subtle z-40 flex items-center justify-between px-space-xl"><div class="flex items-center gap-space-sm text-on-surface-variant font-body-sm text-body-sm"><div class="flex items-center gap-1.5 hover:text-on-surface transition-colors cursor-pointer"><span class="material-symbols-outlined text-[16px]">folder</span><span>Core Engineering</span></div><span class="text-outline-variant font-label-code-sm text-label-code-sm">/</span><div class="flex items-center gap-1.5 font-medium text-on-surface"><span class="material-symbols-outlined text-[16px] text-primary">bolt</span><span>Workspace</span></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-md bg-surface-muted border border-border-subtle hover:border-outline-variant px-space-md py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-focus-ring w-64 justify-between group" type="button"><div class="flex items-center gap-space-sm font-body-sm text-body-sm"><span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface transition-colors">search</span><span class="text-on-surface-variant">Cari perintah atau berkas...</span></div><kbd class="font-label-code-sm text-label-code-sm bg-surface-light border border-border-subtle text-secondary px-1.5 py-0.5 rounded shadow-sm">⌘K</kbd></button><button class="inline-flex items-center gap-1.5 bg-primary-container hover:bg-primary-hover active:scale-[0.98] text-on-primary font-body-md text-body-md font-medium px-space-md py-1.5 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-focus-ring" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>Tambah</span></button><button class="relative w-9 h-9 rounded-lg hover:bg-surface-muted flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors focus:outline-none focus:ring-2 focus:ring-focus-ring" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-light"></span></button><div class="h-5 w-[1px] bg-border-subtle mx-space-xs"></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer ring-2 ring-transparent hover:ring-focus-ring transition-all"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="w-full pt-14 flex-1 bg-canvas-light"><div class="flex flex-col w-full">
+<!-- Sub-header context & Engine status banner -->
+<div class="w-full bg-surface-light border-b border-border-subtle px-space-xl py-space-lg">
+<div class="max-w-[1540px] mx-auto flex flex-col gap-space-md">
+<!-- Breadcrumb navigation & status badge -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs font-body-sm text-body-sm text-secondary">
+<span class="hover:text-on-surface cursor-pointer">Workspace</span>
+<span class="text-outline-variant font-label-code-sm">/</span>
+<span class="hover:text-on-surface cursor-pointer">Asisten &amp; Optimasi</span>
+<span class="text-outline-variant font-label-code-sm">/</span>
+<span class="text-primary font-medium">Smart Coach</span>
+</div>
+<!-- Engine Status Pill: Transparent Local Engine Guarantee -->
+<div class="inline-flex items-center gap-2 bg-success/10 px-3 py-1 rounded-full text-success font-label-tag text-label-tag font-semibold">
+<span class="inline-block w-2 h-2 rounded-full bg-success animate-pulse"></span>
+<span>Rule Engine v2.4 + Local LLM Aktif (Kerahasiaan Data Terjamin)</span>
+</div>
+</div>
+<!-- Main Title Row & Actions -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pt-space-xs">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">Smart Coach — Rekomendasi &amp; Optimasi Alur Kerja</h1>
+<p class="font-body-md text-body-md text-secondary mt-1 max-w-3xl">
+            Analisis cerdas berdasarkan jadwal nyata, kapasitas kognitif, dan progres sasaran. Rekomendasi hanya diterapkan setelah persetujuan eksplisit Anda (Gate L06 Protocol).
+          </p>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<button class="inline-flex items-center gap-2 bg-surface-muted hover:bg-surface-container active:scale-[0.98] border border-border-subtle text-on-surface font-body-md text-body-md font-medium px-4 py-2 rounded-lg transition-all shadow-sm" id="runDiagnosticBtn" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary" id="diagnosticIcon">refresh</span>
+<span>Jalankan Analisis Ulang</span>
+</button>
+</div>
+</div>
+<!-- Filter Tabs Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-xs border-t border-border-subtle">
+<div class="flex items-center gap-1.5" id="coachFilterContainer">
+<button class="coach-filter-btn px-3.5 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-all bg-primary-container text-on-primary" data-filter="all" type="button">
+            Semua Rekomendasi <span class="ml-1 opacity-80 text-label-code-sm">4</span>
+</button>
+<button class="coach-filter-btn px-3.5 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-all text-secondary hover:bg-surface-muted hover:text-on-surface" data-filter="action" type="button">
+            Butuh Tindakan <span class="ml-1 px-1.5 py-0.2 rounded bg-danger/10 text-danger text-label-code-sm font-semibold">3</span>
+</button>
+<button class="coach-filter-btn px-3.5 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-all text-secondary hover:bg-surface-muted hover:text-on-surface" data-filter="applied" type="button">
+            Diterapkan <span class="ml-1 opacity-70 text-label-code-sm">6</span>
+</button>
+<button class="coach-filter-btn px-3.5 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-all text-secondary hover:bg-surface-muted hover:text-on-surface" data-filter="dismissed" type="button">
+            Diabaikan <span class="ml-1 opacity-70 text-label-code-sm">2</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-secondary font-label-code-sm text-label-code-sm">
+<span class="material-symbols-outlined text-[15px] text-outline">verified_user</span>
+<span>Gate L06: Verifikasi Eksekusi Terisolasi</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Notification Banner when mutation applied -->
+<div class="hidden fixed bottom-6 right-8 z-50 bg-surface-dark text-text-dark px-space-md py-3 rounded-xl shadow-xl flex items-center gap-3 transition-transform duration-300" id="toastNotification">
+<span class="material-symbols-outlined text-success text-[20px]">check_circle</span>
+<span class="font-body-md text-body-md" id="toastMessage">Perubahan jadwal telah dikonfirmasi dan diterapkan.</span>
+</div>
+<!-- Two Column Content Grid -->
+<div class="w-full max-w-[1540px] mx-auto px-space-xl py-space-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- LEFT COLUMN: Recommendations Feed (65% -> 8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg" id="feedContainer">
+<!-- CARD 1: Tingkat Kritis / Urgensi Tinggi - Bentrok Jadwal -->
+<article class="bg-surface-light border border-border-subtle rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-danger"></div>
+<div class="p-space-lg sm:p-space-xl flex flex-col gap-space-md pl-6">
+<!-- Badges & Rule Reference -->
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 bg-danger/10 text-danger px-2.5 py-1 rounded text-label-tag font-label-tag font-semibold">
+<span class="material-symbols-outlined text-[14px]">event_busy</span>
+                  Bentrok Jadwal Terdeteksi
+                </span>
+<span class="inline-flex items-center bg-surface-muted text-on-surface-variant px-2 py-0.5 rounded text-label-code-sm font-label-code-sm">
+                  Prioritas Tinggi
+                </span>
+</div>
+<span class="text-secondary font-label-code-sm text-label-code-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+                RULE-CAL-409
+              </span>
+</div>
+<!-- Title & Cause Section (Transparency) -->
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Sesi Belajar Malam Tumpang Tindih dengan Acara Makan Malam Tim</h2>
+<div class="mt-space-sm bg-surface-muted p-space-md rounded-lg flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-warning text-[20px] shrink-0 mt-0.5">info</span>
+<div class="flex flex-col gap-1">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Dasar Data &amp; Alasan Transparansi:</span>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Kalender mendeteksi blok belajar <strong class="text-on-surface font-medium">“Baca materi 15m: Bab 01 Comp Thinking”</strong> terjadwal pukul <span class="font-label-code-sm text-primary">19:00 – 19:45 WIB</span> pada hari yang sama dengan acara tetap <strong class="text-on-surface font-medium">“Makan Malam Tim Engineering”</strong> (<span class="font-label-code-sm text-primary">19:00 – 20:30 WIB</span>).
+                  </p>
+</div>
+</div>
+</div>
+<!-- Change Preview (Diff visualization) -->
+<div class="border border-border-subtle rounded-lg p-space-md bg-canvas-light flex flex-col gap-space-sm">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-secondary font-semibold">Pratinjau Perubahan (Change Preview):</span>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
+<!-- Semula -->
+<div class="flex flex-col gap-1 bg-surface-light p-space-md rounded border border-border-subtle">
+<div class="flex items-center justify-between text-secondary font-label-code-sm">
+<span>Jadwal Semula</span>
+<span class="material-symbols-outlined text-danger text-[16px]">cancel</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-on-surface">Sabtu, 14 Nov • 19:00 WIB</span>
+<span class="text-danger font-body-sm text-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">block</span> Terhalang acara offline
+                  </span>
+</div>
+<!-- Rekomendasi -->
+<div class="flex flex-col gap-1 bg-surface-container-low p-space-md rounded border border-primary/20">
+<div class="flex items-center justify-between text-primary font-label-code-sm font-medium">
+<span>Rekomendasi AI</span>
+<span class="material-symbols-outlined text-primary text-[16px]">schedule</span>
+</div>
+<span class="font-body-md text-body-md font-medium text-primary">Sabtu, 14 Nov • 20:45 – 21:30 WIB</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Setelah kembali ke rumah (jeda transisi 15m)</span>
+</div>
+</div>
+<!-- Dampak -->
+<div class="flex items-center gap-2 pt-space-xs text-secondary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-success text-[18px]">verified</span>
+<span><strong class="text-on-surface">Dampak:</strong> Menjaga streak belajar 4 hari berturut-turut tanpa stres ketergesaan.</span>
+</div>
+</div>
+<!-- Gate L06 Action Buttons: Strict Explicit Mutation Only -->
+<div class="pt-space-xs flex flex-wrap items-center gap-space-sm border-t border-border-subtle">
+<button class="action-btn apply-btn inline-flex items-center gap-1.5 bg-primary-container hover:bg-primary-hover active:scale-[0.98] text-on-primary font-body-md text-body-md font-medium px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-focus-ring" data-action="reschedule-night" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+<span>Terapkan Jadwal Ulang</span>
+</button>
+<button class="action-btn inline-flex items-center gap-1.5 bg-surface-light hover:bg-surface-muted active:scale-[0.98] border border-border-subtle text-on-surface font-body-md text-body-md font-medium px-3.5 py-2 rounded-lg transition-all" data-action="shift-tomorrow" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">wb_sunny</span>
+<span>Pindahkan ke Besok Pagi</span>
+</button>
+<button class="action-btn dismiss-btn inline-flex items-center gap-1 text-secondary hover:text-danger hover:bg-danger/10 px-3 py-2 rounded-lg font-body-md text-body-md font-medium transition-all ml-auto" data-action="dismiss" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+<span>Abaikan</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 2: Optimasi Kognitif & Deep Work -->
+<article class="bg-surface-light border border-border-subtle rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-warning"></div>
+<div class="p-space-lg sm:p-space-xl flex flex-col gap-space-md pl-6">
+<!-- Badges -->
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 bg-warning/10 text-warning px-2.5 py-1 rounded text-label-tag font-label-tag font-semibold">
+<span class="material-symbols-outlined text-[14px]">psychology_alt</span>
+                  Kapasitas Kognitif
+                </span>
+<span class="inline-flex items-center bg-surface-muted text-on-surface-variant px-2 py-0.5 rounded text-label-code-sm font-label-code-sm">
+                  Saran Keseimbangan
+                </span>
+</div>
+<span class="text-secondary font-label-code-sm text-label-code-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">neurology</span>
+                COG-LOAD-18
+              </span>
+</div>
+<!-- Title & Data basis -->
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Beban Fokus Melebihi Batas Ideal Sebelum Sesi Live Coding</h2>
+<div class="mt-space-sm bg-surface-muted p-space-md rounded-lg flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">analytics</span>
+<div class="flex flex-col gap-1">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Dasar Data Deteksi Beban:</span>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Anda telah menjadwalkan <strong class="text-on-surface font-medium">3.5 jam Deep Work berturut-turut</strong> (Migrasi DB) tepat sebelum sesi latihan algoritma LeetCode 1.5 jam di siang hari tanpa buffer istirahat.
+                  </p>
+</div>
+</div>
+</div>
+<!-- Cognitive Solution Breakdown -->
+<div class="bg-canvas-light p-space-md rounded-lg border border-border-subtle flex flex-col gap-space-sm">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-secondary font-semibold">Rekomendasi Solusi &amp; Intervensi:</span>
+<ul class="flex flex-col gap-2 font-body-md text-body-md text-on-surface-variant">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-success text-[18px] mt-0.5 shrink-0">check_box</span>
+<span>Sisipkan blok <strong class="text-on-surface font-medium">‘Istirahat &amp; Jalan Kaki 20 Menit’</strong> pada pukul <span class="font-label-code-sm text-primary">12:40 – 13:00 WIB</span>.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-success text-[18px] mt-0.5 shrink-0">check_box</span>
+<span>Turunkan target latihan dari <strong class="text-secondary font-normal line-through">3 soal</strong> menjadi <strong class="text-on-surface font-medium">1 soal medium berkualitas tinggi</strong> untuk mencegah saturasi memori kerja.</span>
+</li>
+</ul>
+<!-- Cognitive load sparkline representation -->
+<div class="mt-2 pt-2 border-t border-border-subtle flex items-center justify-between text-body-sm text-secondary">
+<span class="font-body-sm">Proyeksi penurunan kelelahan mental:</span>
+<span class="font-label-code-sm font-semibold text-success">-28% Saturasi Kognitif</span>
+</div>
+</div>
+<!-- Gate L06 Actions -->
+<div class="pt-space-xs flex flex-wrap items-center gap-space-sm border-t border-border-subtle">
+<button class="action-btn apply-btn inline-flex items-center gap-1.5 bg-primary-container hover:bg-primary-hover active:scale-[0.98] text-on-primary font-body-md text-body-md font-medium px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-focus-ring" data-action="apply-rest" type="button">
+<span class="material-symbols-outlined text-[18px]">self_improvement</span>
+<span>Terapkan Istirahat 20 Menit</span>
+</button>
+<button class="action-btn dismiss-btn inline-flex items-center gap-1.5 bg-surface-light hover:bg-surface-muted active:scale-[0.98] border border-border-subtle text-secondary hover:text-on-surface font-body-md text-body-md font-medium px-3.5 py-2 rounded-lg transition-all" data-action="stay-plan" type="button">
+<span class="material-symbols-outlined text-[18px]">undo</span>
+<span>Tetap pada Rencana</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 3: Akselerasi Sasaran & Bukti Kompetensi -->
+<article class="bg-surface-light border border-border-subtle rounded-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="p-space-lg sm:p-space-xl flex flex-col gap-space-md pl-6">
+<!-- Badges -->
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 bg-primary-container/10 text-primary px-2.5 py-1 rounded text-label-tag font-label-tag font-semibold">
+<span class="material-symbols-outlined text-[14px]">flag_circle</span>
+                  Penyelarasan Sasaran
+                </span>
+<span class="inline-flex items-center bg-surface-muted text-on-surface-variant px-2 py-0.5 rounded text-label-code-sm font-label-code-sm">
+                  Growth Alignment
+                </span>
+</div>
+<span class="text-secondary font-label-code-sm text-label-code-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">share_location</span>
+                MAP-GOAL-03
+              </span>
+</div>
+<!-- Title & Transparency Reasoning -->
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Tugas Proyek DEV-402 Siap Dijadikan Bukti Milestone Sasaran</h2>
+<div class="mt-space-sm bg-surface-muted p-space-md rounded-lg flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">schema</span>
+<div class="flex flex-col gap-1">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Analisis Kemiripan Kompetensi:</span>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Pekerjaan refactoring arsitektur Midtrans yang sedang berjalan memiliki kesamaan kompetensi <strong class="text-primary font-semibold">95%</strong> dengan <strong class="text-on-surface font-medium">“Checkpoint Milestone 3 (State Machine &amp; Concurrency)”</strong>.
+                  </p>
+</div>
+</div>
+</div>
+<!-- Value Props & Impact -->
+<div class="bg-surface-container-low p-space-md rounded-lg border border-primary/20 flex flex-col gap-space-sm">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-primary font-semibold">Rekomendasi Pemetaan Otomatis:</span>
+<div class="flex flex-col gap-2 font-body-md text-body-md text-on-surface">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">link</span>
+<span>Tautkan <span class="font-label-code-sm bg-surface-light px-1.5 py-0.5 rounded border border-border-subtle">PR #108</span> dan <span class="font-label-code-sm bg-surface-light px-1.5 py-0.5 rounded border border-border-subtle">ADR-014</span> ke Sasaran <em>“Lolos Interview Teknis Software Engineer”</em>.</span>
+</div>
+<!-- Progress indicator mock -->
+<div class="mt-2 bg-surface-light p-3 rounded border border-border-subtle flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-secondary font-medium">Indikator Kesiapan Wawancara:</span>
+<span class="font-label-code-sm font-semibold text-primary">65% → 72% (+7%)</span>
+</div>
+<div class="w-full bg-surface-muted h-2 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full transition-all" style="width: 72%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Gate L06 Actions -->
+<div class="pt-space-xs flex flex-wrap items-center gap-space-sm border-t border-border-subtle">
+<button class="action-btn apply-btn inline-flex items-center gap-1.5 bg-primary-container hover:bg-primary-hover active:scale-[0.98] text-on-primary font-body-md text-body-md font-medium px-4 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-focus-ring" data-action="link-goal" type="button">
+<span class="material-symbols-outlined text-[18px]">add_link</span>
+<span>Hubungkan ke Sasaran</span>
+</button>
+<button class="action-btn inline-flex items-center gap-1.5 bg-surface-light hover:bg-surface-muted active:scale-[0.98] border border-border-subtle text-on-surface font-body-md text-body-md font-medium px-3.5 py-2 rounded-lg transition-all" data-action="review-details" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">visibility</span>
+<span>Tinjau Rincian</span>
+</button>
+<button class="action-btn dismiss-btn inline-flex items-center gap-1 text-secondary hover:text-danger hover:bg-danger/10 px-3 py-2 rounded-lg font-body-md text-body-md font-medium transition-all ml-auto" data-action="dismiss" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+<span>Abaikan</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 4 (Example: Already Handled / Applied earlier) -->
+<article class="bg-surface-light border border-border-subtle rounded-xl p-space-lg flex items-center justify-between gap-space-md opacity-75">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-success/10 text-success flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-medium text-on-surface line-through">Blok Istirahat Pemulihan (Jumat 15:30)</span>
+<span class="font-body-sm text-body-sm text-secondary">Diterapkan otomatis sesuai otorisasi Anda kemarin pukul 16:04 WIB</span>
+</div>
+</div>
+<span class="font-label-tag text-label-tag text-success bg-success/10 px-2.5 py-1 rounded font-medium">Tuntas Dioptimasi</span>
+</article>
+</div>
+<!-- RIGHT COLUMN: Diagnostics & Workload Model (35% -> 4 cols) -->
+<aside class="lg:col-span-4 flex flex-col gap-space-lg">
+<!-- CARD 1: Kesehatan Ritme Kerja Pekan Ini -->
+<div class="bg-surface-light border border-border-subtle rounded-xl p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between pb-space-sm border-b border-border-subtle">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Kesehatan Ritme Kerja</h2>
+<span class="font-label-tag text-label-tag bg-success/10 text-success px-2 py-0.5 rounded font-semibold">Pekan Ini</span>
+</div>
+<!-- Key Metrics Grid -->
+<div class="flex flex-col gap-space-md">
+<!-- Cognitive Load Score -->
+<div class="bg-canvas-light p-space-md rounded-lg border border-border-subtle flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-secondary font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">speed</span>
+                  Beban Kognitif Rata-rata
+                </span>
+<span class="font-label-code-sm font-semibold text-primary">7.2 / 10 (Optimal)</span>
+</div>
+<div class="w-full bg-surface-muted h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 72%;"></div>
+</div>
+<span class="font-body-sm text-body-sm text-outline">Batas kewaspadaan: &gt; 8.5/10</span>
+</div>
+<!-- Rest Ratio -->
+<div class="flex items-center justify-between p-space-md bg-canvas-light rounded-lg border border-border-subtle">
+<div class="flex flex-col">
+<span class="text-body-sm font-medium text-secondary">Rasio Istirahat vs Kerja</span>
+<span class="font-headline-sm text-headline-sm text-on-surface mt-0.5">1 : 4.2</span>
+</div>
+<span class="font-label-tag text-label-tag bg-success/10 text-success px-2 py-1 rounded font-semibold">Sehat</span>
+</div>
+<!-- Fatigue Forecast -->
+<div class="flex flex-col gap-2 p-space-md bg-warning/5 rounded-lg border border-warning/20">
+<span class="font-label-tag text-label-tag font-semibold text-warning uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                Prediksi Kelelahan (Fatigue)
+              </span>
+<p class="font-body-sm text-body-sm text-on-surface leading-normal">
+<strong>Rendah</strong> pada hari kerja (Senin – Jumat).<br/>
+<strong class="text-warning">Waspada</strong> pada Sabtu sore jika blok belajar tetap dipaksakan tanpa jeda makan malam.
+              </p>
+</div>
+</div>
+</div>
+<!-- CARD 2: Transparansi Integritas DevFlow Coach -->
+<div class="bg-surface-light border border-border-subtle rounded-xl p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center gap-2 pb-space-sm border-b border-border-subtle">
+<span class="material-symbols-outlined text-primary text-[20px]">format_image_left</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Integritas DevFlow Coach</h2>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">
+            Sistem beroperasi di bawah mandat kepatuhan ketat perlindungan otonomi pengguna:
+          </p>
+<!-- Principle Checklist -->
+<div class="flex flex-col gap-2.5">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-success text-[18px] shrink-0 mt-0.5">check_circle</span>
+<div class="font-body-sm text-body-sm text-on-surface">
+<strong>Nol Mutasi Senyap:</strong> Tidak ada perubahan jadwal atau sasaran tanpa klik persetujuan Anda.
+              </div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-success text-[18px] shrink-0 mt-0.5">check_circle</span>
+<div class="font-body-sm text-body-sm text-on-surface">
+<strong>Privasi Lokal:</strong> Data kalender tidak dikirim ke LLM publik komersial. Inferensi berjalan pada model sandboxed lokal.
+              </div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-success text-[18px] shrink-0 mt-0.5">check_circle</span>
+<div class="font-body-sm text-body-sm text-on-surface">
+<strong>Audit Log Terbuka:</strong> Setiap saran disertai aturan log (RULE-CAL, COG-LOAD) yang dapat Anda verifikasi.
+              </div>
+</div>
+</div>
+</div>
+<!-- CARD 3: Tanya Coach (Manual Consultation Alternative) -->
+<div class="bg-surface-light border border-border-subtle rounded-xl p-space-lg flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between pb-space-sm border-b border-border-subtle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">chat</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Tanya Coach Manual</h2>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-outline">Offline LLM</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<label class="font-body-sm text-body-sm text-secondary" for="coachQuestionInput">Eksplorasi kapasitas dan skenario jadwal secara interaktif:</label>
+<div class="relative">
+<input class="w-full bg-surface-muted border border-border-subtle focus:border-primary px-3.5 py-2.5 rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-focus-ring pr-10" id="coachQuestionInput" placeholder="Tanya strategi jadwal atau evaluasi kapasitas..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-primary hover:text-primary-hover focus:outline-none" id="sendCoachQuestion" type="button">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+<!-- Quick prompt chips -->
+<div class="flex flex-col gap-1.5 pt-space-xs">
+<span class="font-label-tag text-label-tag uppercase tracking-wider text-secondary font-semibold">Saran Pertanyaan Cepat:</span>
+<div class="flex flex-wrap gap-1.5">
+<button class="prompt-chip text-left bg-surface-muted hover:bg-surface-container border border-border-subtle px-2.5 py-1.5 rounded-md font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+                “Berapa jam ideal belajar pekan depan?”
+              </button>
+<button class="prompt-chip text-left bg-surface-muted hover:bg-surface-container border border-border-subtle px-2.5 py-1.5 rounded-md font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+                “Analisis bottleneck waktu saya”
+              </button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<script>
+  (function initSmartCoach() {
+    const toast = document.getElementById('toastNotification');
+    const toastMsg = document.getElementById('toastMessage');
+    const filterBtns = document.querySelectorAll('.coach-filter-btn');
+    const runDiagBtn = document.getElementById('runDiagnosticBtn');
+    const diagIcon = document.getElementById('diagnosticIcon');
+    const questionInput = document.getElementById('coachQuestionInput');
+    const sendBtn = document.getElementById('sendCoachQuestion');
+    const promptChips = document.querySelectorAll('.prompt-chip');
+
+    function showToast(message) {
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = message;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 4000);
+    }
+
+    // Filter Buttons Interaction
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => {
+          b.className = 'coach-filter-btn px-3.5 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-all text-secondary hover:bg-surface-muted hover:text-on-surface';
+        });
+        btn.className = 'coach-filter-btn px-3.5 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-all bg-primary-container text-on-primary';
+        showToast('Memfilter tampilan rekomendasi: ' + btn.textContent.trim());
+      });
+    });
+
+    // Run Diagnostic action
+    if (runDiagBtn && diagIcon) {
+      runDiagBtn.addEventListener('click', () => {
+        diagIcon.classList.add('animate-spin');
+        runDiagBtn.disabled = true;
+        setTimeout(() => {
+          diagIcon.classList.remove('animate-spin');
+          runDiagBtn.disabled = false;
+          showToast('Diagnostik selesai: Rule engine memeriksa 42 event kalender & beban kognitif mutakhir.');
+        }, 1100);
+      });
+    }
+
+    // Explicit Action buttons (Gate L06 implementation)
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const card = e.target.closest('article');
+        const actionType = btn.getAttribute('data-action');
+
+        if (actionType === 'dismiss' || actionType === 'stay-plan') {
+          if (card) {
+            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            card.style.opacity = '0.4';
+            card.style.pointerEvents = 'none';
+          }
+          showToast('Rekomendasi diabaikan. Jadwal asli Anda tidak mengalami perubahan.');
+        } else if (actionType === 'review-details') {
+          showToast('Membuka pratinjau matriks pemetaan kompetensi Midtrans...');
+        } else {
+          // Mutate explicitly upon approval
+          if (card) {
+            const actionsContainer = btn.closest('div');
+            if (actionsContainer) {
+              actionsContainer.innerHTML = `
+                <div class="inline-flex items-center gap-2 text-success font-body-md text-body-md font-medium bg-success/10 px-3 py-1.5 rounded-lg">
+                  <span class="material-symbols-outlined text-[18px]">verified</span>
+                  <span>Telah disetujui &amp; diterapkan ke Kalender (Audit Log Terbit)</span>
+                </div>
+              `;
+            }
+          }
+          showToast('✓ Berhasil diterapkan! Perubahan disimpan dan disinkronkan ke kalender kerja.');
+        }
+      });
+    });
+
+    // Prompt Chips to input
+    promptChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (questionInput) {
+          questionInput.value = chip.textContent.replace(/[“”]/g, '').trim();
+          questionInput.focus();
+        }
+      });
+    });
+
+    // Manual Coach Q&A submission
+    if (sendBtn && questionInput) {
+      sendBtn.addEventListener('click', () => {
+        if (!questionInput.value.trim()) return;
+        showToast('Memproses pertanyaan: "' + questionInput.value.trim() + '" pada model lokal...');
+        questionInput.value = '';
+      });
+      questionInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          sendBtn.click();
+        }
+      });
+    }
+  })();
+</script></main></div></body></html>

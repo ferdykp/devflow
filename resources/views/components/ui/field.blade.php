@@ -1,9 +1,9 @@
-@props(['name', 'label', 'type' => 'text', 'value' => null, 'placeholder' => '', 'required' => false, 'id' => null])
+@props(['name', 'label', 'type' => 'text', 'value' => null, 'placeholder' => '', 'required' => false, 'id' => null, 'wrapperClass' => ''])
 @php
     $inputId = $id ?? str_replace(['[', ']'], ['-', ''], $name);
     $fieldKey = trim(str_replace(['[', ']'], ['.', ''], $name), '.');
 @endphp
-<div class="space-y-2">
+<div @class(['space-y-2', $wrapperClass])>
     <label for="{{ $inputId }}" class="block text-sm font-medium text-zinc-800">
         {{ $label }} @unless($required)<span class="font-normal text-zinc-500">(opsional)</span>@endunless
     </label>

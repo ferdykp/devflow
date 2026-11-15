@@ -3,8 +3,7 @@
 @section('page-heading', 'Analisis AI')
 @section('content')
 <div class="mx-auto max-w-3xl space-y-6">
-    <a href="{{ route('projects.show', $project) }}" class="text-sm text-[#60615e] underline">← {{ $project->name }}</a>
-    <div><h1 class="df-heading [font-size:clamp(1.65rem,2.8vw,2.15rem)] [font-weight:650] [letter-spacing:-.045em] [line-height:1.18] tracking-tight">Analisis AI</h1><p class="mt-1 text-sm text-[#60615e]">Saran ini bersifat opsional. Keputusan cakupan tetap ada di tanganmu.</p></div>
+    <header class="df-page-heading df-panel flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6"><div><p class="mb-1 text-xs font-medium text-zinc-500">{{ $project->name }}</p><h1 class="df-page-title">Analisis AI</h1><p class="df-page-description mt-2">Saran opsional untuk ditinjau.</p></div><a href="{{ route('projects.show', $project) }}" class="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-medium text-blue-700 hover:bg-blue-50">Kembali ke proyek</a></header>
     <div class="rounded-lg border border-[#e4e4e1] bg-white p-5 sm:p-6">
         @if(! $ready)
             <div role="status" class="rounded-lg bg-zinc-100 p-4 text-sm text-zinc-700">Fitur AI belum aktif. Hubungi pengelola untuk mengaktifkannya. Tugas, peninjauan cakupan, dan ringkasan proyek tetap bisa digunakan.</div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\Workspace;
+use App\Services\TaskRecurrenceService;
 use App\Support\ProjectAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -51,16 +52,17 @@ class TaskController extends Controller
             if (($data['status'] ?? 'todo') === 'done') {
                 $data['completed_at'] = now();
             }
-            $projectModel->tasks()->create($data);
+            $task = $projectModel->tasks()->create($data);
+            $task->history()->create(['user_id' => $request->user()->id, 'action' => 'created', 'to_status' => $task->status]);
         });
 
         return back()->with('success', 'Tugas berhasil dibuat.')->with('quick_task_added', $request->boolean('quick_add'));
     }
 
-    public function update(Request $request, int $project, int $task): RedirectResponse|JsonResponse
+    public function update(Request $request, int $project, int $task, TaskRecurrenceService $recurrenceService): RedirectResponse|JsonResponse
     {
         $projectModel = ProjectAccess::find($project);
-        $taskModel = DB::transaction(function () use ($request, $projectModel, $task): Task {
+        $taskModel = DB::transaction(function () use ($request, $projectModel, $task, $recurrenceService): Task {
             $workspace = Workspace::query()->accessibleTo($request->user()->id)->lockForUpdate()->findOrFail($projectModel->workspace_id);
             $projectModel->setRelation('workspace', $workspace);
             $taskModel = $projectModel->tasks()->lockForUpdate()->findOrFail($task);
@@ -68,7 +70,18 @@ class TaskController extends Controller
             if (array_key_exists('status', $data) && $data['status'] !== $taskModel->status) {
                 $data['completed_at'] = $data['status'] === 'done' ? now() : null;
             }
+            $previousStatus = $taskModel->status;
             $taskModel->update($data);
+            $taskModel->history()->create([
+                'user_id' => $request->user()->id,
+                'action' => 'updated',
+                'from_status' => $previousStatus,
+                'to_status' => $taskModel->status,
+                'metadata' => ['changed_fields' => array_keys($data)],
+            ]);
+            if ($previousStatus !== 'done' && $taskModel->status === 'done') {
+                $recurrenceService->createNextOccurrence($taskModel, $request->user());
+            }
 
             return $taskModel;
         });

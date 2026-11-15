@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { completeOnboarding } from './onboarding';
 
 // Each scenario uses a freshly registered user, no fixed credentials or real user data.
 test('guest access and account creation', async ({ page }) => {
@@ -12,7 +13,7 @@ test('guest access and account creation', async ({ page }) => {
   await page.getByLabel('Kata sandi', { exact: true }).fill('E2eSecurePass123!');
   await page.getByLabel('Ulangi kata sandi').fill('E2eSecurePass123!');
   await page.getByRole('button', { name: /Buat akun/ }).click();
-  await expect(page).toHaveURL(/\/dashboard/);
+  await completeOnboarding(page);
 });
 
 test('project lifecycle, task views, resume and focus', async ({ page }) => {
@@ -23,7 +24,7 @@ test('project lifecycle, task views, resume and focus', async ({ page }) => {
   await page.getByLabel('Kata sandi', { exact: true }).fill('E2eSecurePass123!');
   await page.getByLabel('Ulangi kata sandi').fill('E2eSecurePass123!');
   await page.getByRole('button', { name: /Buat akun/ }).click();
-  await expect(page).toHaveURL(/\/dashboard/);
+  await completeOnboarding(page);
 
   await page.goto('/projects');
   await page.getByRole('link', { name: 'Ruang kerja baru', exact: true }).click();

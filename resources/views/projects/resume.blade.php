@@ -17,7 +17,7 @@
         <x-ui.panel><p class="text-xs text-[#747571]">Penyelesaian tugas</p><p class="mt-2 df-heading [font-size:clamp(1.65rem,2.8vw,2.15rem)] [font-weight:650] [letter-spacing:-.045em] [line-height:1.18]">{{ $resume['progress'] === null ? 'Belum bisa dihitung' : $resume['progress'].'%' }}</p></x-ui.panel>
         <x-ui.panel><p class="text-xs text-[#747571]">Aktivitas terakhir yang tercatat</p><p class="mt-2 text-sm font-semibold">{{ $resume['last_activity']?->occurred_at?->diffForHumans() ?? 'Belum ada aktivitas' }}</p></x-ui.panel>
     </div>
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]">
+    <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,.8fr)]">
         <div class="space-y-5">
             <x-ui.panel>
                 <h2 class="text-base font-semibold">Lanjutkan pekerjaan</h2>

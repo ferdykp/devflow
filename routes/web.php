@@ -1,42 +1,69 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentTaskImportController;
 use App\Http\Controllers\FocusController;
 use App\Http\Controllers\GitHubAppController;
 use App\Http\Controllers\GithubController;
+use App\Http\Controllers\GoalController;
+use App\Http\Controllers\LearningController;
+use App\Http\Controllers\MyDayController;
+use App\Http\Controllers\PersonalDetailController;
+use App\Http\Controllers\PersonalNoteController;
 use App\Http\Controllers\PrdController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectExtrasController;
 use App\Http\Controllers\ProjectInsightsController;
 use App\Http\Controllers\ProjectResumeController;
+use App\Http\Controllers\RoutineController;
 use App\Http\Controllers\ScopeController;
+use App\Http\Controllers\SmartCoachController;
 use App\Http\Controllers\TaskChecklistController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskInboxController;
+use App\Http\Controllers\UserSettingsController;
+use App\Http\Controllers\WeeklyReviewController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceMemberController;
-use App\Models\Activity;
-use App\Models\Project;
-use App\Models\Task;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route(Auth::check() ? 'dashboard' : 'login'));
+if (app()->environment('testing') && config('app.e2e_isolated')) {
+    Route::get('/__e2e/email-verification-code', function (Request $request) {
+        abort_unless(
+            $request->session()->has('pending_email_verification_user_id')
+                && $request->session()->has('e2e_email_verification_code'),
+            404,
+        );
+
+        return response()->json(['code' => $request->session()->get('e2e_email_verification_code')]);
+    });
+}
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::post('/email/verify', [EmailVerificationController::class, 'verify'])->middleware('throttle:10,1')->name('verification.verify');
+    Route::post('/email/verification/resend', [EmailVerificationController::class, 'resend'])->middleware('throttle:3,1')->name('verification.send');
+    Route::post('/email/verification/restart', [EmailVerificationController::class, 'restart'])->name('verification.restart');
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->middleware('throttle:10,1')->name('google.redirect');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->middleware('throttle:20,1')->name('google.callback');
 });
 Route::middleware(['auth', 'cache-history'])->group(function () {
-    Route::get('/dashboard', function () {
-        $projects = Project::whereHas('workspace', fn ($q) => $q->accessibleTo(auth()->id()))->withCount(['tasks', 'activities'])->latest()->limit(6)->get();
-        $openTasks = Task::whereHas('project.workspace', fn ($q) => $q->accessibleTo(auth()->id()))->whereNotIn('status', ['done'])->count();
-        $activities = Activity::whereHas('project.workspace', fn ($q) => $q->accessibleTo(auth()->id()))->with('project')->orderByDesc('occurred_at')->limit(8)->get();
-
-        return view('dashboard.index', compact('projects', 'openTasks', 'activities'));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/welcome', [UserSettingsController::class, 'welcome'])->name('onboarding.welcome');
+    Route::post('/welcome', [UserSettingsController::class, 'completeWelcome'])->name('onboarding.welcome.complete');
+    Route::get('/onboarding/setup', [UserSettingsController::class, 'setup'])->name('onboarding.setup');
+    Route::post('/onboarding/setup', [UserSettingsController::class, 'saveSetup'])->name('onboarding.setup.save');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/workspaces/create', [WorkspaceController::class, 'create'])->name('workspaces.create');
     Route::post('/workspaces', [WorkspaceController::class, 'store'])->name('workspaces.store');
@@ -83,6 +110,83 @@ Route::middleware(['auth', 'cache-history'])->group(function () {
     Route::post('/projects/{project}/repositories', [GithubController::class, 'link'])->name('github.link');
     Route::post('/projects/{project}/repositories/{repository}/sync', [GithubController::class, 'sync'])->middleware('throttle:8,1')->name('github.sync');
     Route::delete('/projects/{project}/repositories/{repository}', [GithubController::class, 'disconnect'])->name('github.disconnect');
+    Route::get('/my-day', [MyDayController::class, 'index'])->name('my-day.index');
+    Route::post('/my-day/tasks/{task}/complete', [MyDayController::class, 'complete'])->name('my-day.tasks.complete');
+    Route::post('/my-day/tasks/{task}/defer', [MyDayController::class, 'defer'])->name('my-day.tasks.defer');
+    Route::post('/my-day/routines/{routine}/check-in', [MyDayController::class, 'routineCheckIn'])->name('my-day.routines.check-in');
+    Route::post('/my-day/reflection', [MyDayController::class, 'reflect'])->name('my-day.reflection');
+    Route::get('/inbox', fn (Request $request) => redirect()->route(
+        'tasks.index',
+        $request->query() + ['status' => 'open'],
+    ))->name('inbox.index');
+    Route::post('/inbox', [TaskInboxController::class, 'store'])->name('inbox.store');
+    Route::get('/tasks', [TaskInboxController::class, 'index'])->name('tasks.index');
+    Route::post('/task-views', [TaskInboxController::class, 'storeView'])->name('task-views.store');
+    Route::delete('/task-views/{viewKey}', [TaskInboxController::class, 'destroyView'])->name('task-views.destroy');
+    Route::get('/tasks/{task}', [PersonalDetailController::class, 'task'])->whereNumber('task')->name('personal-tasks.show');
+    Route::post('/inbox/bulk-update', [TaskInboxController::class, 'bulkUpdate'])->name('inbox.bulk-update');
+    Route::patch('/inbox/{task}', [TaskInboxController::class, 'update'])->name('inbox.update');
+    Route::patch('/inbox/{task}/checklist/{item}', [TaskInboxController::class, 'updateChecklist'])->whereNumber('item')->name('inbox.checklist.update');
+    Route::post('/inbox/{task}/comments', [TaskInboxController::class, 'storeComment'])->name('inbox.comments.store');
+    Route::delete('/inbox/{task}/comments/{comment}', [TaskInboxController::class, 'destroyComment'])->name('inbox.comments.destroy');
+    Route::delete('/inbox/{task}', [TaskInboxController::class, 'destroy'])->name('inbox.destroy');
+    Route::get('/routines', [RoutineController::class, 'index'])->name('routines.index');
+    Route::get('/routines/{routine}', [PersonalDetailController::class, 'routine'])->whereNumber('routine')->name('routines.show');
+    Route::post('/routines', [RoutineController::class, 'store'])->name('routines.store');
+    Route::patch('/routines/{routine}', [RoutineController::class, 'update'])->name('routines.update');
+    Route::post('/routines/{routine}/check-in', [RoutineController::class, 'checkIn'])->name('routines.check-in');
+    Route::get('/goals', [GoalController::class, 'index'])->name('goals.index');
+    Route::get('/goals/{goal}', [PersonalDetailController::class, 'goal'])->whereNumber('goal')->name('goals.show');
+    Route::post('/goals', [GoalController::class, 'store'])->name('goals.store');
+    Route::patch('/goals/{goal}', [GoalController::class, 'update'])->name('goals.update');
+    Route::post('/goals/{goal}/milestones', [GoalController::class, 'storeMilestone'])->name('goals.milestones.store');
+    Route::patch('/goals/{goal}/milestones/{milestone}', [GoalController::class, 'updateMilestone'])->name('goals.milestones.update');
+    Route::post('/goals/{goal}/tasks', [GoalController::class, 'storeTask'])->name('goals.tasks.store');
+    Route::get('/learning', [LearningController::class, 'index'])->name('learning.index');
+    Route::get('/learning/sessions', [PersonalDetailController::class, 'learningSessions'])->name('learning.sessions.index');
+    Route::get('/learning/assessments', [PersonalDetailController::class, 'learningAssessments'])->name('learning.assessments.index');
+    Route::get('/learning/paths/{path}', [PersonalDetailController::class, 'learningPath'])->whereNumber('path')->name('learning.paths.show');
+    Route::get('/learning/paths/{path}/modules/{module}', [PersonalDetailController::class, 'learningModule'])->whereNumber('path')->whereNumber('module')->name('learning.modules.show');
+    Route::get('/learning/lessons/{lesson}', [PersonalDetailController::class, 'lesson'])->whereNumber('lesson')->name('learning.lessons.show');
+    Route::post('/learning', [LearningController::class, 'storePath'])->name('learning.paths.store');
+    Route::patch('/learning/{path}', [LearningController::class, 'updatePath'])->name('learning.paths.update');
+    Route::post('/learning/{path}/modules', [LearningController::class, 'storeModule'])->name('learning.modules.store');
+    Route::patch('/learning/{path}/modules/{module}', [LearningController::class, 'updateModule'])->name('learning.modules.update');
+    Route::post('/learning/{path}/lessons', [LearningController::class, 'storeLesson'])->name('learning.lessons.store');
+    Route::patch('/learning/{path}/lessons/{lesson}', [LearningController::class, 'updateLesson'])->name('learning.lessons.update');
+    Route::post('/learning/{path}/lessons/{lesson}/sessions', [LearningController::class, 'storeSession'])->name('learning.sessions.store');
+    Route::patch('/learning/sessions/{session}', [LearningController::class, 'updateSession'])->whereNumber('session')->name('learning.sessions.update');
+    Route::delete('/learning/sessions/{session}', [LearningController::class, 'destroySession'])->whereNumber('session')->name('learning.sessions.destroy');
+    Route::post('/learning/{path}/lessons/{lesson}/assessments', [LearningController::class, 'storeAssessment'])->name('learning.assessments.store');
+    Route::patch('/learning/assessments/{assessment}', [LearningController::class, 'updateAssessment'])->whereNumber('assessment')->name('learning.assessments.update');
+    Route::delete('/learning/assessments/{assessment}', [LearningController::class, 'destroyAssessment'])->whereNumber('assessment')->name('learning.assessments.destroy');
+    Route::post('/learning/{path}/lessons/{lesson}/materials', [LearningController::class, 'storeMaterial'])->name('learning.materials.store');
+    Route::get('/learning/materials/{material}', [LearningController::class, 'downloadMaterial'])->name('learning.materials.download');
+    Route::get('/notes', [PersonalNoteController::class, 'index'])->name('personal-notes.index');
+    Route::get('/notes/{note}', [PersonalDetailController::class, 'note'])->whereNumber('note')->name('personal-notes.show');
+    Route::post('/notes', [PersonalNoteController::class, 'store'])->name('personal-notes.store');
+    Route::patch('/notes/{note}', [PersonalNoteController::class, 'update'])->name('personal-notes.update');
+    Route::delete('/notes/{note}', [PersonalNoteController::class, 'destroy'])->name('personal-notes.destroy');
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::post('/calendar/events', [CalendarController::class, 'store'])->name('calendar.events.store');
+    Route::patch('/calendar/events/{event}', [CalendarController::class, 'update'])->name('calendar.events.update');
+    Route::patch('/calendar/events/{event}/occurrence', [CalendarController::class, 'rescheduleOccurrence'])->name('calendar.events.reschedule');
+    Route::delete('/calendar/events/{event}', [CalendarController::class, 'cancelOccurrence'])->name('calendar.events.cancel');
+    Route::post('/calendar/events/{event}/complete', [CalendarController::class, 'complete'])->name('calendar.events.complete');
+    Route::get('/weekly-review', [WeeklyReviewController::class, 'index'])->name('weekly-review.index');
+    Route::post('/weekly-review', [WeeklyReviewController::class, 'store'])->name('weekly-review.store');
+    Route::post('/weekly-review/carry-forward', [WeeklyReviewController::class, 'carryForward'])->name('weekly-review.carry-forward');
+    Route::get('/smart-coach', [SmartCoachController::class, 'index'])->name('smart-coach.index');
+    Route::post('/smart-coach/{recommendation}/confirm', [SmartCoachController::class, 'confirm'])->name('smart-coach.confirm');
+    Route::post('/smart-coach/{recommendation}/dismiss', [SmartCoachController::class, 'dismiss'])->name('smart-coach.dismiss');
+    Route::get('/settings', [UserSettingsController::class, 'index'])->name('settings.index');
+    Route::patch('/settings', [UserSettingsController::class, 'update'])->name('settings.update');
+    Route::patch('/settings/profile', [UserSettingsController::class, 'updateProfile'])->name('settings.profile.update');
+    Route::patch('/settings/work-schedule', [UserSettingsController::class, 'updateWorkSchedule'])->name('settings.work-schedule.update');
+    Route::patch('/settings/notifications', [UserSettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
+    Route::get('/notifications', [UserSettingsController::class, 'notificationCenter'])->name('notifications.index');
+    Route::get('/settings/integrations', [UserSettingsController::class, 'integrations'])->name('settings.integrations');
     Route::get('/focus', [FocusController::class, 'index'])->name('focus.index');
+    Route::post('/focus/reorder', [FocusController::class, 'reorder'])->name('focus.reorder');
     Route::post('/focus/{task}', [FocusController::class, 'toggle'])->name('focus.toggle');
 });

@@ -5,7 +5,7 @@
 <x-ui.page-heading :title="$workspace->name" description="Semua anggota dapat mengelola proyek, dokumen, dan tugas. Pemilik mengelola undangan dan keanggotaan." eyebrow="Ruang kerja">
     <x-ui.button :href="route('projects.index')" variant="secondary">Kembali ke proyek</x-ui.button>
 </x-ui.page-heading>
-<div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+<div class="space-y-6">
     <x-ui.panel>
         <h2 class="text-lg font-semibold">Anggota <span class="text-sm font-normal text-zinc-500">{{ $participants->count() }}</span></h2>
         <div class="mt-5 divide-y divide-zinc-100">

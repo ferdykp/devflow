@@ -3,7 +3,7 @@
 @section('page-heading', 'Hubungkan GitHub')
 @section('content')
 <div class="mx-auto max-w-2xl space-y-5">
-    <div><h1 class="df-heading [font-size:clamp(1.65rem,2.8vw,2.15rem)] [font-weight:650] [letter-spacing:-.045em] [line-height:1.18] tracking-tight">Pilih repositori</h1><p class="mt-1 text-sm text-[#60615e]">Hanya repositori yang kamu izinkan untuk DevFlow yang ditampilkan.</p></div>
+    <header class="df-page-heading df-panel p-5 sm:p-6"><p class="mb-1 text-xs font-medium text-zinc-500">{{ $project->name }} · GitHub</p><h1 class="df-page-title">Pilih repositori</h1><p class="df-page-description mt-2">Repositori yang kamu izinkan untuk DevFlow.</p></header>
     <div class="rounded-xl border border-[#eaeae8] bg-white p-5">
         @forelse($repositories as $repository)
         <form method="POST" action="{{ route('github.app.connect', $project) }}" class="flex items-center justify-between gap-4 border-b border-zinc-100 py-3 last:border-0">

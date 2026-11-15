@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { completeOnboarding } from './onboarding';
 import type { Page, TestInfo } from '@playwright/test';
 
 async function capture(page: Page, testInfo: TestInfo, name: string) {
@@ -17,7 +18,7 @@ async function createProject(page: Page) {
   await page.getByLabel('Kata sandi', { exact: true }).fill('SandiUji123!');
   await page.getByLabel('Ulangi kata sandi').fill('SandiUji123!');
   await page.getByRole('button', { name: /Buat akun/ }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await completeOnboarding(page);
   await page.goto('/projects');
   await page.getByRole('link', { name: 'Proyek baru', exact: true }).click();
   await page.locator('select[name="workspace_id"]').selectOption({ label: 'Personal' });
@@ -57,12 +58,13 @@ test('navigasi utama jelas dan menu tambahan dapat ditutup dengan keyboard atau 
   await expect(panel).toBeHidden();
 });
 
-test('status alternatif tersimpan, konfirmasi batal aman, dan penghapusan bekerja', async ({ page, isMobile }) => {
+test('status alternatif tersimpan, konfirmasi batal aman, dan penghapusan bekerja', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   const project = await createProject(page);
   await createTask(page, project);
-  if (isMobile) await page.getByRole('link', { name: 'Daftar', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'Papan', exact: true })).toHaveAttribute('aria-current', 'page');
+  await page.getByRole('link', { name: 'Daftar', exact: true }).click();
   await page.getByLabel('Pilihan tugas Tugas pengujian', { exact: true }).click();
   await page.getByLabel('Status tugas Tugas pengujian', { exact: true }).scrollIntoViewIfNeeded();
   await page.getByLabel('Status tugas Tugas pengujian', { exact: true }).selectOption('in_review');
@@ -109,7 +111,7 @@ test('drag and drop tersimpan dan kegagalan request mengembalikan kartu', async 
   await page.route('**/tasks/*', route => route.request().method() === 'PATCH'
     ? route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Layanan tidak tersedia' }) })
     : route.continue());
-  await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="todo"]'));
+  await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="todo"] h2'));
   await expect(page.locator('[data-task-move-error]')).toBeVisible();
   await expect(page.locator('[data-task-column="in_progress"] [data-task-card]')).toHaveCount(1);
   await page.clock.install();
