@@ -309,7 +309,7 @@ class GoogleAuthControllerTest extends TestCase
         Route::get('/__test/google-callback-error', function () {
             request()->attributes->set('google_oauth_intent', 'register');
 
-            throw new RuntimeException('Simulated callback failure.');
+            throw new \RuntimeException('Simulated callback failure.');
         })->name('google.callback');
 
         $response = $this->get('/__test/google-callback-error');

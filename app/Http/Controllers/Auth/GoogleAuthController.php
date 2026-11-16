@@ -103,6 +103,10 @@ class GoogleAuthController extends Controller
                         return ['action' => 'already_registered'];
                     }
 
+                    if ($user->email_verified_at !== null) {
+                        return ['action' => 'login', 'user' => $user];
+                    }
+
                     return ['action' => 'verify', 'is_new_account' => false, 'user' => $user];
                 }
 
@@ -120,6 +124,10 @@ class GoogleAuthController extends Controller
 
                     if ($user->google_id === null) {
                         $user->forceFill(['google_id' => $profile['sub']])->save();
+                    }
+
+                    if ($user->email_verified_at !== null) {
+                        return ['action' => 'login', 'user' => $user];
                     }
 
                     return ['action' => 'verify', 'is_new_account' => false, 'user' => $user];
@@ -164,6 +172,13 @@ class GoogleAuthController extends Controller
 
         /** @var User $user */
         $user = $result['user'];
+
+        if ($result['action'] === 'login') {
+            auth()->login($user);
+            $request->session()->regenerate();
+
+            return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali!');
+        }
 
         $request->session()->regenerate();
         $request->session()->put('pending_email_verification_user_id', $user->id);
