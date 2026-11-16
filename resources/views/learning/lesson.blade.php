@@ -2,12 +2,131 @@
 @section('title', $lesson->title)
 @section('page-heading', 'Ruang belajar')
 @section('content')
-<x-ui.page-heading eyebrow="{{ $lesson->module->path->title }} · {{ $lesson->module->title }}" :title="$lesson->title" description="Baca materi, catat sesi, dan tandai progres sesuai bukti yang kamu miliki."><a href="{{ route('learning.modules.show', [$lesson->module->path, $lesson->module]) }}" class="text-sm font-medium text-blue-700">Kembali ke modul</a></x-ui.page-heading>
-<div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,.75fr)]"><article class="space-y-5"><x-ui.panel><div class="flex items-center justify-between gap-3"><h2 class="font-semibold">Materi</h2><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs text-blue-700">{{ ['not_started'=>'Belum dimulai','content_viewed'=>'Materi dilihat','practice_completed'=>'Latihan selesai','competency_demonstrated'=>'Kompetensi ditunjukkan'][$lesson->status] ?? $lesson->status }}</span></div>@if($lesson->objectives)<p class="mt-3 rounded-xl bg-blue-50/70 p-4 text-sm leading-6 text-blue-950"><strong>Tujuan:</strong> {{ $lesson->objectives }}</p>@endif<div class="mt-5 whitespace-pre-wrap break-words text-sm leading-7 text-zinc-700">{{ $lesson->materials_markdown ?: 'Belum ada materi. Kamu bisa menambahkan penjelasan atau catatan dari Learning Hub.' }}</div>@if($lesson->reference_url)<a href="{{ $lesson->reference_url }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-blue-700">Buka referensi <i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>@endif</x-ui.panel>
-<x-ui.panel><div class="flex flex-wrap items-center justify-between gap-3"><h2 class="font-semibold">Lampiran</h2><form method="POST" enctype="multipart/form-data" action="{{ route('learning.materials.store', [$lesson->module->path, $lesson]) }}" class="flex flex-wrap items-center gap-2">@csrf<input name="file" type="file" accept=".pdf,.txt,.md,.png,.jpg,.jpeg" required class="max-w-56 text-xs"><button class="min-h-10 rounded-lg bg-zinc-100 px-3 text-xs font-semibold">Unggah</button></form></div><ul class="mt-3 divide-y divide-zinc-100">@forelse($lesson->materials as $material)<li><a href="{{ route('learning.materials.download', $material) }}" class="flex min-h-11 items-center justify-between gap-3 py-2 text-sm text-blue-700"><span class="truncate">{{ $material->original_name }}</span><span class="shrink-0 text-xs text-zinc-500">{{ number_format($material->file_size / 1024, 0) }} KB · Unduh</span></a></li>@empty<li class="py-3 text-sm text-zinc-500">Belum ada lampiran.</li>@endforelse</ul></x-ui.panel>
-<x-ui.panel><h2 class="font-semibold">Riwayat sesi</h2><ul class="mt-3 space-y-2">@forelse($lesson->sessions as $session)<li class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2 text-sm"><span>{{ $session->occurred_on->format('d M Y') }} · {{ ucfirst($session->session_type) }}</span><span class="font-medium">{{ $session->duration_minutes }} menit</span></li>@empty<li class="text-sm text-zinc-500">Belum ada sesi.</li>@endforelse</ul></x-ui.panel>
-</article><aside class="space-y-4"><x-ui.panel><details><summary class="min-h-10 cursor-pointer font-semibold text-blue-700">Edit materi pelajaran</summary><form method="POST" action="{{ route('learning.lessons.update', [$lesson->module->path, $lesson]) }}" class="mt-3 space-y-3">@csrf @method('PATCH')<x-ui.field label="Judul" name="title" :value="$lesson->title" required /><x-ui.textarea label="Tujuan belajar" name="objectives" rows="2" :value="$lesson->objectives" /><x-ui.textarea label="Isi materi Markdown" name="materials_markdown" rows="9" :value="$lesson->materials_markdown" /><x-ui.field label="URL referensi" name="reference_url" type="url" :value="$lesson->reference_url" /><x-ui.select label="Status" name="status" :options="['not_started'=>'Belum dimulai','content_viewed'=>'Materi dilihat','practice_completed'=>'Latihan selesai','competency_demonstrated'=>'Kompetensi ditunjukkan']" :value="$lesson->status" /><x-ui.field label="Bukti kompetensi" name="competency_evidence" :value="$lesson->competency_evidence" /><x-ui.button>Simpan pelajaran</x-ui.button></form></details></x-ui.panel><x-ui.panel><h2 class="font-semibold">Progres pelajaran</h2><form method="POST" action="{{ route('learning.lessons.update', [$lesson->module->path, $lesson]) }}" class="mt-3 space-y-3">@csrf @method('PATCH')<x-ui.select label="Status" name="status" :options="['not_started'=>'Belum dimulai','content_viewed'=>'Materi dilihat','practice_completed'=>'Latihan selesai','competency_demonstrated'=>'Kompetensi ditunjukkan']" :value="$lesson->status" /><x-ui.textarea label="Bukti kompetensi (jika ditunjukkan)" name="competency_evidence" rows="3" :value="$lesson->competency_evidence" /><x-ui.field label="Review berikutnya" name="next_review_at" type="datetime-local" :value="$lesson->next_review_at?->format('Y-m-d\TH:i')" /><label class="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" name="knowledge_gap" value="1" @checked($lesson->knowledge_gap)>Perlu penguatan</label><x-ui.button>Simpan progres</x-ui.button></form></x-ui.panel>
-<x-ui.panel><h2 class="font-semibold">Catat sesi</h2><form method="POST" action="{{ route('learning.sessions.store', [$lesson->module->path, $lesson]) }}" class="mt-3 space-y-3">@csrf<x-ui.select label="Jenis sesi" name="session_type" :options="['study'=>'Belajar','practice'=>'Latihan','review'=>'Review']" value="study" /><x-ui.field label="Durasi (menit)" name="duration_minutes" type="number" min="1" max="1440" value="25" required /><x-ui.field label="Tanggal" name="occurred_on" type="date" :value="today(auth()->user()->timezone ?: 'Asia/Jakarta')->toDateString()" /><x-ui.textarea label="Hasil atau refleksi" name="evidence" rows="3" /><x-ui.button>Simpan sesi</x-ui.button></form></x-ui.panel>
-<x-ui.panel><h2 class="font-semibold">Catat latihan atau penilaian</h2><form method="POST" action="{{ route('learning.assessments.store', [$lesson->module->path, $lesson]) }}" class="mt-3 space-y-3">@csrf<x-ui.field label="Nama latihan" name="title" required /><div class="grid grid-cols-2 gap-3"><x-ui.field label="Nilai" name="score" type="number" min="0" step="0.01" /><x-ui.field label="Maksimum" name="maximum_score" type="number" min="0.01" step="0.01" /></div><x-ui.field label="Tanggal" name="assessed_on" type="date" :value="today(auth()->user()->timezone ?: 'Asia/Jakarta')->toDateString()" required /><x-ui.textarea label="Bukti atau umpan balik" name="evidence" rows="3" /><p class="text-xs text-zinc-500">Nilai disimpan sebagai catatanmu; DevFlow tidak menilai kompetensi secara otomatis.</p><x-ui.button>Simpan catatan latihan</x-ui.button></form></x-ui.panel>
-<div class="flex justify-between">@if($previousLesson)<a href="{{ route('learning.lessons.show', $previousLesson) }}" class="min-h-10 inline-flex items-center text-sm text-blue-700">← {{ $previousLesson->title }}</a>@else<span></span>@endif @if($nextLesson)<a href="{{ route('learning.lessons.show', $nextLesson) }}" class="min-h-10 inline-flex items-center text-sm text-blue-700">Berikutnya →</a>@endif</div></aside></div>
+<x-ui.page-heading eyebrow="{{ $lesson->module->path->title }} · {{ $lesson->module->title }}" :title="$lesson->title" description="Baca materi, catat sesi, dan tandai progres sesuai bukti yang kamu miliki.">
+    <a href="{{ route('learning.modules.show', [$lesson->module->path, $lesson->module]) }}" class="text-sm font-medium text-blue-700">Kembali ke modul</a>
+    <button type="button" data-create-open="learning-lesson-edit" class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>Edit pelajaran
+    </button>
+    <button type="button" data-create-open="learning-session-add" class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 hover:bg-zinc-50">
+        <i class="fa-solid fa-clock" aria-hidden="true"></i>Catat sesi
+    </button>
+    <button type="button" data-create-open="learning-assessment-add" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>Catat latihan
+    </button>
+</x-ui.page-heading>
+
+<div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,.75fr)]">
+    <article class="space-y-5">
+        <x-ui.panel>
+            <div class="flex items-center justify-between gap-3">
+                <h2 class="font-semibold">Materi</h2>
+                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs text-blue-700">{{ ['not_started' => 'Belum dimulai', 'content_viewed' => 'Materi dilihat', 'practice_completed' => 'Latihan selesai', 'competency_demonstrated' => 'Kompetensi ditunjukkan'][$lesson->status] ?? $lesson->status }}</span>
+            </div>
+            @if($lesson->objectives)
+                <p class="mt-3 rounded-xl bg-blue-50/70 p-4 text-sm leading-6 text-blue-950"><strong>Tujuan:</strong> {{ $lesson->objectives }}</p>
+            @endif
+            <div class="mt-5 whitespace-pre-wrap break-words text-sm leading-7 text-zinc-700">{{ $lesson->materials_markdown ?: 'Belum ada materi. Kamu bisa menambahkan penjelasan atau catatan dari Learning Hub.' }}</div>
+            @if($lesson->reference_url)
+                <a href="{{ $lesson->reference_url }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-blue-700">Buka referensi <i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
+            @endif
+        </x-ui.panel>
+
+        <x-ui.panel>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h2 class="font-semibold">Lampiran</h2>
+                <form method="POST" enctype="multipart/form-data" action="{{ route('learning.materials.store', [$lesson->module->path, $lesson]) }}" class="flex flex-wrap items-center gap-2">
+                    @csrf
+                    <input name="file" type="file" accept=".pdf,.txt,.md,.png,.jpg,.jpeg" required class="max-w-56 text-xs">
+                    <button class="min-h-10 rounded-lg bg-zinc-100 px-3 text-xs font-semibold">Unggah</button>
+                </form>
+            </div>
+            <ul class="mt-3 divide-y divide-zinc-100">
+                @forelse($lesson->materials as $material)
+                    <li><a href="{{ route('learning.materials.download', $material) }}" class="flex min-h-11 items-center justify-between gap-3 py-2 text-sm text-blue-700"><span class="truncate">{{ $material->original_name }}</span><span class="shrink-0 text-xs text-zinc-500">{{ number_format($material->file_size / 1024, 0) }} KB · Unduh</span></a></li>
+                @empty
+                    <li class="py-3 text-sm text-zinc-500">Belum ada lampiran.</li>
+                @endforelse
+            </ul>
+        </x-ui.panel>
+
+        <x-ui.panel>
+            <h2 class="font-semibold">Riwayat sesi</h2>
+            <ul class="mt-3 space-y-2">
+                @forelse($lesson->sessions as $session)
+                    <li class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-zinc-50 px-3 py-2 text-sm"><span>{{ $session->occurred_on->format('d M Y') }} · {{ ucfirst($session->session_type) }}</span><span class="font-medium">{{ $session->duration_minutes }} menit</span></li>
+                @empty
+                    <li class="text-sm text-zinc-500">Belum ada sesi.</li>
+                @endforelse
+            </ul>
+        </x-ui.panel>
+    </article>
+
+    <aside class="space-y-4">
+        <x-ui.panel>
+            <h2 class="font-semibold">Progres pelajaran</h2>
+            <form method="POST" action="{{ route('learning.lessons.update', [$lesson->module->path, $lesson]) }}" class="mt-3 space-y-3">
+                @csrf
+                @method('PATCH')
+                <x-ui.select label="Status" name="status" :options="['not_started' => 'Belum dimulai', 'content_viewed' => 'Materi dilihat', 'practice_completed' => 'Latihan selesai', 'competency_demonstrated' => 'Kompetensi ditunjukkan']" :value="$lesson->status" />
+                <x-ui.textarea label="Bukti kompetensi (jika ditunjukkan)" name="competency_evidence" rows="3" :value="$lesson->competency_evidence" />
+                <x-ui.field label="Review berikutnya" name="next_review_at" type="datetime-local" :value="$lesson->next_review_at?->format('Y-m-d\TH:i')" />
+                <label class="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" name="knowledge_gap" value="1" @checked($lesson->knowledge_gap)>Perlu penguatan</label>
+                <x-ui.button>Simpan progres</x-ui.button>
+            </form>
+        </x-ui.panel>
+        <div class="flex justify-between">
+            @if($previousLesson)
+                <a href="{{ route('learning.lessons.show', $previousLesson) }}" class="inline-flex min-h-10 items-center text-sm text-blue-700">← {{ $previousLesson->title }}</a>
+            @else
+                <span></span>
+            @endif
+            @if($nextLesson)
+                <a href="{{ route('learning.lessons.show', $nextLesson) }}" class="inline-flex min-h-10 items-center text-sm text-blue-700">Berikutnya →</a>
+            @endif
+        </div>
+    </aside>
+</div>
+
+<x-ui.create-dialog type="learning-lesson-edit" size="compact" title="Edit materi pelajaran" description="Perbarui materi dan informasi pelajaran." :errors="$errors->any() && old('_form') === 'edit-lesson'">
+    <form method="POST" action="{{ route('learning.lessons.update', [$lesson->module->path, $lesson]) }}" class="space-y-4">
+        @csrf
+        @method('PATCH')
+        <input type="hidden" name="_form" value="edit-lesson">
+        <x-ui.field label="Judul" name="title" :value="$lesson->title" required />
+        <x-ui.textarea label="Tujuan belajar" name="objectives" rows="2" :value="$lesson->objectives" />
+        <x-ui.textarea label="Isi materi Markdown" name="materials_markdown" rows="9" :value="$lesson->materials_markdown" />
+        <x-ui.field label="URL referensi" name="reference_url" type="url" :value="$lesson->reference_url" />
+        <x-ui.select label="Status" name="status" :options="['not_started' => 'Belum dimulai', 'content_viewed' => 'Materi dilihat', 'practice_completed' => 'Latihan selesai', 'competency_demonstrated' => 'Kompetensi ditunjukkan']" :value="$lesson->status" />
+        <x-ui.field label="Bukti kompetensi" name="competency_evidence" :value="$lesson->competency_evidence" />
+        <div class="flex justify-end pt-2"><x-ui.button>Simpan pelajaran</x-ui.button></div>
+    </form>
+</x-ui.create-dialog>
+
+<x-ui.create-dialog type="learning-session-add" size="compact" title="Catat sesi belajar" description="Simpan durasi dan hasil sesi belajar ini." :errors="$errors->any() && old('_form') === 'add-session'">
+    <form method="POST" action="{{ route('learning.sessions.store', [$lesson->module->path, $lesson]) }}" class="space-y-4">
+        @csrf
+        <input type="hidden" name="_form" value="add-session">
+        <x-ui.select label="Jenis sesi" name="session_type" :options="['study' => 'Belajar', 'practice' => 'Latihan', 'review' => 'Review']" value="study" />
+        <x-ui.field label="Durasi (menit)" name="duration_minutes" type="number" min="1" max="1440" value="25" required />
+        <x-ui.field label="Tanggal" name="occurred_on" type="date" :value="today(auth()->user()->timezone ?: 'Asia/Jakarta')->toDateString()" />
+        <x-ui.textarea label="Hasil atau refleksi" name="evidence" rows="3" />
+        <div class="flex justify-end pt-2"><x-ui.button>Simpan sesi</x-ui.button></div>
+    </form>
+</x-ui.create-dialog>
+
+<x-ui.create-dialog type="learning-assessment-add" size="compact" title="Catat latihan atau penilaian" description="Catat hasil latihan sebagai referensi progresmu." :errors="$errors->any() && old('_form') === 'add-assessment'">
+    <form method="POST" action="{{ route('learning.assessments.store', [$lesson->module->path, $lesson]) }}" class="space-y-4">
+        @csrf
+        <input type="hidden" name="_form" value="add-assessment">
+        <x-ui.field label="Nama latihan" name="title" required />
+        <div class="grid grid-cols-2 gap-3">
+            <x-ui.field label="Nilai" name="score" type="number" min="0" step="0.01" />
+            <x-ui.field label="Maksimum" name="maximum_score" type="number" min="0.01" step="0.01" />
+        </div>
+        <x-ui.field label="Tanggal" name="assessed_on" type="date" :value="today(auth()->user()->timezone ?: 'Asia/Jakarta')->toDateString()" required />
+        <x-ui.textarea label="Bukti atau umpan balik" name="evidence" rows="3" />
+        <p class="text-xs text-zinc-500">Nilai disimpan sebagai catatanmu; DevFlow tidak menilai kompetensi secara otomatis.</p>
+        <div class="flex justify-end pt-2"><x-ui.button>Simpan catatan latihan</x-ui.button></div>
+    </form>
+</x-ui.create-dialog>
 @endsection
