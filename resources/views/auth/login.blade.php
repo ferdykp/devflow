@@ -22,9 +22,10 @@
                 @endif
             </div>
             <div>
-                <label for="password" class="mb-2 block text-sm font-medium">
-                    Kata sandi
-                </label>
+                <div class="mb-2 flex items-center justify-between gap-3">
+                    <label for="password" class="block text-sm font-medium">Kata sandi</label>
+                    <a href="{{ route('password.request') }}" class="text-xs font-semibold text-blue-700 underline-offset-4 hover:underline">Lupa kata sandi?</a>
+                </div>
 
                 <div class="relative">
                     <input id="password" name="password" type="password" data-password-input autocomplete="current-password" required
