@@ -5,7 +5,7 @@
         class="w-full max-w-[440px] rounded-xl border border-zinc-200 bg-white px-6 py-8 shadow-xs sm:px-9 sm:py-10">
         <h1 class="text-[25px] font-semibold tracking-[-.04em]">Selamat datang kembali</h1>
         <p class="mt-2 text-sm text-[#71717A]">Masuk untuk melanjutkan pekerjaan di DevFlow.</p>
-        @include('auth._google-button')
+        @include('auth._google-button', ['intent' => 'login'])
         <form action="{{ route('login') }}" method="POST" class="mt-8 space-y-5">@csrf
             <div>
                 <label for="email" class="mb-2 block text-sm font-medium">Alamat email</label>

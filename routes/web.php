@@ -31,10 +31,11 @@ use App\Http\Controllers\WeeklyReviewController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\WorkspaceMemberController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route(Auth::check() ? 'dashboard' : 'login'));
+Route::view('/', 'welcome')->name('home');
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+Route::view('/terms', 'legal.terms')->name('terms');
 if (app()->environment('testing') && config('app.e2e_isolated')) {
     Route::get('/__e2e/email-verification-code', function (Request $request) {
         abort_unless(

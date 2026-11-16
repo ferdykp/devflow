@@ -7,7 +7,7 @@
     @if (session('status'))
         <p role="status" class="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-800">{{ session('status') }}</p>
     @endif
-    @include('auth._google-button')
+    @include('auth._google-button', ['intent' => 'register'])
     <form action="{{ route('register') }}" method="POST" class="mt-8 space-y-5">@csrf
         <div>
             <label for="name" class="mb-2 block text-sm font-medium">Nama lengkap</label>

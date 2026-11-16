@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\EmailVerificationService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\RedirectResponse;
@@ -25,8 +26,10 @@ class GoogleAuthController extends Controller
             return back()->withErrors(['email' => 'Login Google belum dikonfigurasi. Isi GOOGLE_CLIENT_ID dan GOOGLE_CLIENT_SECRET terlebih dahulu.']);
         }
 
+        $intent = $request->query('intent') === 'register' ? 'register' : 'login';
         $state = Str::random(48);
         $request->session()->put('google_oauth_state', $state);
+        $request->session()->put('google_oauth_intent', $intent);
 
         $query = http_build_query([
             'client_id' => $clientId,
@@ -40,17 +43,18 @@ class GoogleAuthController extends Controller
         return redirect()->away('https://accounts.google.com/o/oauth2/v2/auth?'.$query);
     }
 
-    public function callback(Request $request): RedirectResponse
+    public function callback(Request $request, EmailVerificationService $emailVerification): RedirectResponse
     {
         $expectedState = $request->session()->pull('google_oauth_state');
+        $intent = $request->session()->pull('google_oauth_intent', 'login');
         $state = $request->query('state');
 
         if (! is_string($expectedState) || ! is_string($state) || ! hash_equals($expectedState, $state)) {
-            return $this->loginError('Sesi login Google tidak valid atau sudah kedaluwarsa. Silakan coba lagi.');
+            return $this->authError('Sesi Google tidak valid atau sudah kedaluwarsa. Silakan coba lagi.', $intent);
         }
 
         if ($request->filled('error') || ! $request->filled('code')) {
-            return $this->loginError('Login Google dibatalkan atau tidak dapat dilanjutkan.');
+            return $this->authError('Proses Google dibatalkan atau tidak dapat dilanjutkan.', $intent);
         }
 
         try {
@@ -69,7 +73,7 @@ class GoogleAuthController extends Controller
             $accessToken = $tokenResponse->json('access_token');
 
             if (! is_string($accessToken) || $accessToken === '') {
-                return $this->loginError('Google tidak mengembalikan token login yang valid.');
+                return $this->authError('Google tidak mengembalikan token login yang valid.', $intent);
             }
 
             $profile = Http::withToken($accessToken)
@@ -79,7 +83,7 @@ class GoogleAuthController extends Controller
                 ->throw()
                 ->json();
         } catch (ConnectionException|RequestException $exception) {
-            return $this->loginError('Tidak dapat menghubungi Google saat ini. Silakan coba beberapa saat lagi.');
+            return $this->authError('Tidak dapat menghubungi Google saat ini. Silakan coba beberapa saat lagi.', $intent);
         }
 
         if (! is_array($profile)
@@ -87,31 +91,40 @@ class GoogleAuthController extends Controller
             || ! is_string($profile['email'] ?? null)
             || ! filter_var($profile['email'], FILTER_VALIDATE_EMAIL)
             || ($profile['email_verified'] ?? false) !== true) {
-            return $this->loginError('Akun Google harus memiliki alamat email terverifikasi untuk digunakan di DevFlow.');
+            return $this->authError('Akun Google harus memiliki alamat email terverifikasi untuk digunakan di DevFlow.', $intent);
         }
 
         try {
-            [$user, $isNewUser] = DB::transaction(function () use ($profile): array {
+            $result = DB::transaction(function () use ($profile, $intent): array {
                 $user = User::query()->where('google_id', $profile['sub'])->lockForUpdate()->first();
 
                 if ($user instanceof User) {
-                    return [$user, false];
+                    return $intent === 'register'
+                        ? ['action' => 'already_registered']
+                        : ['action' => $user->email_verified_at === null ? 'verify' : 'login', 'user' => $user];
                 }
 
                 $email = Str::lower($profile['email']);
                 $user = User::query()->whereRaw('LOWER(email) = ?', [$email])->lockForUpdate()->first();
 
                 if ($user instanceof User) {
+                    if ($intent === 'register') {
+                        return ['action' => 'already_registered'];
+                    }
+
                     if ($user->google_id !== null && $user->google_id !== $profile['sub']) {
                         throw new \DomainException('Akun Google ini sudah terhubung ke akun DevFlow lain.');
                     }
 
-                    $user->forceFill([
-                        'google_id' => $profile['sub'],
-                        'email_verified_at' => $user->email_verified_at ?? now(),
-                    ])->save();
+                    if ($user->google_id === null) {
+                        $user->forceFill(['google_id' => $profile['sub']])->save();
+                    }
 
-                    return [$user, false];
+                    return ['action' => $user->email_verified_at === null ? 'verify' : 'login', 'user' => $user];
+                }
+
+                if ($intent === 'login') {
+                    return ['action' => 'not_registered'];
                 }
 
                 $user = User::query()->create([
@@ -123,10 +136,7 @@ class GoogleAuthController extends Controller
                     'google_id' => $profile['sub'],
                 ]);
 
-                $user->forceFill(['email_verified_at' => now()])->save();
-                $user->workspaces()->create(['name' => 'Personal']);
-
-                return [$user, true];
+                return ['action' => 'verify', 'user' => $user];
             });
         } catch (Throwable $exception) {
             report($exception);
@@ -135,15 +145,47 @@ class GoogleAuthController extends Controller
                 ? $exception->getMessage()
                 : 'Akun Google tidak dapat dihubungkan. Pastikan email tersebut belum dipakai akun lain.';
 
-            return $this->loginError($message);
+            return $this->authError($message, $intent);
+        }
+
+        if ($result['action'] === 'not_registered') {
+            return redirect()->route('register')->withErrors([
+                'email' => 'Akun belum terdaftar. Silakan daftar terlebih dahulu.',
+            ]);
+        }
+
+        if ($result['action'] === 'already_registered') {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun dengan email Google ini sudah terdaftar. Silakan masuk.',
+            ]);
+        }
+
+        /** @var User $user */
+        $user = $result['user'];
+
+        if ($result['action'] === 'verify') {
+            $request->session()->regenerate();
+            $request->session()->put('pending_email_verification_user_id', $user->id);
+
+            try {
+                $code = $emailVerification->issue($user);
+
+                if (config('app.e2e_isolated')) {
+                    $request->session()->put('e2e_email_verification_code', $code);
+                }
+            } catch (Throwable $exception) {
+                report($exception);
+
+                return redirect()->route('verification.notice')->withErrors([
+                    'email' => 'Akun sudah dibuat, tetapi kode belum terkirim. Coba kirim ulang kode verifikasi.',
+                ]);
+            }
+
+            return redirect()->route('verification.notice')->with('status', 'Kode verifikasi telah dikirim ke email Anda.');
         }
 
         Auth::login($user, true);
         $request->session()->regenerate();
-
-        if ($isNewUser) {
-            return redirect()->route('onboarding.welcome')->with('success', 'Akun DevFlow berhasil dibuat dengan Google.');
-        }
 
         return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali!');
     }
@@ -157,8 +199,8 @@ class GoogleAuthController extends Controller
             : route('google.callback');
     }
 
-    private function loginError(string $message): RedirectResponse
+    private function authError(string $message, string $intent): RedirectResponse
     {
-        return redirect()->route('login')->withErrors(['email' => $message]);
+        return redirect()->route($intent === 'register' ? 'register' : 'login')->withErrors(['email' => $message]);
     }
 }

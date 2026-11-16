@@ -16,7 +16,7 @@
 <body class="min-h-screen bg-canvas font-sans text-ink antialiased">
     <a href="#konten" class="absolute -top-24 left-4 z-50 rounded-lg bg-white px-4 py-3 text-sm font-medium shadow-lg focus:top-3">Lewati ke konten</a>
     <header class="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12">
-        <a href="{{ url('/') }}" aria-label="DevFlow, halaman utama" class="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-zinc-950">
+        <a href="{{ route('home') }}" aria-label="DevFlow, halaman utama" class="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-zinc-950">
             <span aria-hidden="true" class="grid size-9 place-items-center rounded-xl bg-[#651d32] text-sm text-white"><i class="fa-solid fa-code"></i></span>
             <span class="font-display">DevFlow<span class="text-[#8f344f]">.</span></span>
         </a>
@@ -97,7 +97,12 @@
 
     <footer class="border-t border-[#e7ded5]">
         <div class="mx-auto flex max-w-[1280px] flex-col gap-3 px-5 py-5 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
-            <span>© {{ date('Y') }} DevFlow</span><span>Kerja lebih terarah, tanpa ribet.</span>
+            <span>© {{ date('Y') }} DevFlow</span>
+            <nav aria-label="Informasi layanan" class="flex flex-wrap gap-x-5 gap-y-2">
+                <a href="{{ route('privacy') }}" class="underline-offset-4 hover:text-[#651d32] hover:underline">Kebijakan privasi</a>
+                <a href="{{ route('terms') }}" class="underline-offset-4 hover:text-[#651d32] hover:underline">Syarat layanan</a>
+                <a href="mailto:kpferdy@gmail.com" class="underline-offset-4 hover:text-[#651d32] hover:underline">Hubungi DevFlow</a>
+            </nav>
         </div>
     </footer>
 </body>
