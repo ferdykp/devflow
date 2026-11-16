@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\EmailVerificationService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\RedirectResponse;
@@ -43,7 +42,7 @@ class GoogleAuthController extends Controller
         return redirect()->away('https://accounts.google.com/o/oauth2/v2/auth?'.$query);
     }
 
-    public function callback(Request $request, EmailVerificationService $emailVerification): RedirectResponse
+    public function callback(Request $request): RedirectResponse
     {
         $expectedState = $request->session()->pull('google_oauth_state');
         $intent = $request->session()->pull('google_oauth_intent', 'login');
@@ -99,9 +98,13 @@ class GoogleAuthController extends Controller
                 $user = User::query()->where('google_id', $profile['sub'])->lockForUpdate()->first();
 
                 if ($user instanceof User) {
-                    return $intent === 'register'
-                        ? ['action' => 'already_registered']
-                        : ['action' => $user->email_verified_at === null ? 'verify' : 'login', 'user' => $user];
+                    if ($intent === 'register') {
+                        return ['action' => 'already_registered'];
+                    }
+
+                    $this->verifyGoogleEmail($user);
+
+                    return ['action' => 'login', 'user' => $user];
                 }
 
                 $email = Str::lower($profile['email']);
@@ -116,11 +119,16 @@ class GoogleAuthController extends Controller
                         throw new \DomainException('Akun Google ini sudah terhubung ke akun DevFlow lain.');
                     }
 
-                    if ($user->google_id === null) {
-                        $user->forceFill(['google_id' => $profile['sub']])->save();
+                    $user->forceFill([
+                        'google_id' => $profile['sub'],
+                        'email_verified_at' => $user->email_verified_at ?? now(),
+                    ])->save();
+
+                    if (! $user->workspaces()->where('name', 'Personal')->exists()) {
+                        $user->workspaces()->create(['name' => 'Personal']);
                     }
 
-                    return ['action' => $user->email_verified_at === null ? 'verify' : 'login', 'user' => $user];
+                    return ['action' => 'login', 'user' => $user];
                 }
 
                 if ($intent === 'login') {
@@ -136,7 +144,10 @@ class GoogleAuthController extends Controller
                     'google_id' => $profile['sub'],
                 ]);
 
-                return ['action' => 'verify', 'user' => $user];
+                $user->forceFill(['email_verified_at' => now()])->save();
+                $user->workspaces()->create(['name' => 'Personal']);
+
+                return ['action' => 'created', 'user' => $user];
             });
         } catch (Throwable $exception) {
             report($exception);
@@ -163,31 +174,25 @@ class GoogleAuthController extends Controller
         /** @var User $user */
         $user = $result['user'];
 
-        if ($result['action'] === 'verify') {
-            $request->session()->regenerate();
-            $request->session()->put('pending_email_verification_user_id', $user->id);
-
-            try {
-                $code = $emailVerification->issue($user);
-
-                if (config('app.e2e_isolated')) {
-                    $request->session()->put('e2e_email_verification_code', $code);
-                }
-            } catch (Throwable $exception) {
-                report($exception);
-
-                return redirect()->route('verification.notice')->withErrors([
-                    'email' => 'Akun sudah dibuat, tetapi kode belum terkirim. Coba kirim ulang kode verifikasi.',
-                ]);
-            }
-
-            return redirect()->route('verification.notice')->with('status', 'Kode verifikasi telah dikirim ke email Anda.');
-        }
-
         Auth::login($user, true);
         $request->session()->regenerate();
 
+        if ($result['action'] === 'created') {
+            return redirect()->route('onboarding.welcome')->with('success', 'Akun DevFlow berhasil dibuat dengan Google.');
+        }
+
         return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali!');
+    }
+
+    private function verifyGoogleEmail(User $user): void
+    {
+        if ($user->email_verified_at === null) {
+            $user->forceFill(['email_verified_at' => now()])->save();
+        }
+
+        if (! $user->workspaces()->where('name', 'Personal')->exists()) {
+            $user->workspaces()->create(['name' => 'Personal']);
+        }
     }
 
     private function redirectUri(): string

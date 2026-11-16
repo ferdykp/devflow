@@ -24,7 +24,10 @@ class GoogleAuthControllerTest extends TestCase
             ]),
         ]);
 
-        $response = $this->withSession(['google_oauth_state' => 'expected-state'])
+        $response = $this->withSession([
+            'google_oauth_state' => 'expected-state',
+            'google_oauth_intent' => 'register',
+        ])
             ->get('/auth/google/callback?code=authorization-code&state=expected-state');
 
         $response->assertRedirect(route('onboarding.welcome'));
@@ -61,6 +64,32 @@ class GoogleAuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'google_id' => 'google-user-200',
+        ]);
+    }
+
+    public function test_google_login_verifies_an_existing_unverified_account(): void
+    {
+        $user = User::factory()->unverified()->create(['email' => 'existing@example.test']);
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://oauth2.googleapis.com/token' => Http::response(['access_token' => 'google-access-token']),
+            'https://openidconnect.googleapis.com/v1/userinfo' => Http::response([
+                'sub' => 'google-user-201',
+                'email' => 'existing@example.test',
+                'email_verified' => true,
+            ]),
+        ]);
+
+        $response = $this->withSession(['google_oauth_state' => 'expected-state'])
+            ->get('/auth/google/callback?code=authorization-code&state=expected-state');
+
+        $response->assertRedirect('/dashboard');
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotNull($user->fresh()->email_verified_at);
+        $this->assertDatabaseHas('workspaces', [
+            'user_id' => $user->id,
+            'name' => 'Personal',
         ]);
     }
 
