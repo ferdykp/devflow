@@ -3,16 +3,20 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Notifications\EmailVerificationCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class GoogleAuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_google_registration_creates_a_verified_account_and_personal_workspace(): void
+    public function test_google_registration_requires_otp_before_onboarding(): void
     {
+        Notification::fake();
+
         Http::preventStrayRequests();
         Http::fake([
             'https://oauth2.googleapis.com/token' => Http::response(['access_token' => 'google-access-token']),
@@ -30,16 +34,62 @@ class GoogleAuthControllerTest extends TestCase
         ])
             ->get('/auth/google/callback?code=authorization-code&state=expected-state');
 
-        $response->assertRedirect(route('onboarding.welcome'));
-        $this->assertAuthenticated();
+        $response->assertRedirect(route('verification.notice'));
+        $this->assertGuest();
 
         $user = User::query()->where('email', 'new.user@example.test')->firstOrFail();
-        $this->assertNotNull($user->email_verified_at);
+        $this->assertNull($user->email_verified_at);
         $this->assertSame('google-user-100', $user->google_id);
+        $this->assertDatabaseMissing('workspaces', [
+            'user_id' => $user->id,
+            'name' => 'Personal',
+        ]);
+        $this->assertSame($user->id, session('pending_email_verification_user_id'));
+
+        $code = null;
+        Notification::assertSentTo($user, EmailVerificationCode::class, function (EmailVerificationCode $notification) use (&$code): bool {
+            $code = $notification->code;
+
+            return true;
+        });
+
+        $this->post(route('verification.verify'), ['code' => $code])
+            ->assertRedirect(route('onboarding.welcome'));
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotNull($user->fresh()->email_verified_at);
         $this->assertDatabaseHas('workspaces', [
             'user_id' => $user->id,
             'name' => 'Personal',
         ]);
+    }
+
+    public function test_google_login_for_an_unregistered_user_starts_registration_with_otp(): void
+    {
+        Notification::fake();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://oauth2.googleapis.com/token' => Http::response(['access_token' => 'google-access-token']),
+            'https://openidconnect.googleapis.com/v1/userinfo' => Http::response([
+                'sub' => 'google-user-101',
+                'email' => 'first.login@example.test',
+                'email_verified' => true,
+                'name' => 'First Login',
+            ]),
+        ]);
+
+        $response = $this->withSession(['google_oauth_state' => 'expected-state'])
+            ->get('/auth/google/callback?code=authorization-code&state=expected-state');
+
+        $response->assertRedirect(route('verification.notice'));
+        $response->assertSessionHas('status', 'Akun Google belum terdaftar. Kode OTP telah dikirim ke email Anda untuk menyelesaikan pendaftaran.');
+        $this->assertGuest();
+
+        $user = User::query()->where('email', 'first.login@example.test')->firstOrFail();
+        $this->assertNull($user->email_verified_at);
+        $this->assertSame($user->id, session('pending_email_verification_user_id'));
+        Notification::assertSentTo($user, EmailVerificationCode::class);
     }
 
     public function test_google_login_links_a_verified_email_to_an_existing_account(): void
@@ -67,8 +117,9 @@ class GoogleAuthControllerTest extends TestCase
         ]);
     }
 
-    public function test_google_login_verifies_an_existing_unverified_account(): void
+    public function test_google_login_requires_otp_for_an_existing_unverified_account(): void
     {
+        Notification::fake();
         $user = User::factory()->unverified()->create(['email' => 'existing@example.test']);
 
         Http::preventStrayRequests();
@@ -84,13 +135,14 @@ class GoogleAuthControllerTest extends TestCase
         $response = $this->withSession(['google_oauth_state' => 'expected-state'])
             ->get('/auth/google/callback?code=authorization-code&state=expected-state');
 
-        $response->assertRedirect('/dashboard');
-        $this->assertAuthenticatedAs($user);
-        $this->assertNotNull($user->fresh()->email_verified_at);
-        $this->assertDatabaseHas('workspaces', [
+        $response->assertRedirect(route('verification.notice'));
+        $this->assertGuest();
+        $this->assertNull($user->fresh()->email_verified_at);
+        $this->assertDatabaseMissing('workspaces', [
             'user_id' => $user->id,
             'name' => 'Personal',
         ]);
+        Notification::assertSentTo($user, EmailVerificationCode::class);
     }
 
     public function test_google_login_does_not_take_over_an_account_linked_to_another_google_identity(): void
