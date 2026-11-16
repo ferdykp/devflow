@@ -34,6 +34,8 @@ class LoginRequest extends FormRequest
 
         if ($user !== null && $user->email_verified_at === null) {
             $this->session()->put('pending_email_verification_user_id', $user->getAuthIdentifier());
+            $this->session()->put('pending_email_verification_purpose', 'email_verification');
+            $this->session()->put('pending_email_verification_can_cancel', false);
             Auth::logout();
 
             throw ValidationException::withMessages([

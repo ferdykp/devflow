@@ -30,6 +30,8 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
         $request->session()->put('pending_email_verification_user_id', $user->id);
+        $request->session()->put('pending_email_verification_purpose', 'registration');
+        $request->session()->put('pending_email_verification_can_cancel', true);
 
         try {
             $code = $emailVerification->issue($user);

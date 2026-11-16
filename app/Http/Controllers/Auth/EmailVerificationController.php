@@ -15,12 +15,13 @@ class EmailVerificationController extends Controller
     public function notice(Request $request): View|RedirectResponse
     {
         $user = User::query()->find($request->session()->get('pending_email_verification_user_id'));
+        $purpose = $request->session()->get('pending_email_verification_purpose', 'registration');
 
         if (! $user instanceof User) {
             return redirect()->route('register');
         }
 
-        if ($user->email_verified_at !== null) {
+        if ($user->email_verified_at !== null && $purpose !== 'google_login') {
             return redirect()->route('login');
         }
 
@@ -30,6 +31,7 @@ class EmailVerificationController extends Controller
     public function verify(Request $request, EmailVerificationService $emailVerification): RedirectResponse
     {
         $user = User::query()->find($request->session()->get('pending_email_verification_user_id'));
+        $purpose = $request->session()->get('pending_email_verification_purpose', 'registration');
 
         if (! $user instanceof User) {
             return redirect()->route('register')->withErrors(['email' => 'Sesi verifikasi berakhir. Silakan daftar kembali.']);
@@ -46,9 +48,15 @@ class EmailVerificationController extends Controller
         }
 
         $request->session()->forget('pending_email_verification_user_id');
+        $request->session()->forget('pending_email_verification_purpose');
+        $request->session()->forget('pending_email_verification_can_cancel');
         $request->session()->forget('e2e_email_verification_code');
         auth()->login($user);
         $request->session()->regenerate();
+
+        if ($purpose === 'google_login') {
+            return redirect()->intended('/dashboard')->with('success', 'Login Google berhasil diverifikasi.');
+        }
 
         return redirect()->route('onboarding.welcome')->with('success', 'Email terverifikasi. Selamat datang di DevFlow.');
     }
@@ -56,12 +64,13 @@ class EmailVerificationController extends Controller
     public function resend(Request $request, EmailVerificationService $emailVerification): RedirectResponse
     {
         $user = User::query()->find($request->session()->get('pending_email_verification_user_id'));
+        $purpose = $request->session()->get('pending_email_verification_purpose', 'registration');
 
         if (! $user instanceof User) {
             return redirect()->route('register')->withErrors(['email' => 'Sesi verifikasi berakhir. Silakan daftar kembali.']);
         }
 
-        if ($user->email_verified_at !== null) {
+        if ($user->email_verified_at !== null && $purpose !== 'google_login') {
             return redirect()->route('login');
         }
 
@@ -80,15 +89,23 @@ class EmailVerificationController extends Controller
 
     public function restart(Request $request): RedirectResponse
     {
-        User::query()
-            ->whereKey($request->session()->get('pending_email_verification_user_id'))
-            ->whereNull('email_verified_at')
-            ->delete();
+        $canCancel = $request->session()->boolean('pending_email_verification_can_cancel');
+
+        if ($canCancel) {
+            User::query()
+                ->whereKey($request->session()->get('pending_email_verification_user_id'))
+                ->whereNull('email_verified_at')
+                ->delete();
+        }
 
         $request->session()->forget('pending_email_verification_user_id');
+        $request->session()->forget('pending_email_verification_purpose');
+        $request->session()->forget('pending_email_verification_can_cancel');
         $request->session()->forget('e2e_email_verification_code');
         $request->session()->regenerate();
 
-        return redirect()->route('register')->with('status', 'Pendaftaran sebelumnya dibatalkan. Silakan gunakan email yang benar.');
+        return $canCancel
+            ? redirect()->route('register')->with('status', 'Pendaftaran sebelumnya dibatalkan. Silakan gunakan email yang benar.')
+            : redirect()->route('login')->with('status', 'Proses verifikasi dibatalkan. Silakan masuk kembali.');
     }
 }

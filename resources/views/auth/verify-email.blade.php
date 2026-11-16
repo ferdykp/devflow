@@ -8,7 +8,11 @@
         <h1 class="text-[25px] font-semibold tracking-[-.04em]">Periksa email Anda</h1>
         <p class="mt-2 text-sm leading-6 text-zinc-600">
             Kami mengirim kode 6 digit ke <span class="font-semibold text-zinc-900">{{ $user->email }}</span>.
-            Masukkan kode untuk menyelesaikan pendaftaran. Kode berlaku 10 menit.
+            @if (session('pending_email_verification_purpose') === 'google_login')
+                Masukkan kode untuk menyelesaikan login Google. Kode berlaku 10 menit.
+            @else
+                Masukkan kode untuk menyelesaikan verifikasi akun. Kode berlaku 10 menit.
+            @endif
         </p>
 
         @if (session('status'))
@@ -39,10 +43,12 @@
             <button type="submit" class="mt-1 text-sm font-semibold text-blue-700 underline-offset-4 hover:underline">Kirim kode baru</button>
         </form>
 
-        <form action="{{ route('verification.restart') }}" method="POST" class="mt-7 border-t border-zinc-200 pt-6 text-center">
-            @csrf
-            <p class="text-sm text-zinc-500">Salah alamat email?</p>
-            <button type="submit" class="mt-1 text-sm font-semibold text-blue-700 underline-offset-4 hover:underline">Batalkan dan gunakan email lain</button>
-        </form>
+        @if (session('pending_email_verification_can_cancel'))
+            <form action="{{ route('verification.restart') }}" method="POST" class="mt-7 border-t border-zinc-200 pt-6 text-center">
+                @csrf
+                <p class="text-sm text-zinc-500">Salah alamat email?</p>
+                <button type="submit" class="mt-1 text-sm font-semibold text-blue-700 underline-offset-4 hover:underline">Batalkan dan gunakan email lain</button>
+            </form>
+        @endif
     </div>
 @endsection

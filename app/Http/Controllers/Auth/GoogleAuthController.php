@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\EmailVerificationService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -42,7 +42,7 @@ class GoogleAuthController extends Controller
         return redirect()->away('https://accounts.google.com/o/oauth2/v2/auth?'.$query);
     }
 
-    public function callback(Request $request): RedirectResponse
+    public function callback(Request $request, EmailVerificationService $emailVerification): RedirectResponse
     {
         $expectedState = $request->session()->pull('google_oauth_state');
         $intent = $request->session()->pull('google_oauth_intent', 'login');
@@ -103,10 +103,7 @@ class GoogleAuthController extends Controller
                         return ['action' => 'already_registered'];
                     }
 
-                    $user->forceFill(['email_verified_at' => $user->email_verified_at ?? now()])->save();
-                    $this->ensurePersonalWorkspace($user);
-
-                    return ['action' => 'login', 'user' => $user];
+                    return ['action' => 'verify', 'is_new_account' => false, 'user' => $user];
                 }
 
                 $email = Str::lower($profile['email']);
@@ -121,13 +118,11 @@ class GoogleAuthController extends Controller
                         throw new \DomainException('Akun Google ini sudah terhubung ke akun DevFlow lain.');
                     }
 
-                    $user->forceFill([
-                        'google_id' => $profile['sub'],
-                        'email_verified_at' => $user->email_verified_at ?? now(),
-                    ])->save();
-                    $this->ensurePersonalWorkspace($user);
+                    if ($user->google_id === null) {
+                        $user->forceFill(['google_id' => $profile['sub']])->save();
+                    }
 
-                    return ['action' => 'login', 'user' => $user];
+                    return ['action' => 'verify', 'is_new_account' => false, 'user' => $user];
                 }
 
                 if ($intent === 'login') {
@@ -143,10 +138,7 @@ class GoogleAuthController extends Controller
                     'google_id' => $profile['sub'],
                 ]);
 
-                $user->forceFill(['email_verified_at' => now()])->save();
-                $this->ensurePersonalWorkspace($user);
-
-                return ['action' => 'created', 'user' => $user];
+                return ['action' => 'verify', 'is_new_account' => true, 'user' => $user];
             });
         } catch (Throwable $exception) {
             report($exception);
@@ -173,21 +165,30 @@ class GoogleAuthController extends Controller
         /** @var User $user */
         $user = $result['user'];
 
-        Auth::login($user, true);
         $request->session()->regenerate();
+        $request->session()->put('pending_email_verification_user_id', $user->id);
+        $request->session()->put('pending_email_verification_purpose', ($result['is_new_account'] ?? false) ? 'registration' : 'google_login');
+        $request->session()->put('pending_email_verification_can_cancel', (bool) ($result['is_new_account'] ?? false));
 
-        if ($result['action'] === 'created') {
-            return redirect()->route('onboarding.welcome')->with('success', 'Akun DevFlow berhasil dibuat dengan Google.');
+        try {
+            $code = $emailVerification->issue($user);
+
+            if (config('app.e2e_isolated')) {
+                $request->session()->put('e2e_email_verification_code', $code);
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()->route('verification.notice')->withErrors([
+                'email' => 'Kode OTP belum dapat dikirim. Coba kirim ulang dari halaman verifikasi.',
+            ]);
         }
 
-        return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali!');
-    }
+        $status = ($result['is_new_account'] ?? false)
+            ? 'Kode OTP telah dikirim untuk memverifikasi akun Google Anda.'
+            : 'Kode OTP telah dikirim untuk mengonfirmasi login Google Anda.';
 
-    private function ensurePersonalWorkspace(User $user): void
-    {
-        if (! $user->workspaces()->where('name', 'Personal')->exists()) {
-            $user->workspaces()->create(['name' => 'Personal']);
-        }
+        return redirect()->route('verification.notice')->with('status', $status);
     }
 
     private function redirectUri(): string
