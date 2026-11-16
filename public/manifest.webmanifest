@@ -7,8 +7,14 @@
   "scope": "/",
   "display": "standalone",
   "background_color": "#f7f7f8",
-  "theme_color": "#2463eb",
+  "theme_color": "#651d32",
   "icons": [
+    {
+      "src": "/icons/devflow-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",

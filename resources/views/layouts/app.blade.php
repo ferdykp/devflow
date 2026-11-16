@@ -14,7 +14,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         referrerpolicy="no-referrer">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
-    <link rel="icon" type="image/png" href="{{ asset('icons/icon-192.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('icons/devflow-mark.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="alternate icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 

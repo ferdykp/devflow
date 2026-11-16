@@ -11,7 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer">
-    <link rel="icon" type="image/png" href="{{ asset('icons/icon-192.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('icons/devflow-mark.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="alternate icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
     @vite(['resources/css/app.css'])
 </head>
 
@@ -20,7 +23,7 @@
     <header class="border-b border-hairline bg-surface/90">
         <div class="mx-auto flex w-full max-w-[1100px] items-center justify-between gap-4 px-5 py-4 sm:px-8">
             <a href="{{ route('home') }}" aria-label="DevFlow, halaman utama" class="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-zinc-950">
-                <span aria-hidden="true" class="grid size-9 place-items-center rounded-xl bg-[#651d32] text-sm text-white"><i class="fa-solid fa-code"></i></span>
+                <img src="{{ asset('icons/devflow-mark.svg') }}" alt="" class="size-9 rounded-xl">
                 <span class="font-display">DevFlow<span class="text-[#8f344f]">.</span></span>
             </a>
             <nav aria-label="Navigasi utama" class="flex items-center gap-2 sm:gap-3">

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">DevFlow</title>
+  <rect width="64" height="64" rx="19" fill="#651d32"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+    <path d="m21 21-11 11 11 11M43 21l11 11-11 11" stroke="#fff"/>
+    <path d="M25 32h5c6 0 5-9 12-9M30 32c6 0 5 9 12 9" stroke="#f5c7d4"/>
+  </g>
+  <circle cx="25" cy="32" r="3" fill="#8ce1d0"/>
+  <circle cx="42" cy="23" r="3" fill="#8ce1d0"/>
+  <circle cx="42" cy="41" r="3" fill="#8ce1d0"/>
+</svg>

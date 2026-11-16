@@ -17,7 +17,7 @@
     <a href="#konten" class="absolute -top-24 left-4 z-50 rounded-lg bg-white px-4 py-3 text-sm font-medium shadow-lg focus:top-3">Lewati ke konten</a>
     <header class="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12">
         <a href="{{ route('home') }}" aria-label="DevFlow, halaman utama" class="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-zinc-950">
-            <span aria-hidden="true" class="grid size-9 place-items-center rounded-xl bg-[#651d32] text-sm text-white"><i class="fa-solid fa-code"></i></span>
+            <img src="{{ asset('icons/devflow-mark.svg') }}" alt="" class="size-9 rounded-xl">
             <span class="font-display">DevFlow<span class="text-[#8f344f]">.</span></span>
         </a>
         <nav aria-label="Akun" class="flex items-center gap-2 sm:gap-3">
@@ -54,7 +54,7 @@
                 <div class="absolute -inset-5 -z-10 rounded-[36px] bg-[#ead9d3]/70 blur-2xl" aria-hidden="true"></div>
                 <div class="overflow-hidden rounded-[22px] border border-[#e7ded5] bg-[#fcfaf7] shadow-[0_26px_80px_rgba(70,33,45,.13)]">
                     <div class="flex min-h-14 items-center justify-between gap-3 border-b border-[#e7ded5] px-4 sm:px-5">
-                        <div class="flex items-center gap-2.5"><span class="grid size-7 place-items-center rounded-lg bg-[#651d32] text-[10px] text-white"><i class="fa-solid fa-code" aria-hidden="true"></i></span><span class="text-xs font-semibold text-[#242127]">DevFlow <span class="font-normal text-[#9a8e8c]">/ Hari ini</span></span></div>
+                        <div class="flex items-center gap-2.5"><img src="{{ asset('icons/devflow-mark.svg') }}" alt="" class="size-7 rounded-lg"><span class="text-xs font-semibold text-[#242127]">DevFlow <span class="font-normal text-[#9a8e8c]">/ Hari ini</span></span></div>
                         <span class="flex items-center gap-1.5 text-[10px] font-medium text-[#706970]"><span class="size-1.5 rounded-full bg-[#24784f]" aria-hidden="true"></span> Semua sinkron</span>
                     </div>
                     <div class="grid min-h-[365px] grid-cols-[44px_minmax(0,1fr)] sm:grid-cols-[54px_minmax(0,1fr)]">

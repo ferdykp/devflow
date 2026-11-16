@@ -1,5 +1,5 @@
 /* DevFlow app shell service worker. Never cache authenticated HTML or API responses. */
-const CACHE_NAME = 'devflow-static-v2';
+const CACHE_NAME = 'devflow-static-v3';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE = [OFFLINE_URL, '/icons/icon-192.png', '/icons/icon-512.png'];
 self.addEventListener('install', (event) => {

@@ -37,7 +37,7 @@
     class="group/sidebar fixed inset-y-0 left-0 z-30 flex h-dvh w-[min(300px,calc(100vw-48px))] -translate-x-full flex-col overflow-y-auto border-r bg-white transition-[width,transform] duration-200 data-[open]:translate-x-0 motion-reduce:transition-none min-[851px]:sticky min-[851px]:top-0 min-[851px]:h-svh min-[851px]:w-64 min-[851px]:translate-x-0">
     <div class="flex h-[72px] shrink-0 items-center justify-between border-b border-zinc-100 px-5" data-sidebar-brand>
         <a href="{{ route('dashboard') }}" aria-label="DevFlow, buka ikhtisar" title="DevFlow, buka ikhtisar" class="inline-flex items-center gap-3 font-semibold tracking-tight text-zinc-950">
-            <span aria-hidden="true" class="df-brand-mark grid size-9 place-items-center rounded-xl text-base"><i class="fa-solid fa-code"></i></span>
+            <img src="{{ asset('icons/devflow-mark.svg') }}" alt="" class="df-brand-mark size-9 rounded-xl">
             <span class="df-sidebar-brand-name font-display text-[17px]">DevFlow<span class="text-[#8f344f]">.</span></span>
         </a>
         <button type="button" data-sidebar-collapse aria-label="Kecilkan sidebar" aria-pressed="false" title="Kecilkan sidebar" class="hidden size-8 shrink-0 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 min-[851px]:grid">
