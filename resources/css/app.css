@@ -188,15 +188,13 @@ html[data-theme="dark"] .df-sidebar-switcher { background: #302a30; }
     html[data-sidebar-collapsed] .df-sidebar-workspace-chevron,
     html[data-sidebar-collapsed] .df-sidebar-section,
     html[data-sidebar-collapsed] .df-sidebar-label-full,
-    html[data-sidebar-collapsed] .df-sidebar-shortcut,
-    html[data-sidebar-collapsed] .df-sidebar-user-copy { display: none; }
+    html[data-sidebar-collapsed] .df-sidebar-shortcut { display: none; }
     html[data-sidebar-collapsed] [data-sidebar-workspace-menu] { position: fixed; top: 84px; left: 84px; right: auto; width: 236px; }
     html[data-sidebar-collapsed] .df-sidebar-nav-group { padding-top: 7px; }
     html[data-sidebar-collapsed] .df-sidebar-nav-group + .df-sidebar-section + .df-sidebar-nav-group { border-top: 1px solid var(--df-edge); }
     html[data-sidebar-collapsed] [data-sidebar] .df-menu-link { min-height: 58px; flex-direction: column; justify-content: center; gap: 4px; padding: 6px 2px; font-size: 9px; line-height: 1.1; text-align: center; }
     html[data-sidebar-collapsed] [data-sidebar] .df-menu-link i { width: auto; font-size: 16px; }
     html[data-sidebar-collapsed] .df-sidebar-label-short { display: block; max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    html[data-sidebar-collapsed] .df-sidebar-user { flex-direction: column; gap: 7px; padding-inline: 0; }
     html[data-theme="dark"][data-sidebar-collapsed] .df-sidebar-nav-group + .df-sidebar-section + .df-sidebar-nav-group { border-color: #41353d; }
 }
 @media (max-width: 850px) {
@@ -207,7 +205,6 @@ html[data-theme="dark"] .df-sidebar-switcher { background: #302a30; }
     .df-page-title { font-size: clamp(1.5rem, 7vw, 1.8rem); }
     .df-panel { border-radius: 15px; }
 }
-@media (max-width: 420px) { .df-toolbar-secondary-action { display: none; } }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
     [data-page-transition] { animation: none; }

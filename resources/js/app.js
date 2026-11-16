@@ -180,11 +180,14 @@ const dfSearch = document.querySelector('[data-command-input]');
 const dfItems = [...document.querySelectorAll('[data-command-item]')];
 const dfTaskSearchItem = document.querySelector('[data-command-task-search]');
 const dfTaskSearchLabel = document.querySelector('[data-command-task-label]');
+const dfNavActionsMenu = document.querySelector('[data-nav-actions-menu]');
 let dfActive = 0;
 function dfVisibleItems(){return dfItems.filter(item=>!item.hidden)}
 function dfHighlight(){dfVisibleItems().forEach((item,index)=>item.toggleAttribute('data-active',index===dfActive));}
-function dfOpen(){if(!dfPalette || dfPalette.open)return;dfPalette.showModal();dfSearch.value='';dfItems.forEach(item=>item.hidden=item===dfTaskSearchItem);document.querySelector('[data-command-empty]').hidden=true;dfActive=0;dfHighlight();dfSearch.focus()}
+function dfOpen(){if(!dfPalette || dfPalette.open)return;dfNavActionsMenu?.removeAttribute('open');dfPalette.showModal();dfSearch.value='';dfItems.forEach(item=>item.hidden=item===dfTaskSearchItem);document.querySelector('[data-command-empty]').hidden=true;dfActive=0;dfHighlight();dfSearch.focus()}
 document.querySelectorAll('[data-command-open]').forEach(button=>button.addEventListener('click',dfOpen));
+document.addEventListener('click',event=>{if(dfNavActionsMenu?.open&&!dfNavActionsMenu.contains(event.target))dfNavActionsMenu.open=false});
+dfNavActionsMenu?.addEventListener('keydown',event=>{if(event.key==='Escape'&&dfNavActionsMenu.open){dfNavActionsMenu.open=false;dfNavActionsMenu.querySelector('summary')?.focus();event.stopPropagation()}});
 document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();dfPalette?.open?dfPalette.close():dfOpen()}});
 dfSearch?.addEventListener('input',()=>{const term=dfSearch.value.trim();const normalizedTerm=term.toLowerCase();dfItems.forEach(item=>item.hidden=item===dfTaskSearchItem||!item.textContent.toLowerCase().includes(normalizedTerm));const routeMatches=dfVisibleItems().length>0;if(dfTaskSearchItem){dfTaskSearchItem.hidden=term.length===0||routeMatches;if(term){const taskUrl=new URL(dfTaskSearchItem.dataset.searchBase,window.location.origin);taskUrl.searchParams.set('q',term);dfTaskSearchItem.href=taskUrl.toString();dfTaskSearchLabel.textContent=`Cari tugas: ${term}`;}}dfActive=0;dfHighlight();document.querySelector('[data-command-empty]').hidden=dfVisibleItems().length>0});
 dfSearch?.addEventListener('keydown',event=>{const visible=dfVisibleItems();if(event.key==='ArrowDown'){event.preventDefault();dfActive=Math.min(dfActive+1,visible.length-1);dfHighlight()}else if(event.key==='ArrowUp'){event.preventDefault();dfActive=Math.max(0,dfActive-1);dfHighlight()}else if(event.key==='Enter'&&visible[dfActive]){event.preventDefault();visible[dfActive].click()}});

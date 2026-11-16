@@ -32,10 +32,34 @@
             </div>
         </details>
 
-        <button type="button" data-theme-toggle class="df-toolbar-secondary-action grid size-10 place-items-center rounded-xl text-zinc-600 transition hover:bg-zinc-100" aria-label="Aktifkan tema gelap" title="Ubah tema">
-            <i class="fa-solid fa-moon" aria-hidden="true" data-theme-icon></i>
-        </button>
-        <a href="{{ route('notifications.index') }}" class="df-toolbar-secondary-action relative grid size-10 shrink-0 place-items-center rounded-xl text-zinc-600 transition hover:bg-zinc-100 hover:text-[#651d32]" aria-label="Pusat notifikasi" title="Notifikasi"><i class="fa-regular fa-bell" aria-hidden="true"></i><span class="absolute right-[9px] top-[8px] size-1.5 rounded-full bg-[#8f344f]" aria-hidden="true"></span></a>
-        <a href="{{ route('settings.index') }}" class="grid size-9 shrink-0 place-items-center rounded-full bg-[#ead9d3] text-xs font-bold text-[#651d32] ring-2 ring-white" aria-label="Profil {{ auth()->user()->name }}" title="{{ auth()->user()->name }}">{{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</a>
+        <details class="group relative shrink-0" data-nav-actions-menu>
+            <summary aria-label="Menu akun dan pengaturan" class="grid size-10 cursor-pointer list-none place-items-center rounded-full bg-[#ead9d3] text-xs font-bold text-[#651d32] ring-2 ring-white transition hover:ring-[#d5b6bd] [&::-webkit-details-marker]:hidden min-[481px]:size-11">
+                {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+            </summary>
+            <div class="absolute right-0 top-[calc(100%+10px)] z-50 w-[min(18rem,calc(100vw-24px))] max-h-[calc(100dvh-96px)] overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
+                <div class="flex items-center gap-3 border-b border-zinc-100 px-3 py-3">
+                    <span aria-hidden="true" class="grid size-10 shrink-0 place-items-center rounded-full bg-[#ead9d3] text-sm font-semibold text-[#651d32]">{{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                    <div class="min-w-0"><p class="truncate text-sm font-semibold text-zinc-900">{{ auth()->user()->name }}</p><p class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</p></div>
+                </div>
+                <div class="space-y-1 py-2">
+                    <button type="button" data-theme-toggle aria-label="Aktifkan tema gelap" aria-pressed="false" class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100">
+                        <i class="fa-solid fa-moon w-4 text-center" aria-hidden="true" data-theme-icon></i><span class="flex-1 text-left" data-theme-label>Tema gelap</span><span class="text-[10px] text-zinc-400">Ubah</span>
+                    </button>
+                    <button type="button" data-command-open aria-label="Buka pencarian cepat" class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100">
+                        <i class="fa-solid fa-magnifying-glass w-4 text-center" aria-hidden="true"></i><span class="flex-1 text-left">Pencarian cepat</span><kbd class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">⌘ K</kbd>
+                    </button>
+                    <a href="{{ route('notifications.index') }}" @if(request()->routeIs('notifications.*')) aria-current="page" @endif class="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100 {{ request()->routeIs('notifications.*') ? 'bg-[#f1e2e5] text-[#651d32]' : '' }}">
+                        <i class="fa-regular fa-bell w-4 text-center" aria-hidden="true"></i><span class="flex-1">Notifikasi</span><span class="size-1.5 rounded-full bg-[#8f344f]" aria-hidden="true"></span>
+                    </a>
+                    <a href="{{ route('settings.index') }}" @if(request()->routeIs('settings.*')) aria-current="page" @endif class="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100 {{ request()->routeIs('settings.*') ? 'bg-[#f1e2e5] text-[#651d32]' : '' }}">
+                        <i class="fa-solid fa-gear w-4 text-center" aria-hidden="true"></i><span>Pengaturan</span>
+                    </a>
+                </div>
+                <form method="POST" action="{{ route('logout') }}" class="border-t border-zinc-100 pt-2">
+                    @csrf
+                    <button type="submit" class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-red-50 hover:text-red-700"><i class="fa-solid fa-arrow-right-from-bracket w-4 text-center" aria-hidden="true"></i>Keluar dari DevFlow</button>
+                </form>
+            </div>
+        </details>
     </div>
 </header>

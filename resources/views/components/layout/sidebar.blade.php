@@ -80,23 +80,4 @@
         @endforeach
     </nav>
 
-    <div class="shrink-0 border-t border-zinc-100 px-3 pb-3 pt-2">
-        <button type="button" data-theme-toggle aria-label="Aktifkan tema gelap" class="df-menu-link flex w-full items-center gap-3 min-[851px]:hidden">
-            <i class="fa-solid fa-moon shrink-0 text-center" aria-hidden="true" data-theme-icon></i><span data-theme-label>Tema gelap</span>
-        </button>
-        <button type="button" data-command-open aria-label="Buka pencarian cepat" title="Pencarian cepat" class="df-menu-link flex w-full items-center gap-3">
-            <i class="fa-solid fa-magnifying-glass shrink-0 text-center" aria-hidden="true"></i><span class="df-sidebar-label-full flex-1 text-left">Pencarian cepat</span><span class="df-sidebar-label-short" aria-hidden="true">Cari</span><kbd class="df-sidebar-shortcut rounded border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">⌘ K</kbd>
-        </button>
-        <a href="{{ route('notifications.index') }}" aria-label="Pusat notifikasi" class="df-menu-link flex w-full items-center gap-3 min-[851px]:hidden {{ request()->routeIs('notifications.*') ? 'bg-[#f1e2e5] text-[#651d32]' : '' }}">
-            <i class="fa-regular fa-bell shrink-0 text-center" aria-hidden="true"></i><span>Notifikasi</span>
-        </a>
-        <a href="{{ route('settings.index') }}" aria-label="Pengaturan" title="Pengaturan" class="df-menu-link flex w-full items-center gap-3 {{ request()->routeIs('settings.*', 'notifications.*') ? 'bg-[#f1e2e5] text-[#651d32]' : '' }}">
-            <i class="fa-solid fa-gear shrink-0 text-center" aria-hidden="true"></i><span class="df-sidebar-label-full">Pengaturan</span><span class="df-sidebar-label-short" aria-hidden="true">Setelan</span>
-        </a>
-        <div class="df-sidebar-user mt-2 flex items-center gap-3 border-t border-zinc-100 px-2 pt-3" title="{{ auth()->user()->name }}">
-            <span aria-hidden="true" class="grid size-9 shrink-0 place-items-center rounded-full bg-[#ead9d3] text-sm font-semibold text-[#651d32]">{{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
-            <div class="df-sidebar-user-copy min-w-0 flex-1"><p class="truncate text-xs font-semibold text-zinc-900">{{ auth()->user()->name }}</p><p class="truncate text-[11px] text-zinc-500" title="{{ auth()->user()->email }}">{{ auth()->user()->email }}</p></div>
-            <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" aria-label="Keluar dari DevFlow" title="Keluar" class="grid size-9 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i></button></form>
-        </div>
-    </div>
 </aside>

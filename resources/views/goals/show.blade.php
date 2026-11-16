@@ -61,7 +61,7 @@
                         </form>
                         <details>
                             <summary class="min-h-9 cursor-pointer px-2 text-xs text-zinc-500">Edit</summary>
-                            <form method="POST" action="{{ route('goals.milestones.update', [$goal, $milestone]) }}" class="mt-1 w-64 space-y-2 rounded-xl border border-zinc-200 bg-white p-3">
+                            <form method="POST" action="{{ route('goals.milestones.update', [$goal, $milestone]) }}" class="mt-1 w-[min(16rem,calc(100vw-72px))] max-w-full space-y-2 rounded-xl border border-zinc-200 bg-white p-3">
                                 @csrf
                                 @method('PATCH')
                                 <x-ui.field label="Judul" name="title" :value="$milestone->title" required />
