@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -124,6 +125,24 @@ class ProjectIntegrityTest extends TestCase
             ->assertNotFound();
 
         $this->assertSame('todo', $task->fresh()->status);
+    }
+
+    public function test_task_board_uses_forwarded_https_scheme_for_task_move_urls(): void
+    {
+        $user = User::factory()->create();
+        $task = Task::query()->create([
+            'owner_id' => $user->id,
+            'title' => 'Move me securely',
+            'status' => 'todo',
+            'priority' => 'normal',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->withHeaders(['X-Forwarded-Proto' => 'https'])
+            ->get('http://devflow.fdevsite.cloud/tasks?view=board');
+
+        $response->assertOk()
+            ->assertSee('data-task-update-url="https://devflow.fdevsite.cloud/inbox/'.$task->id.'"', false);
     }
 
     public function test_task_cannot_be_assigned_to_milestone_in_another_project(): void
