@@ -127,7 +127,7 @@ class ProjectIntegrityTest extends TestCase
         $this->assertSame('todo', $task->fresh()->status);
     }
 
-    public function test_task_board_uses_forwarded_https_scheme_for_task_move_urls(): void
+    public function test_task_board_and_calendar_use_forwarded_https_scheme_for_ajax_urls(): void
     {
         $user = User::factory()->create();
         $task = Task::query()->create([
@@ -143,6 +143,10 @@ class ProjectIntegrityTest extends TestCase
 
         $response->assertOk()
             ->assertSee('data-task-update-url="https://devflow.fdevsite.cloud/inbox/'.$task->id.'"', false);
+
+        $this->get('http://devflow.fdevsite.cloud/calendar')
+            ->assertOk()
+            ->assertSee('data-calendar-store-url="https://devflow.fdevsite.cloud/calendar/events"', false);
     }
 
     public function test_task_cannot_be_assigned_to_milestone_in_another_project(): void
