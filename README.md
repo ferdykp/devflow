@@ -1,32 +1,113 @@
 # DevFlow
 
-**Kerja fokus. Tumbuh konsisten.** DevFlow adalah workspace untuk developer yang menyatukan pengelolaan proyek, pekerjaan harian, dan pengembangan diri dalam satu aplikasi.
+**Kerja fokus. Tumbuh konsisten.** DevFlow adalah workspace untuk developer yang menggabungkan perencanaan proyek, eksekusi tugas, kolaborasi, dan pengembangan diri dalam satu aplikasi.
 
-## Tampilan
+DevFlow membantu menjawab tiga hal: **apa yang sedang dikerjakan, apa langkah berikutnya, dan bagaimana melanjutkan pekerjaan setelah berpindah konteks.** Proyek tetap bisa dipakai tanpa PRD, GitHub, atau fitur AI.
 
-| Dashboard | Proyek |
+## Galeri tampilan
+
+### Workspace dan eksekusi
+
+| Dashboard | Daftar proyek |
 | --- | --- |
 | ![Dashboard DevFlow](docs/screenshots/dashboard.png) | ![Daftar proyek DevFlow](docs/screenshots/projects.png) |
 
-## Fitur
+| Papan tugas proyek | Fokus harian |
+| --- | --- |
+| ![Papan tugas dengan alur status](docs/screenshots/task-board.png) | ![Halaman Fokus Saya](docs/screenshots/focus.png) |
 
-- **Dashboard & rencana harian** — ringkasan tugas, prioritas, agenda, rutinitas, dan pekerjaan mendatang.
-- **Proyek dan kolaborasi** — kelola beberapa workspace, proyek, anggota, serta undangan tim.
-- **Manajemen tugas** — status, prioritas, tenggat, checklist, komentar, milestone, dan impor tugas dari dokumen.
-- **Perencanaan proyek** — catatan, backlog ide, dokumen PRD dengan versi dan persetujuan, serta tinjauan perubahan scope.
-- **Fokus & kalender** — pilih prioritas harian dan atur agenda serta sesi fokus.
-- **Tujuan & kebiasaan** — catat target, milestone, rutinitas, sesi belajar, dan progresnya.
-- **Smart Coach & review mingguan** — tinjau rekomendasi aktivitas dan refleksi pekerjaan.
-- **Integrasi GitHub opsional** — hubungkan repositori dan sinkronkan aktivitas melalui GitHub App/webhook.
-- **Akun & akses** — registrasi, login Google opsional, verifikasi email, dan pengaturan profil.
-- **PWA** — aplikasi menyediakan web manifest dan halaman fallback saat offline.
+### Dokumen menjadi pekerjaan
+
+| Impor dokumen Markdown | Tugas hasil ekstraksi dokumen |
+| --- | --- |
+| ![Form impor dokumen Markdown](docs/screenshots/markdown-import.png) | ![Tugas yang disusun dari dokumen](docs/screenshots/generated-tasks.png) |
+
+| Tinjau draf tugas sebelum dibuat | Detail tugas dan diskusi tim |
+| --- | --- |
+| ![Tinjau draf hasil ekstraksi](docs/screenshots/draft-review.png) | ![Detail tugas, checklist, dan diskusi](docs/screenshots/task-discussion.png) |
+
+### Perencanaan dan konteks proyek
+
+| Penjaga cakupan proyek | Lanjutkan pekerjaan |
+| --- | --- |
+| ![Pengaturan baseline dan review cakupan](docs/screenshots/scope.png) | ![Ringkasan untuk melanjutkan proyek](docs/screenshots/project-resume.png) |
+
+| Integrasi GitHub | Backlog ide |
+| --- | --- |
+| ![Pengaturan integrasi GitHub proyek](docs/screenshots/github.png) | ![Backlog ide proyek](docs/screenshots/backlog.png) |
+
+## Fitur unggulan
+
+### 1. Perencanaan proyek yang lentur
+
+- Buat beberapa workspace personal atau tim dan kelola proyek aktif, tertunda, atau arsip.
+- Mulai proyek cukup dengan nama; PRD, milestone, dan koneksi GitHub bersifat opsional.
+- Catat tujuan, milestone, catatan proyek, aktivitas, dan ide yang belum masuk rencana kerja.
+- Gunakan tampilan tugas berbentuk daftar atau papan status untuk melihat pekerjaan dari backlog sampai selesai.
+- Kelola prioritas, tenggat, checklist, komentar, penanggung jawab, dan riwayat perubahan tugas.
+
+### 2. Impor dokumen menjadi daftar tugas
+
+- Tempel atau unggah dokumen Markdown/TXT seperti PRD dan panduan kerja.
+- DevFlow membaca judul bagian sebagai kelompok pekerjaan, langkah utama sebagai tugas, dan subpoin sebagai checklist.
+- Periksa judul, deskripsi, checklist, prioritas, penanggung jawab, dan tenggat sebelum membuat tugas.
+- Pilih tugas yang diperlukan; draf yang tidak dipilih tidak dibuat.
+
+### 3. PRD dan pengendalian perubahan scope
+
+- Simpan PRD dalam Markdown dengan draf, versi, dan alur persetujuan.
+- Tetapkan baseline pekerjaan yang termasuk dan di luar cakupan, dengan atau tanpa PRD.
+- Ajukan review saat ada usulan perubahan; catat klasifikasi, alasan, dan keputusan.
+- Simpan ide di backlog masa depan agar usulan baru tidak otomatis berubah menjadi tugas aktif.
+- Versi PRD yang sudah disetujui menjadi riwayat; perubahan berikutnya dibuat sebagai versi baru.
+
+### 4. Lanjutkan proyek dengan konteks yang jelas
+
+- Halaman **Lanjutkan** merangkum tugas terbuka, aktivitas terbaru, milestone, catatan, dan sumber data yang tersedia.
+- Tampilkan waktu sinkronisasi GitHub jika integrasi dipakai, sehingga pengguna bisa menilai kebaruan datanya.
+- Ringkasan mengikuti data yang tercatat; DevFlow tidak menganggap commit sebagai bukti tugas selesai atau mengarang persentase progres.
+
+### 5. Sinkronisasi GitHub opsional
+
+- Hubungkan repositori publik atau instal GitHub App untuk repositori privat.
+- Sinkronisasi bersifat baca-saja untuk aktivitas repositori dan dapat menampilkan perubahan di aktivitas proyek.
+- GitHub App menggunakan izin repositori minimal untuk membaca metadata dan konten yang diperlukan.
+- Pekerjaan manual tetap bisa dikelola ketika GitHub belum dikonfigurasi.
+
+### 6. Rencana kerja dan fokus personal
+
+- Dashboard merangkum tugas terbuka, tiga prioritas harian, agenda, proyek, rutinitas, dan sesi belajar.
+- Pilih hingga tiga tugas fokus, lalu tandai selesai atau tunda dari halaman Hari Ini.
+- Kelola tugas pribadi lintas proyek melalui inbox, termasuk filter, checklist, komentar, dan pembaruan beberapa tugas sekaligus.
+- Atur kalender, sesi fokus, rutinitas harian, tujuan, dan review mingguan dalam workspace yang sama.
+
+### 7. Belajar dan Smart Coach
+
+- Susun jalur belajar menjadi modul dan pelajaran; catat sesi, materi, asesmen, serta jadwal review.
+- Pantau tujuan melalui target angka atau milestone.
+- Smart Coach memberi saran berbasis aturan dari data tugas, agenda, rutinitas, dan belajar—misalnya tenggat terlewat atau jadwal bertumpuk.
+- Saran transparan dan perlu dikonfirmasi pengguna; Coach tidak mengubah jadwal atau menyelesaikan tugas sendiri.
+
+### 8. Kolaborasi dan akses
+
+- Buat workspace tim, undang anggota melalui tautan undangan, dan cabut undangan yang belum dipakai.
+- Diskusikan tugas lewat komentar dan tetapkan penanggung jawab.
+- Akses proyek mengikuti workspace yang dimiliki atau dapat diakses anggota.
+
+### 9. Pengalaman web
+
+- Antarmuka responsif untuk desktop dan layar kecil.
+- Mendukung instalasi sebagai PWA melalui web manifest.
+- Saat offline, DevFlow menampilkan halaman informasi; data proyek pribadi tidak disimpan di perangkat.
+- Tersedia autentikasi email, verifikasi email, pemulihan kata sandi, serta login Google opsional.
 
 ## Teknologi
 
-- PHP 8.3+ dan Laravel 13
-- Blade dan Tailwind CSS 4
-- Vite
-- Database SQLite secara default (dapat dikonfigurasi melalui Laravel)
+- **Backend:** PHP 8.3+, Laravel 13
+- **UI:** Blade, Tailwind CSS 4
+- **Aset frontend:** Vite
+- **Database default:** SQLite; konfigurasi koneksi mengikuti Laravel
+- **Integrasi:** GitHub App/webhook dan Google OAuth (opsional)
 
 ## Menjalankan secara lokal
 
@@ -39,9 +120,9 @@ touch database/database.sqlite
 composer setup
 ```
 
-`composer setup` menginstal dependensi, menyiapkan `.env`, membuat application key, menjalankan migrasi, lalu membangun aset frontend.
+Perintah `composer setup` menginstal dependensi, menyiapkan `.env`, membuat application key, menjalankan migrasi, menginstal dependensi frontend, dan membangun aset.
 
-Jalankan aplikasi dan Vite di dua terminal:
+Jalankan aplikasi dan Vite di terminal terpisah:
 
 ```bash
 php artisan serve
@@ -51,18 +132,18 @@ php artisan serve
 npm run dev
 ```
 
-Buka `http://localhost:8000`. Untuk membuat data contoh lokal:
+Buka `http://localhost:8000`. Untuk menambahkan data contoh di database lokal:
 
 ```bash
 php artisan db:seed --class=DevFlowDemoSeeder
 ```
 
-Seeder demo menyiapkan akun `demo@devflow.local` dengan kata sandi `Devdemo123.`. Gunakan hanya pada lingkungan lokal.
+Seeder demo membuat akun `demo@devflow.local` dengan kata sandi `Devdemo123.`. Kredensial ini hanya untuk lingkungan lokal.
 
 ## Integrasi opsional
 
-Login Google, email SMTP, dan GitHub App memerlukan kredensial masing-masing di `.env`. Aplikasi tetap dapat digunakan tanpa mengaktifkan integrasi eksternal. Panduan koneksi GitHub App tersedia di [`docs/GITHUB-APP-SETUP.md`](docs/GITHUB-APP-SETUP.md).
+Kredensial Google OAuth, SMTP, dan GitHub App dapat diisi di `.env`. Petunjuk konfigurasi GitHub App dan webhook tersedia di [`docs/GITHUB-APP-SETUP.md`](docs/GITHUB-APP-SETUP.md). Aplikasi inti tetap dapat digunakan tanpa integrasi tersebut.
 
 ## Lisensi
 
-Lihat [`composer.json`](composer.json) untuk informasi lisensi proyek.
+MIT — lihat metadata proyek di [`composer.json`](composer.json).
