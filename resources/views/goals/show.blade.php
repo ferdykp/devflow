@@ -57,10 +57,10 @@
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="completed" value="{{ $milestone->completed_at ? 0 : 1 }}">
-                            <button class="min-h-9 rounded-lg px-2 text-xs text-blue-700">{{ $milestone->completed_at ? 'Buka' : 'Selesaikan' }}</button>
+                            <button class="min-h-10 rounded-lg border border-blue-200 bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-700">{{ $milestone->completed_at ? 'Buka' : 'Selesaikan' }}</button>
                         </form>
                         <details>
-                            <summary class="min-h-9 cursor-pointer px-2 text-xs text-zinc-500">Edit</summary>
+                            <summary class="flex min-h-10 cursor-pointer items-center rounded-lg border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-blue-700">Edit</summary>
                             <form method="POST" action="{{ route('goals.milestones.update', [$goal, $milestone]) }}" class="mt-1 w-[min(16rem,calc(100vw-72px))] max-w-full space-y-2 rounded-xl border border-zinc-200 bg-white p-3">
                                 @csrf
                                 @method('PATCH')

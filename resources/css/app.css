@@ -39,6 +39,12 @@
 }
 
 html { background: var(--df-canvas); }
+@media (min-width: 1920px) {
+    html { font-size: 17px; }
+}
+@media (min-width: 2400px) {
+    html { font-size: 18px; }
+}
 body {
     background: var(--df-canvas);
     color: var(--df-ink);

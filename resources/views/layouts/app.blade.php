@@ -31,7 +31,7 @@
         <div class="df-stage min-w-0 [overflow-wrap:anywhere]">
             @include('components.layout.topbar')
             <main id="main-content" tabindex="-1" data-page-transition
-                class="mx-auto w-full max-w-[1600px] px-4 pb-24 pt-6 sm:px-7 min-[851px]:px-8 min-[851px]:pb-12 min-[851px]:pt-7 xl:px-10">
+                class="mx-auto w-full max-w-[2200px] px-4 pb-24 pt-6 sm:px-7 min-[851px]:px-8 min-[851px]:pb-12 min-[851px]:pt-7 xl:px-10">
                 <div class="fixed right-3 top-20 z-[1000] grid w-[min(390px,calc(100vw-24px))] gap-3 pointer-events-none sm:right-6"
                     role="region" aria-label="Notifikasi" data-toast-stack>
                     @if (session('success'))

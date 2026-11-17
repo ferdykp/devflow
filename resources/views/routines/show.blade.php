@@ -46,12 +46,12 @@
     <aside class="space-y-4">
         <x-ui.panel>
             <h2 class="font-semibold">Tindakan hari ini</h2>
-            <div class="mt-3 flex gap-2">
+            <div class="mt-3 grid grid-cols-2 gap-2">
                 @foreach(['completed' => 'Selesai', 'skipped' => 'Lewati'] as $status => $label)
                     <form method="POST" action="{{ route('routines.check-in', $routine) }}">
                         @csrf
                         <input type="hidden" name="status" value="{{ $status }}">
-                        <button class="min-h-11 rounded-lg {{ $status === 'completed' ? 'bg-blue-600 text-white' : 'bg-zinc-100 text-zinc-700' }} px-3 text-sm font-semibold">{{ $label }}</button>
+                        <button class="min-h-11 flex-1 rounded-lg border px-3 text-sm font-semibold transition focus-visible:outline-2 {{ $status === 'completed' ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700 focus-visible:outline-blue-700' : 'border-zinc-200 bg-zinc-100 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-200 focus-visible:outline-zinc-700' }}">{{ $label }}</button>
                     </form>
                 @endforeach
             </div>
@@ -59,7 +59,7 @@
         <x-ui.panel>
             <h2 class="font-semibold">Status rutinitas</h2>
             <p class="mt-2 text-sm text-zinc-600">{{ $routine->status === 'active' ? 'Rutinitas aktif dan siap diikuti.' : ($routine->status === 'paused' ? 'Rutinitas sedang dijeda.' : 'Rutinitas diarsipkan.') }}</p>
-            <button type="button" data-create-open="routine-edit" class="mt-3 inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-semibold text-blue-700 hover:bg-blue-50">Ubah status</button>
+            <button type="button" data-create-open="routine-edit" class="mt-3 inline-flex min-h-10 items-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-700">Ubah status</button>
         </x-ui.panel>
     </aside>
 </div>
