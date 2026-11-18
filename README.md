@@ -1,20 +1,49 @@
 # DevFlow
 
-**Kerja fokus. Tumbuh konsisten.** DevFlow adalah workspace untuk developer yang menggabungkan perencanaan proyek, eksekusi tugas, kolaborasi, dan pengembangan diri dalam satu aplikasi.
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Dashboard DevFlow" width="900">
+</p>
 
-DevFlow membantu menjawab tiga hal: **apa yang sedang dikerjakan, apa langkah berikutnya, dan bagaimana melanjutkan pekerjaan setelah berpindah konteks.** Proyek tetap bisa dipakai tanpa PRD, GitHub, atau fitur AI.
+<h3 align="center">Kerja fokus. Tumbuh konsisten.</h3>
+
+<p align="center">
+  Satu workspace untuk merencanakan proyek, mengubah dokumen menjadi pekerjaan, dan kembali bekerja tanpa kehilangan konteks.
+</p>
+
+<p align="center">
+  <a href="https://devflow.fdevsite.cloud"><strong>Buka DevFlow</strong></a>
+  · <a href="#fitur-utama">Jelajahi fitur</a>
+  · <a href="#menjalankan-secara-lokal">Jalankan secara lokal</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/ferdykp/devflow/actions/workflows/quality.yml"><img src="https://github.com/ferdykp/devflow/actions/workflows/quality.yml/badge.svg" alt="Status quality checks"></a>
+  <img src="https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.3 atau lebih baru">
+  <img src="https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
+</p>
+
+DevFlow membantu menjawab tiga hal: **apa yang sedang dikerjakan, apa langkah berikutnya, dan bagaimana melanjutkan pekerjaan setelah berpindah konteks.** Mulai dari daftar tugas sederhana; PRD, GitHub, dan Smart Coach tersedia saat dibutuhkan.
+
+### Kenapa DevFlow
+
+- **Dari dokumen ke pekerjaan:** impor PRD Markdown/TXT, tinjau draf hasil ekstraksi, lalu pilih tugas yang ingin dibuat.
+- **Proyek tetap punya konteks:** simpan PRD, keputusan scope, milestone, catatan, dan aktivitas dalam satu ruang kerja.
+- **Lanjutkan dengan jelas:** lihat pekerjaan terbuka dan aktivitas terbaru sebelum kembali mengerjakan proyek.
+- **Alur kerja sederhana:** papan tugas merangkum pekerjaan menjadi *Belum dikerjakan*, *Sedang dikerjakan*, dan *Selesai*.
+- **Integrasi sesuai kebutuhan:** GitHub bersifat opsional dan sinkronisasi repositori hanya-baca.
 
 ## Galeri tampilan
 
 ### Workspace dan eksekusi
 
-| Dashboard | Daftar proyek |
+| Daftar proyek | Fokus harian |
 | --- | --- |
-| ![Dashboard DevFlow](docs/screenshots/dashboard.png) | ![Daftar proyek DevFlow](docs/screenshots/projects.png) |
+| ![Daftar proyek DevFlow](docs/screenshots/projects.png) | ![Halaman Fokus Saya](docs/screenshots/focus.png) |
 
-| Papan tugas proyek | Fokus harian |
+| Lanjutkan pekerjaan | Diskusi tugas |
 | --- | --- |
-| ![Papan tugas dengan alur status](docs/screenshots/task-board.png) | ![Halaman Fokus Saya](docs/screenshots/focus.png) |
+| ![Ringkasan untuk melanjutkan proyek](docs/screenshots/project-resume.png) | ![Detail tugas, checklist, dan diskusi](docs/screenshots/task-discussion.png) |
 
 ### Dokumen menjadi pekerjaan
 
@@ -28,22 +57,22 @@ DevFlow membantu menjawab tiga hal: **apa yang sedang dikerjakan, apa langkah be
 
 ### Perencanaan dan konteks proyek
 
-| Penjaga cakupan proyek | Lanjutkan pekerjaan |
+| Penjaga cakupan proyek | Integrasi GitHub |
 | --- | --- |
-| ![Pengaturan baseline dan review cakupan](docs/screenshots/scope.png) | ![Ringkasan untuk melanjutkan proyek](docs/screenshots/project-resume.png) |
+| ![Pengaturan baseline dan review cakupan](docs/screenshots/scope.png) | ![Pengaturan integrasi GitHub proyek](docs/screenshots/github.png) |
 
-| Integrasi GitHub | Backlog ide |
+| Backlog ide | Dokumen proyek |
 | --- | --- |
-| ![Pengaturan integrasi GitHub proyek](docs/screenshots/github.png) | ![Backlog ide proyek](docs/screenshots/backlog.png) |
+| ![Backlog ide proyek](docs/screenshots/backlog.png) | ![Dokumen proyek](docs/screenshots/documents.png) |
 
-## Fitur unggulan
+## Fitur utama
 
 ### 1. Perencanaan proyek yang lentur
 
 - Buat beberapa workspace personal atau tim dan kelola proyek aktif, tertunda, atau arsip.
 - Mulai proyek cukup dengan nama; PRD, milestone, dan koneksi GitHub bersifat opsional.
 - Catat tujuan, milestone, catatan proyek, aktivitas, dan ide yang belum masuk rencana kerja.
-- Gunakan tampilan tugas berbentuk daftar atau papan status untuk melihat pekerjaan dari backlog sampai selesai.
+- Gunakan tampilan daftar atau papan yang merangkum tugas menjadi tiga tahap: belum dikerjakan, sedang dikerjakan, dan selesai. Status seperti review atau terhambat tetap tersedia sebagai rincian.
 - Kelola prioritas, tenggat, checklist, komentar, penanggung jawab, dan riwayat perubahan tugas.
 
 ### 2. Impor dokumen menjadi daftar tugas
