@@ -9,6 +9,12 @@ class DocumentTaskParser
 {
     public const int MAX_TASKS = 1000;
 
+    private const int MAX_TITLE_LENGTH = 200;
+
+    private const int MAX_GROUP_LENGTH = 180;
+
+    private const int MAX_DESCRIPTION_LENGTH = 4000;
+
     /** @return list<array{title: string, description: string, source_text: string, group: ?string, checklist: list<array{title: string, done: bool}>, position: int}> */
     public function parse(string $content): array
     {
@@ -147,9 +153,6 @@ class DocumentTaskParser
             if ($item['title'] === '') {
                 continue;
             }
-            if (mb_strlen($item['title']) > 200 || mb_strlen($item['description']) > 4000 || mb_strlen($item['group'] ?? '') > 180) {
-                $this->reject('Satu bagian terlalu panjang. Gunakan judul maksimal 200 karakter, nama kelompok 180 karakter, dan uraian 4.000 karakter.');
-            }
             if (count($item['checklist']) > 50 || collect($item['checklist'])->contains(fn (array $check) => mb_strlen($check['title']) > 500)) {
                 $this->reject('Satu tugas memiliki checklist terlalu panjang. Gunakan maksimal 50 poin, masing-masing 500 karakter.');
             }
@@ -165,8 +168,8 @@ class DocumentTaskParser
                     $existing['source_text'] .= "\n".$item['source_text'];
                 }
                 $existing['checklist'] = collect([...$existing['checklist'], ...$item['checklist']])->unique('title')->values()->all();
-                if (mb_strlen($existing['description']) > 4000 || count($existing['checklist']) > 50) {
-                    $this->reject('Poin dengan judul sama terlalu panjang. Pisahkan menjadi beberapa tugas.');
+                if (count($existing['checklist']) > 50) {
+                    $this->reject('Poin dengan judul sama memiliki terlalu banyak checklist. Pisahkan menjadi beberapa tugas.');
                 }
                 unset($existing);
             }
@@ -175,7 +178,39 @@ class DocumentTaskParser
             $this->reject('Belum ada langkah kerja yang dapat dibaca. Tambahkan judul tugas atau daftar kebutuhan ke dokumen.');
         }
 
-        return array_values($result);
+        $expanded = [];
+        foreach ($result as $item) {
+            $sourceText = $item['source_text'];
+            $fullTitle = $item['title'];
+            $fullGroup = $item['group'];
+            $item['title'] = $this->limitLabel($fullTitle, self::MAX_TITLE_LENGTH);
+            $item['group'] = $fullGroup === null ? null : $this->limitLabel($fullGroup, self::MAX_GROUP_LENGTH);
+            if ($item['title'] !== $fullTitle) {
+                $sourceText .= "\nJudul lengkap: ".$fullTitle;
+            }
+            if ($item['group'] !== $fullGroup) {
+                $sourceText .= "\nKelompok lengkap: ".$fullGroup;
+            }
+            $item['source_text'] = $sourceText;
+
+            foreach ($this->splitLongText(trim($item['description']), self::MAX_DESCRIPTION_LENGTH) as $index => $description) {
+                $draft = $item;
+                $draft['description'] = trim($description);
+                if ($index > 0) {
+                    $draft['title'] = $this->appendTitleSuffix($item['title'], ' (lanjutan '.($index + 1).')');
+                    $draft['source_text'] = 'Lanjutan uraian untuk "'.$item['title'].'": '.trim($description);
+                    $draft['checklist'] = [];
+                }
+                $draft['position'] = count($expanded) + 1;
+                $expanded[] = $draft;
+            }
+        }
+
+        if (count($expanded) > self::MAX_TASKS) {
+            $this->reject('Dokumen terlalu panjang setelah uraian tugas dipecah. Kurangi isi dokumen atau unggah dalam beberapa bagian.');
+        }
+
+        return $expanded;
     }
 
     /** @param list<string> $lines */
@@ -223,6 +258,47 @@ class DocumentTaskParser
     {
         $item['description'] .= "\n".$line;
         $item['source_text'] .= "\n".$line;
+    }
+
+    private function limitLabel(string $value, int $limit): string
+    {
+        if (mb_strlen($value) <= $limit) {
+            return $value;
+        }
+
+        return rtrim(mb_substr($value, 0, $limit - 1)).'…';
+    }
+
+    private function appendTitleSuffix(string $title, string $suffix): string
+    {
+        $prefixLength = self::MAX_TITLE_LENGTH - mb_strlen($suffix);
+
+        return rtrim(mb_substr($title, 0, $prefixLength)).$suffix;
+    }
+
+    /** @return list<string> */
+    private function splitLongText(string $text, int $limit): array
+    {
+        if (mb_strlen($text) <= $limit) {
+            return [$text];
+        }
+
+        $chunks = [];
+        while (mb_strlen($text) > $limit) {
+            $candidate = mb_substr($text, 0, $limit);
+            $breakPosition = mb_strrpos($candidate, "\n", 0, 'UTF-8');
+            if ($breakPosition === false || $breakPosition < (int) ($limit / 2)) {
+                $breakPosition = mb_strrpos($candidate, ' ', 0, 'UTF-8');
+            }
+            $chunkLength = $breakPosition !== false && $breakPosition >= (int) ($limit / 2)
+                ? $breakPosition + 1
+                : $limit;
+            $chunks[] = mb_substr($text, 0, $chunkLength);
+            $text = mb_substr($text, $chunkLength);
+        }
+        $chunks[] = $text;
+
+        return $chunks;
     }
 
     private function reject(string $message): never

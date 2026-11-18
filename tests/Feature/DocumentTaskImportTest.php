@@ -78,12 +78,36 @@ class DocumentTaskImportTest extends TestCase
         $this->assertDatabaseCount('project_documents', 0);
     }
 
-    public function test_large_documents_are_not_silently_truncated_into_partial_tasks(): void
+    public function test_documents_over_one_thousand_tasks_are_rejected_without_partial_creation(): void
     {
         $project = Project::factory()->create();
         $this->actingAs($project->workspace->user)->post(route('task-imports.store', $project), ['content_markdown' => implode("\n", array_map(fn ($i) => '- Tugas '.$i, range(1, 1001)))])->assertSessionHasErrors('content_markdown');
-        $this->post(route('task-imports.store', $project), ['content_markdown' => '- '.str_repeat('a', 201)])->assertSessionHasErrors('content_markdown');
         $this->assertDatabaseCount('document_task_imports', 0);
+    }
+
+    public function test_long_prd_sections_are_split_into_valid_drafts_and_original_document_is_preserved(): void
+    {
+        $project = Project::factory()->create();
+        $group = 'Kelompok fitur '.str_repeat('pengelolaan ruang kerja ', 12);
+        $title = 'Implementasi alur '.str_repeat('pengembangan produk ', 12);
+        $description = str_repeat('Pastikan validasi, izin akses, dan alur kerja tetap konsisten pada setiap kondisi penggunaan. ', 70);
+        $content = "## Tahap 1: {$group}\n### {$title}\n{$description}";
+
+        $response = $this->actingAs($project->workspace->user)
+            ->post(route('task-imports.store', $project), ['content_markdown' => $content]);
+
+        $response->assertRedirect()->assertSessionHasNoErrors();
+        $import = $project->taskImports()->sole();
+        $normalizedContent = trim(str_replace(["\r\n", "\r", "\xEF\xBB\xBF"], ["\n", "\n", ''], $content));
+        $this->assertSame($normalizedContent, $import->version->content_markdown);
+        $this->assertGreaterThan(1, count($import->draft_tasks));
+        foreach ($import->draft_tasks as $draft) {
+            $this->assertLessThanOrEqual(200, mb_strlen($draft['title']));
+            $this->assertLessThanOrEqual(180, mb_strlen($draft['group'] ?? ''));
+            $this->assertLessThanOrEqual(4000, mb_strlen($draft['description']));
+        }
+        $this->assertStringContainsString('lanjutan', mb_strtolower($import->draft_tasks[1]['title']));
+        $this->assertDatabaseCount('tasks', 0);
     }
 
     public function test_invalid_confirmation_leaves_all_tasks_uncreated(): void
