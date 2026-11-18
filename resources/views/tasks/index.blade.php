@@ -36,7 +36,7 @@
         @if($taskView === 'board')
             <p class="text-xs text-zinc-500">Seret kartu untuk memperbarui status.</p>
             <div class="-mx-1 overflow-x-auto overscroll-x-contain px-1 pb-3" aria-label="Papan tugas, geser ke samping untuk melihat status lainnya">
-                <div class="grid min-w-max grid-flow-col auto-cols-[280px] items-start gap-4">
+                <div class="grid w-full min-w-max grid-flow-col auto-cols-[minmax(260px,1fr)] items-start gap-4">
                 @foreach(['backlog' => 'Backlog', 'todo' => 'Akan dikerjakan', 'in_progress' => 'Sedang dikerjakan', 'in_review' => 'Ditinjau', 'blocked' => 'Terhambat', 'done' => 'Selesai'] as $statusKey => $statusLabel)
                     @php($statusTasks = $tasks->getCollection()->where('status', $statusKey))
                     <section data-task-dropzone="{{ $statusKey }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400">

@@ -1,6 +1,5 @@
-@php($board = $board ?? false)
 <div class="mt-3 space-y-2 border-t border-zinc-100 pt-3">
-    <form action="{{ route('tasks.update', [$project, $task]) }}" method="POST" data-busy-form class="{{ $board ? 'absolute right-3 top-3 z-10 w-32' : '' }}">
+    <form action="{{ route('tasks.update', [$project, $task]) }}" method="POST" data-busy-form>
         @csrf @method('PATCH')
         <label class="sr-only" for="status-{{ $task->id }}">Status tugas {{ $task->title }}</label>
         <select id="status-{{ $task->id }}" name="status" class="min-h-10 w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-2 text-xs font-medium text-zinc-700 outline-none transition hover:border-zinc-300 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10" data-task-status onchange="this.form.requestSubmit()">

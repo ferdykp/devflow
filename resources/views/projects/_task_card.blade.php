@@ -10,10 +10,10 @@
         @endif
     </div>
 
-    <h3 class="mt-2 min-w-0 break-words pr-32 text-sm font-semibold leading-5 [overflow-wrap:anywhere] {{ $task->status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-900' }}"><a draggable="false" href="{{ route('tasks.show', [$project, $task]) }}" class="rounded-sm hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600">{{ $task->title }}</a></h3>
+    <h3 class="mt-2 min-w-0 break-words text-sm font-semibold leading-6 {{ $task->status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-900' }}"><a draggable="false" href="{{ route('tasks.show', [$project, $task]) }}" class="rounded-sm hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600">{{ $task->title }}</a></h3>
 
     @if($task->description)
-        <p class="mt-2 line-clamp-2 break-words text-xs leading-5 text-zinc-600 [overflow-wrap:anywhere]">{{ $task->description }}</p>
+        <p class="mt-2 line-clamp-3 break-words text-sm leading-6 text-zinc-600">{{ $task->description }}</p>
     @endif
 
     <div class="mt-3 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-500">
@@ -30,5 +30,5 @@
         </div>
     @endif
 
-    @include('projects._task_actions', ['task' => $task, 'columns' => $columns, 'board' => true])
+    @include('projects._task_actions', ['task' => $task, 'columns' => $columns])
 </article>
