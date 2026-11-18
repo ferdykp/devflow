@@ -44,8 +44,8 @@
 @if($editingTask) @include('projects._task_editor') @endif
  @include('projects._task_filters')
  @if($view==='board')
- <p class="mb-3 text-xs text-zinc-500">Seret kartu ke kolom lain untuk mengubah status. Geser papan ke samping untuk melihat semua status.</p>
- <div class="-mx-1 overflow-x-auto overscroll-x-contain px-1 pb-3" aria-label="Papan tugas, geser ke samping untuk melihat status lainnya"><div class="grid w-full min-w-max grid-flow-col auto-cols-[minmax(260px,1fr)] items-start gap-4">
+ <p class="mb-3 text-xs text-zinc-500">Seret kartu ke kolom lain atau ubah status lewat pilihan pada kartu. Kolom menyesuaikan lebar layar.</p>
+ <div class="min-w-0 pb-3" aria-label="Papan tugas, kolom status menyesuaikan lebar layar"><div class="grid min-w-0 grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4 min-[2200px]:grid-cols-6">
   @foreach($columns as $status=>$label)
    @php($items = $tasks->getCollection()->where('status',$status))
    <section data-task-dropzone="{{ $status }}" data-task-column="{{ $status }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400" aria-label="{{ $label }}">
