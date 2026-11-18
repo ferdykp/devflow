@@ -4,7 +4,7 @@
     <input type="hidden" name="section" value="tasks"><input type="hidden" name="view" value="{{ $view }}">
     @if($taskPlan)<input type="hidden" name="plan" value="{{ $taskPlan->id }}">@endif
     <x-ui.field name="search" id="task-search" label="Cari tugas" :value="request('search')" placeholder="Judul tugas…" maxlength="200" />
-    <x-ui.select name="status" id="task-status-filter" label="Status" :value="request('status')" :options="['' => 'Semua status'] + $columns" />
+    <x-ui.select name="status" id="task-status-filter" label="Status" :value="request('status')" :options="['' => 'Semua status'] + $statusGroups" />
     <x-ui.select name="priority" id="task-priority-filter" label="Prioritas" :value="request('priority')" :options="['' => 'Semua prioritas', 'high' => 'Tinggi', 'normal' => 'Normal', 'low' => 'Rendah']" />
     <x-ui.select name="assignee" id="task-assignee-filter" label="Penanggung jawab" :value="request('assignee')" :options="['' => 'Semua anggota', 'me' => 'Ditugaskan ke saya', 'unassigned' => 'Belum ditentukan']" />
     <div class="flex min-h-11 flex-wrap items-center gap-3"><x-ui.button variant="secondary">Terapkan</x-ui.button>@if(request()->filled('search') || request()->filled('status') || request()->filled('priority') || request()->filled('assignee'))<a href="{{ route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => $view, 'plan' => $taskPlan?->id]) }}" class="text-sm text-blue-700 hover:underline">Reset</a>@endif</div>

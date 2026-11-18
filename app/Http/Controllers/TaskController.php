@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\Workspace;
 use App\Services\TaskRecurrenceService;
 use App\Support\ProjectAccess;
+use App\Support\TaskWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,7 +40,9 @@ class TaskController extends Controller
         $participants = $project->workspace->participants();
         $milestones = $project->milestones()->orderBy('id')->get();
 
-        return view('projects.task-details', compact('project', 'task', 'comments', 'participants', 'milestones'));
+        $statusGroups = TaskWorkflow::groupedStatuses();
+
+        return view('projects.task-details', compact('project', 'task', 'comments', 'participants', 'milestones', 'statusGroups'));
     }
 
     public function store(Request $request, int $project): RedirectResponse

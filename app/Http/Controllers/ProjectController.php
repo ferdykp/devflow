@@ -6,6 +6,7 @@ use App\Models\PrdVersion;
 use App\Models\Project;
 use App\Models\Workspace;
 use App\Support\ProjectAccess;
+use App\Support\TaskWorkflow;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -84,6 +85,9 @@ class ProjectController extends Controller
         $approvedPrdVersions = collect();
         $totalWeight = 0;
         $completedWeight = 0;
+        $columns = TaskWorkflow::flatStatuses();
+        $statusGroups = TaskWorkflow::groupedStatuses();
+        $boardColumns = TaskWorkflow::boardColumns();
 
         if ($section === 'overview') {
             $project->load(['activities' => fn ($query) => $query->latest('occurred_at')->limit(5)]);
@@ -143,7 +147,7 @@ class ProjectController extends Controller
 
         return view('projects.show', compact(
             'project', 'section', 'tasks', 'milestones', 'backlog', 'documents',
-            'repositories', 'totalWeight', 'completedWeight', 'scopeReviews', 'changeRequests', 'approvedPrdVersions', 'editingTask', 'participants', 'taskPlan'
+            'repositories', 'totalWeight', 'completedWeight', 'scopeReviews', 'changeRequests', 'approvedPrdVersions', 'editingTask', 'participants', 'taskPlan', 'columns', 'statusGroups', 'boardColumns'
         ));
     }
 

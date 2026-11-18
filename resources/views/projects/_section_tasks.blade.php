@@ -1,8 +1,4 @@
 @php
-    $columns = [
-        'backlog' => 'Backlog', 'todo' => 'Akan dikerjakan', 'in_progress' => 'Sedang dikerjakan',
-        'in_review' => 'Ditinjau', 'blocked' => 'Terhambat', 'done' => 'Selesai',
-    ];
     $view = in_array(request('view'), ['list','board'], true) ? request('view') : 'board';
 @endphp
 <div class="df-task-page" data-tasks-root>
@@ -46,12 +42,12 @@
  @if($view==='board')
  <p class="mb-3 text-xs text-zinc-500">Seret kartu ke kolom lain atau ubah status lewat pilihan pada kartu. Kolom menyesuaikan lebar layar.</p>
  <div class="min-w-0 pb-3" aria-label="Papan tugas, kolom status menyesuaikan lebar layar"><div class="grid min-w-0 grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4 min-[2200px]:grid-cols-6">
-  @foreach($columns as $status=>$label)
-   @php($items = $tasks->getCollection()->where('status',$status))
-   <section data-task-dropzone="{{ $status }}" data-task-column="{{ $status }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400" aria-label="{{ $label }}">
-    <header class="flex items-center justify-between gap-3 px-1 py-1"><h2 class="text-sm font-semibold text-zinc-800">{{ $label }}</h2><span title="Tugas pada halaman ini" class="rounded-full bg-white px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-500">{{ $items->count() }}</span></header>
+  @foreach($boardColumns as $columnKey => $column)
+   @php($items = $tasks->getCollection()->whereIn('status', $column['statuses']))
+   <section data-task-dropzone="{{ $column['drop_status'] }}" data-task-column="{{ $columnKey }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400" aria-label="{{ $column['label'] }}">
+    <header class="flex items-center justify-between gap-3 px-1 py-1"><h2 class="text-sm font-semibold text-zinc-800">{{ $column['label'] }}</h2><span title="Tugas pada halaman ini" class="rounded-full bg-white px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-500">{{ $items->count() }}</span></header>
      @foreach($items as $task)
-      @include('projects._task_card',['task'=>$task,'columns'=>$columns])
+      @include('projects._task_card',['task'=>$task,'columns'=>$columns,'statusGroups'=>$statusGroups])
      @endforeach
      @if($items->isEmpty()) <p class="rounded-xl border border-dashed border-zinc-300 px-3 py-5 text-center text-xs text-zinc-500">Lepas tugas di sini</p> @endif
    </section>

@@ -6,6 +6,7 @@ use App\Models\LearningAssessment;
 use App\Models\LearningLesson;
 use App\Models\Project;
 use App\Models\Task;
+use App\Support\TaskWorkflow;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,7 +21,7 @@ class PersonalDetailController extends Controller
             ->with(['project:id,name', 'personalGoal:id,title', 'learningLesson:id,title', 'assignee:id,name', 'history.user:id,name'])
             ->firstOrFail();
 
-        return view('tasks.show', ['task' => $taskModel]);
+        return view('tasks.show', ['task' => $taskModel, 'statusGroups' => TaskWorkflow::groupedStatuses()]);
     }
 
     public function routine(Request $request, int $routine): View

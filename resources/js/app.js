@@ -452,7 +452,9 @@ if (taskRoot) {
      const status = zone.dataset.taskDropzone;
      const select = card.querySelector('[data-task-status]');
      const currentStatus = card.dataset.taskStatus || select?.value;
-     if (!status || currentStatus === status) return;
+     const currentColumn = card.closest('[data-task-column]')?.dataset.taskColumn;
+     const nextColumn = zone.dataset.taskColumn;
+     if (!status || currentStatus === status || (currentColumn && currentColumn === nextColumn)) return;
      const url = card.dataset.taskUpdateUrl;
      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
      if (!url || !csrf) { showMoveError('Tugas gagal disimpan. Muat ulang halaman lalu coba lagi.'); return; }

@@ -49,7 +49,7 @@
     </div>
     <x-ui.panel><h2 class="font-semibold">Pengaturan tugas</h2>
         <form action="{{ route('tasks.update', [$project, $task]) }}" method="POST" class="mt-5 space-y-5">@csrf @method('PATCH')
-            <x-ui.select name="status" label="Status" :value="$task->status" :options="['backlog' => 'Antrean tugas', 'todo' => 'Belum dikerjakan', 'in_progress' => 'Sedang dikerjakan', 'in_review' => 'Dalam peninjauan', 'blocked' => 'Terhambat', 'done' => 'Selesai']" required />
+            <x-ui.select name="status" label="Status" :value="$task->status" :options="$statusGroups" required />
             <x-ui.select name="priority" label="Prioritas" :value="$task->priority" :options="['low' => 'Rendah', 'normal' => 'Normal', 'high' => 'Tinggi']" required />
             <x-ui.select name="assignee_id" label="Penanggung jawab" :value="$task->assignee_id" :options="['' => 'Belum ditentukan'] + $participants->pluck('name', 'id')->all()" />
             <x-ui.select name="milestone_id" label="Kelompok pekerjaan" :value="$task->milestone_id" :options="['' => 'Tanpa kelompok'] + $milestones->pluck('title', 'id')->all()" />

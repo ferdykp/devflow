@@ -1,6 +1,9 @@
 @php($updateUrl = $task->project ? route('tasks.update', [$task->project, $task]) : route('inbox.update', $task))
 <article data-task-card draggable="true" data-task-id="{{ $task->id }}" data-task-status="{{ $task->status }}" data-task-update-url="{{ $updateUrl }}" aria-label="Tugas {{ $task->title }}. Seret ke kolom status lain." class="group min-w-0 cursor-grab rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-blue-300 hover:shadow-sm active:cursor-grabbing [&.is-dragging]:opacity-50">
     <div class="flex min-w-0 flex-wrap items-center gap-2">
+        @if(in_array($task->status, ['backlog', 'in_review', 'blocked'], true))
+            <span class="inline-flex items-center rounded-full bg-violet-50 px-2 py-1 text-[11px] font-semibold text-violet-700">{{ \App\Support\UiLabel::status($task->status) }}</span>
+        @endif
         @if($task->priority === 'high')
             <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-700"><i class="fa-solid fa-flag" aria-hidden="true"></i>Prioritas tinggi</span>
         @elseif($task->priority === 'low')

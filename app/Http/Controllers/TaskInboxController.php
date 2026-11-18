@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\TaskHistoryEntry;
 use App\Services\TaskRecurrenceService;
 use App\Support\ProjectAccess;
+use App\Support\TaskWorkflow;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -85,8 +86,10 @@ class TaskInboxController extends Controller
             'project_id' => $projectId,
             'due' => $dueFilter,
         ];
+        $statusGroups = TaskWorkflow::groupedStatuses();
+        $boardColumns = TaskWorkflow::boardColumns();
 
-        return view('tasks.index', compact('tasks', 'goals', 'projects', 'lessons', 'search', 'status', 'priority', 'projectId', 'dueFilter', 'savedViews', 'filterState'));
+        return view('tasks.index', compact('tasks', 'goals', 'projects', 'lessons', 'search', 'status', 'priority', 'projectId', 'dueFilter', 'savedViews', 'filterState', 'statusGroups', 'boardColumns'));
     }
 
     public function storeView(Request $request): RedirectResponse

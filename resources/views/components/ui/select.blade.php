@@ -8,7 +8,17 @@
     <select id="{{ $inputId }}" name="{{ $name }}" @required($required)
         @error($fieldKey) aria-invalid="true" aria-describedby="{{ $inputId }}-error" @enderror
         {{ $attributes->class(['df-input w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-base leading-6 text-zinc-900 shadow-xs outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10 aria-invalid:border-red-500 sm:text-sm']) }}>
-        @foreach($options as $key => $text)<option value="{{ $key }}" @selected((string) old($fieldKey, $value) === (string) $key)>{{ $text }}</option>@endforeach
+        @foreach($options as $key => $text)
+            @if(is_array($text))
+                <optgroup label="{{ $key }}">
+                    @foreach($text as $optionValue => $optionText)
+                        <option value="{{ $optionValue }}" @selected((string) old($fieldKey, $value) === (string) $optionValue)>{{ $optionText }}</option>
+                    @endforeach
+                </optgroup>
+            @else
+                <option value="{{ $key }}" @selected((string) old($fieldKey, $value) === (string) $key)>{{ $text }}</option>
+            @endif
+        @endforeach
     </select>
     @error($fieldKey)<p id="{{ $inputId }}-error" role="alert" class="text-sm text-red-700">{{ $message }}</p>@enderror
 </div>

@@ -93,7 +93,7 @@
                         @method('PATCH')
                         <x-ui.field label="Judul" name="title" :value="$task->title" required />
                         <x-ui.textarea label="Deskripsi" name="description" rows="4" :value="$task->description" />
-                        <x-ui.select label="Status" name="status" :options="['backlog' => 'Backlog', 'todo' => 'To do', 'in_progress' => 'Sedang dikerjakan', 'in_review' => 'Review', 'blocked' => 'Terhambat', 'done' => 'Selesai']" :value="$task->status" />
+                        <x-ui.select label="Status" name="status" :options="$statusGroups" :value="$task->status" />
                         <x-ui.select label="Prioritas" name="priority" :options="['high' => 'Tinggi', 'normal' => 'Normal', 'low' => 'Rendah']" :value="$task->priority" />
                         <x-ui.field label="Tenggat" name="due_date" type="date" :value="$task->due_date?->format('Y-m-d')" />
                         <x-ui.field label="Jadwal" name="scheduled_at" type="datetime-local" :value="$task->scheduled_at?->format('Y-m-d\\TH:i')" />

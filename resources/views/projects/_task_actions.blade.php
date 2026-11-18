@@ -3,8 +3,12 @@
         @csrf @method('PATCH')
         <label class="sr-only" for="status-{{ $task->id }}">Status tugas {{ $task->title }}</label>
         <select id="status-{{ $task->id }}" name="status" class="min-h-10 w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-2 text-xs font-medium text-zinc-700 outline-none transition hover:border-zinc-300 focus:border-blue-600 focus:ring-3 focus:ring-blue-600/10" data-task-status onchange="this.form.requestSubmit()">
-            @foreach($columns as $key => $name)
-                <option value="{{ $key }}" @selected($task->status === $key)>{{ $name }}</option>
+            @foreach($statusGroups as $group => $statuses)
+                <optgroup label="{{ $group }}">
+                    @foreach($statuses as $key => $name)
+                        <option value="{{ $key }}" @selected($task->status === $key)>{{ $name }}</option>
+                    @endforeach
+                </optgroup>
             @endforeach
         </select>
     </form>

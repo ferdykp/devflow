@@ -7,10 +7,10 @@ final class UiLabel
     public static function status(?string $value): string
     {
         return match ($value) {
-            'backlog' => 'Antrean tugas',
-            'todo' => 'Belum dikerjakan',
+            'backlog' => 'Backlog',
+            'todo' => 'Akan dikerjakan',
             'in_progress' => 'Sedang dikerjakan',
-            'in_review' => 'Dalam peninjauan',
+            'in_review' => 'Ditinjau',
             'blocked' => 'Terhambat',
             'done' => 'Selesai',
             'active' => 'Aktif',
