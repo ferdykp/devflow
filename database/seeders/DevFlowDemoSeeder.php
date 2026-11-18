@@ -2,11 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\{User, Workspace, Project, FocusItem};
+use App\Models\FocusItem;
+use App\Models\Project;
+use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
@@ -30,6 +32,7 @@ class DevFlowDemoSeeder extends Seeder
                     'name' => 'DevFlow Demo',
                     'email' => $email,
                     'password' => Hash::make('Devdemo123.'),
+                    'timezone' => 'Asia/Jakarta',
                     'email_verified_at' => now(),
                 ]);
             }
@@ -139,13 +142,14 @@ class DevFlowDemoSeeder extends Seeder
                 $milestones = [];
                 foreach ($row['milestones'] as $offset => $name) {
                     $milestones[] = $project->milestones()->firstOrCreate(['title' => $name], [
-                        'description' => 'Demo milestone for ' . $row['name'],
+                        'description' => 'Demo milestone for '.$row['name'],
                         'due_date' => now()->addWeeks($offset + 2)->toDateString(),
                     ]);
                 }
                 foreach ($row['tasks'] as $index => [$title, $status, $priority, $milestoneIndex]) {
                     $project->tasks()->firstOrCreate(['title' => $title], [
                         'milestone_id' => $milestones[$milestoneIndex]->id,
+                        'owner_id' => $user->id,
                         'description' => 'Sample development task used for the DevFlow interface preview.',
                         'status' => $status,
                         'priority' => $priority,
@@ -173,7 +177,7 @@ class DevFlowDemoSeeder extends Seeder
                 }
                 if ($row['prd']) {
                     $document = $project->documents()->firstOrCreate(['title' => 'Product Requirements']);
-                    $markdown = "# {$row['name']} — Product Requirements\n\n## Goal\n{$row['goal']}\n\n## Key workflows\n{$row['description']}\n\n## Scope\n" . ($row['baseline']['in'] ?? 'Project planning only.');
+                    $markdown = "# {$row['name']} — Product Requirements\n\n## Goal\n{$row['goal']}\n\n## Key workflows\n{$row['description']}\n\n## Scope\n".($row['baseline']['in'] ?? 'Project planning only.');
                     $document->versions()->firstOrCreate(['version_number' => 1], [
                         'status' => 'approved',
                         'content_markdown' => $markdown,
@@ -183,15 +187,15 @@ class DevFlowDemoSeeder extends Seeder
                     ]);
                     $document->versions()->firstOrCreate(['version_number' => 2], [
                         'status' => 'draft',
-                        'content_markdown' => $markdown . "\n\n## Proposed update\nReview the upcoming iteration.",
-                        'content_hash' => hash('sha256', $markdown . "\n\n## Proposed update\nReview the upcoming iteration."),
+                        'content_markdown' => $markdown."\n\n## Proposed update\nReview the upcoming iteration.",
+                        'content_hash' => hash('sha256', $markdown."\n\n## Proposed update\nReview the upcoming iteration."),
                     ]);
                 }
                 // Demo activities are never represented as authenticated GitHub events.
                 foreach (['Task list reviewed', 'Milestone planning updated', 'Project notes updated'] as $index => $title) {
-                    $project->activities()->firstOrCreate(['source' => 'demo', 'source_key' => 'seed-' . $index], [
+                    $project->activities()->firstOrCreate(['source' => 'demo', 'source_key' => 'seed-'.$index], [
                         'type' => 'note',
-                        'title' => '[Demo] ' . $title,
+                        'title' => '[Demo] '.$title,
                         'description' => 'Illustrative development activity; not synchronized from GitHub.',
                         'occurred_at' => now()->subHours(3 + $index * 18),
                         'metadata' => ['demo' => true],
@@ -217,7 +221,7 @@ class DevFlowDemoSeeder extends Seeder
                             'decision' => 'move_to_backlog',
                             'reason' => 'Keep core workflow focused.',
                             'created_at' => now(),
-                            'updated_at' => now()
+                            'updated_at' => now(),
                         ]
                     );
                     $project->events()->firstOrCreate(['action' => 'demo_scope_review'], [
@@ -228,8 +232,8 @@ class DevFlowDemoSeeder extends Seeder
             }
             // Maximum three current focus tasks, all from an active project.
             $tasks = $user->workspaces()->with('projects.tasks')->get()->flatMap(
-                fn($w) => $w->projects->where('status', 'active')->flatMap(
-                    fn($p) => $p->tasks->whereIn('status', ['todo', 'in_progress', 'in_review'])->where('priority', 'high')
+                fn ($w) => $w->projects->where('status', 'active')->flatMap(
+                    fn ($p) => $p->tasks->whereIn('status', ['todo', 'in_progress', 'in_review'])->where('priority', 'high')
                 )
             )->take(3);
             foreach ($tasks as $task) {
@@ -239,7 +243,13 @@ class DevFlowDemoSeeder extends Seeder
                     'focus_date' => today()->toDateString(),
                 ]);
             }
-            $this->command?->info("Demo created: {$projectCount} projects. Login: demo@devflow.local / DevFlowDemo2026! (local only)");
+
+            $this->call([
+                DevFlowPersonalWorkspaceSeeder::class,
+                DevFlowProjectWorkflowSeeder::class,
+            ]);
+
+            $this->command?->info("Demo created: {$projectCount} projects and personal workflows. Logins: demo@devflow.local or teammate@devflow.local / Devdemo123. (local only)");
         });
     }
 }

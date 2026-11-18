@@ -84,6 +84,9 @@ test('undangan menghubungkan dua akun dan pencabutan anggota mencabut akses proy
   await page.goto('/projects');
   await page.getByRole('link', { name: 'Personal', exact: true }).click();
   const teamUrl = page.url();
+  if (!testInfo.project.name.startsWith('mobile')) {
+    await expect(page.locator('header a[aria-label="Area proyek"]')).toBeVisible();
+  }
   await page.getByLabel('Email anggota', { exact: true }).fill(memberEmail);
   await page.getByRole('button', { name: 'Buat undangan', exact: true }).click();
   const invitationUrl = await page.getByLabel('Tautan undangan', { exact: true }).inputValue();
@@ -93,6 +96,7 @@ test('undangan menghubungkan dua akun dan pencabutan anggota mencabut akses proy
   await register(page, 'Anggota Tim', memberEmail);
   await page.goto(invitationUrl);
   await page.getByRole('button', { name: 'Terima undangan', exact: true }).click();
+  await page.locator('[data-nav-actions-menu] summary').click();
   await expect(page.getByText('Anggota Tim', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Buat undangan' })).toHaveCount(0);
   await page.goto('/projects');

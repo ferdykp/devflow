@@ -76,4 +76,24 @@ class ScopeWorkflowTest extends TestCase
         ])->assertSessionHasErrors('reason');
         $this->assertSame('pending', $review->fresh()->status);
     }
+
+    public function test_definite_classification_without_a_baseline_preserves_input_and_does_not_resolve_review(): void
+    {
+        $user = User::factory()->create();
+        $project = $this->projectFor($user);
+        $review = $project->reviews()->create(['title' => 'Consider billing export']);
+
+        $this->actingAs($user)->from(route('projects.show', ['project' => $project, 'section' => 'scope']))
+            ->post(route('scope.decide', [$project, $review]), [
+                'decision' => 'approve_proposal',
+                'classification' => 'in_scope',
+                'reason' => 'There is no scope reference yet.',
+            ])
+            ->assertRedirect(route('projects.show', ['project' => $project, 'section' => 'scope']))
+            ->assertSessionHasErrors('classification')
+            ->assertSessionHas('_old_input.classification', 'in_scope');
+
+        $this->assertSame('pending', $review->fresh()->status);
+        $this->assertSame(0, $review->decisions()->count());
+    }
 }

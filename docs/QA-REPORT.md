@@ -1,5 +1,24 @@
 # Laporan QA — 24 Oktober 2026
 
+## Audit source dan kesiapan lokal — 18 November 2026
+
+Run ini dilakukan terhadap checkout lokal pada tanggal tersebut; tidak mengubah source aplikasi atau schema.
+
+| Pemeriksaan | Status | Bukti/batas |
+|---|---|---|
+| PHPUnit | PASS | 128 tes, 867 assertions, `php artisan test --compact`. |
+| Browser Chromium | PASS terbatas | 47 lulus, 9 dilewati dari 56 kasus; proyek desktop dan emulasi mobile. Yang dilewati: satu drag touch (kontrol status alternatif diuji) dan delapan matriks viewport duplikat pada proyek mobile. |
+| Responsive screenshot candidate | PASS terbatas | 320, 375, 430, 768, 1280, 1920, 2560, 3840 px. 1024 px belum tercakup. Screenshot kandidat dibuat oleh E2E; bukan visual baseline yang disetujui. |
+| Browser visual review | PASS terbatas | Login lokal ditinjau pada browser; screenshot overview kandidat 320 px dan 3840 px ditinjau. Di 320 px, label tab proyek terpotong pada viewport dan bergantung pada scroll horizontal; di 3840 px, area konten melebar sepanjang viewport sehingga halaman teks panjang berpotensi sulit dipindai. Catat sebagai peluang validasi UX, bukan regresi produk yang disetujui. |
+| CLI commit assistant | PASS | 4 tes Python lulus (`python3 -m unittest discover -s tests/cli -p 'test_*.py' -v`); cakupan consent AI, validasi pesan, fallback lokal, dan preview tanpa commit. |
+| Vite production build | PASS | `npm run build`; CSS 87.55 kB / gzip 17.10 kB, JS 24.17 kB / gzip 7.19 kB. |
+| Aksesibilitas penuh | NOT TESTED | Beberapa alur keyboard/dialog diuji otomatis; belum audit screen reader atau WCAG AA menyeluruh. |
+| Viewport 1024 px | NOT TESTED | Tidak ada kasus dalam matriks run saat ini. |
+| WebKit/Safari, provider GitHub/AI nyata | NOT TESTED | Run ini hanya Chromium lokal; tidak ada kredensial provider/staging yang digunakan. |
+| Staging, monitoring, backup/restore dan rollback production | BLOCKED | Tidak dijalankan dalam audit lokal ini; lihat gate pada `GO-NO-GO.md`. |
+
+Screenshot kandidat dan laporan Playwright berada di direktori hasil tes selama run; direktori tersebut tidak menjadi bagian dari deliverable perubahan source. Screenshot bukan baseline yang disetujui.
+
 ## Verifikasi to-do otomatis dari Markdown — 24 Oktober 2026
 
 | Pemeriksaan | Status | Bukti/batas |
@@ -146,3 +165,13 @@ Build diulang setelah seluruh screenshot dihasilkan; SHA-256 aset CSS/JS sama de
 - Delapan tes khusus dialog juga lulus terpisah pada empat kombinasi browser/perangkat. Pengukuran pusat dan batas dialog mencakup 320×568, 568×320, 1280×800, 3840×900 serta resize saat terbuka ke 375×667. Pembatalan tidak mengirim penghapusan, fokus/scroll dipulihkan, konfirmasi menghasilkan satu request.
 - Build dan Pint lulus. CSS 71.25 kB/gzip 15.58; JS 9.96 kB/gzip 3.57. Tidak ada dependency atau migrasi baru. Log browser terbaru hanya menunjukkan koneksi Vite; error backend terakhir bertanggal sebelumnya merupakan pembatasan koneksi sandbox, bukan temuan baru.
 - Bukti dan screenshot di `/tmp/devflow-dialog-evidence`, termasuk run khusus, run lengkap dan hasil backend. Screenshot desktop/mobile WebKit diperiksa. Verifikasi ini mencakup alur yang diuji, bukan klaim seluruh kemungkinan bug telah hilang.
+
+## Implementasi Developer Intelligence — 18 November 2026
+
+- Laravel PHPUnit full suite: **139 tes, 924 assertions, lulus**. Cakupan tambahan menguji Context Generator dan redaksi secret, isolasi proyek Change Request/notifications, scope anchor dan klasifikasi tanpa baseline, transisi draft PRD, serta immutability versi approved.
+- Playwright E2E baru: **2 skenario lulus pada desktop Chromium dan 2 pada mobile Chromium**. Mencakup Context Generator → manual scope → keputusan → Change Request → draft PRD dan failed autosave → pulihkan draf → reload. Validasi memastikan task tidak dibuat otomatis dan draf PRD tetap draft sampai approval terpisah.
+- Vite production build: **lulus**; CSS 88.60 kB / gzip 17.25 kB, JS 28.07 kB / gzip 8.44 kB.
+- Laravel Pint `--dirty --format agent`: **lulus** dan merapikan PHP yang berubah.
+- Migration terbaru berjalan pada database SQLite pengujian segar lewat `RefreshDatabase`; tidak menjalankan migrasi terhadap database aplikasi aktif.
+- Tidak termasuk run ini: seluruh suite E2E lama, WebKit, audit WCAG komprehensif, koneksi provider GitHub/AI nyata, staging, queue/scheduler production, backup/restore, dan rollback server.
+- Run awal E2E menemukan assertion textarea yang salah serta ID label ganda pada form scope; kedua masalah diperbaiki, lalu desktop/mobile rerun lulus.

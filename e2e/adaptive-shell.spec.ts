@@ -25,6 +25,8 @@ test('ruang kerja, tema, sidebar ringkas, dan posisi navigasi tetap konsisten di
     await expect(compactWorkspaceSwitcher.getByRole('link', { name: 'Proyek & tim', exact: true })).toBeVisible();
     await compactWorkspaceSwitcher.locator('summary').click();
     await page.goto('/projects');
+    await expect(page.getByText('Proyek & ruang kerja', { exact: true })).toBeVisible();
+    await expect(page.locator('[data-sidebar-workspace-switcher] summary')).toHaveAttribute('aria-label', 'Pindah area');
     await expect(page.locator('[data-sidebar]')).toHaveAttribute('data-collapsed', '');
     await page.getByRole('button', { name: 'Perlebar sidebar' }).click();
     await expect(page.locator('html')).not.toHaveAttribute('data-sidebar-collapsed', '');
@@ -32,9 +34,9 @@ test('ruang kerja, tema, sidebar ringkas, dan posisi navigasi tetap konsisten di
   if (isMobile) {
     await page.getByRole('button', { name: 'Buka menu lainnya' }).click();
   }
-  const workspaceSwitcher = page.locator('[data-sidebar] details').first();
-  await workspaceSwitcher.locator('summary').click();
-  await workspaceSwitcher.getByRole('link', { name: 'Proyek & tim', exact: true }).click();
+  const areaSwitcher = page.locator('[data-sidebar-workspace-switcher]');
+  await areaSwitcher.locator('summary').click();
+  await areaSwitcher.getByRole('link', { name: 'Proyek & tim', exact: true }).click();
   await expect(page).toHaveURL(/\/projects$/);
 
   if (isMobile) {
@@ -53,20 +55,17 @@ test('ruang kerja, tema, sidebar ringkas, dan posisi navigasi tetap konsisten di
       .toBeGreaterThan(navigationMetrics.scrollTop - 2);
   }
 
-  if (isMobile) {
-    if (!await page.locator('[data-sidebar]').evaluate((element) => element.hasAttribute('data-open'))) {
-      await page.getByRole('button', { name: 'Buka menu lainnya' }).click();
-    }
+  if (isMobile && await page.locator('[data-sidebar]').evaluate((element) => element.hasAttribute('data-open'))) {
+    await page.getByRole('button', { name: 'Tutup navigasi' }).click();
   }
+  await page.locator('[data-nav-actions-menu] summary').click();
   await page.getByRole('button', { name: 'Aktifkan tema gelap', exact: true }).last().click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect.poll(() => page.evaluate(() => localStorage.getItem('devflow.theme'))).toBe('dark');
 
   await page.goto('/calendar');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  if (isMobile) {
-    await page.getByRole('button', { name: 'Buka menu lainnya' }).click();
-  }
+  await page.locator('[data-nav-actions-menu] summary').click();
   await page.getByRole('button', { name: 'Aktifkan tema terang', exact: true }).last().click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });

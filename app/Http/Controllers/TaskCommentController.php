@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ProjectNotificationService;
 use App\Support\ProjectAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class TaskCommentController extends Controller
 {
-    public function store(Request $request, int $project, int $task): RedirectResponse
+    public function store(Request $request, int $project, int $task, ProjectNotificationService $notifications): RedirectResponse
     {
         $project = ProjectAccess::find($project);
         $task = $project->tasks()->findOrFail($task);
         $data = $request->validate(['body' => ['required', 'string', 'max:4000']]);
         $task->comments()->create($data + ['user_id' => $request->user()->id]);
+        $notifications->notifyParticipants($project, $request->user()->id, 'task.comment.created', 'Komentar tugas baru', $task->title, route('tasks.show', [$project, $task], false));
 
         return redirect()->route('tasks.show', [$project, $task])->with('success', 'Komentar ditambahkan.');
     }

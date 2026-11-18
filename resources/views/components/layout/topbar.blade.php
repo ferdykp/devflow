@@ -1,11 +1,12 @@
 @php
-    $isTeamContext = request()->routeIs('projects.*', 'scope.*', 'github.*', 'tasks.show', 'task-checklist.*', 'task-comments.*');
+    $isProjectArea = request()->routeIs('workspaces.*', 'projects.*', 'scope.*', 'github.*', 'tasks.show', 'task-checklist.*', 'task-comments.*');
+    $unreadNotificationsCount = auth()->user()->unreadNotifications()->count();
 @endphp
 <header class="df-toolbar sticky top-0 z-20 flex min-h-[72px] w-full min-w-0 items-center justify-between gap-2 border-b px-3 backdrop-blur-xl min-[481px]:gap-3 min-[481px]:px-5 lg:px-7">
     <div class="flex min-w-0 items-center gap-2.5 min-[481px]:gap-3">
         <button type="button" class="grid size-10 shrink-0 place-items-center rounded-xl text-zinc-600 transition hover:bg-zinc-100 min-[851px]:hidden" data-sidebar-open aria-label="Buka navigasi" aria-controls="app-sidebar" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
-        <a href="{{ $isTeamContext ? route('projects.index') : route('dashboard') }}" class="hidden min-h-9 shrink-0 items-center gap-2 rounded-lg px-2 text-[11px] font-semibold {{ $isTeamContext ? 'bg-[#f1e2e5] text-[#651d32]' : 'text-zinc-500 hover:bg-zinc-100' }} min-[851px]:inline-flex" aria-label="{{ $isTeamContext ? 'Ruang tim' : 'Ruang pribadi' }}">
-            <span class="grid size-6 place-items-center rounded-md {{ $isTeamContext ? 'bg-[#651d32] text-white' : 'bg-[#f0e9e1] text-[#651d32]' }}"><i class="fa-solid {{ $isTeamContext ? 'fa-people-group' : 'fa-user' }} text-[10px]" aria-hidden="true"></i></span>{{ $isTeamContext ? 'Tim' : 'Pribadi' }}
+        <a href="{{ $isProjectArea ? route('projects.index') : route('dashboard') }}" class="hidden min-h-9 shrink-0 items-center gap-2 rounded-lg px-2 text-[11px] font-semibold {{ $isProjectArea ? 'bg-[#f1e2e5] text-[#651d32]' : 'text-zinc-500 hover:bg-zinc-100' }} min-[851px]:inline-flex" aria-label="{{ $isProjectArea ? 'Area proyek' : 'Area pribadi' }}">
+            <span class="grid size-6 place-items-center rounded-md {{ $isProjectArea ? 'bg-[#651d32] text-white' : 'bg-[#f0e9e1] text-[#651d32]' }}"><i class="fa-solid {{ $isProjectArea ? 'fa-layer-group' : 'fa-user' }} text-[10px]" aria-hidden="true"></i></span>{{ $isProjectArea ? 'Proyek' : 'Pribadi' }}
         </a>
         <span class="hidden text-zinc-300 min-[851px]:block" aria-hidden="true">/</span>
         <span class="max-w-[30vw] truncate text-[13px] font-semibold text-zinc-800 min-[481px]:max-w-[34vw] min-[851px]:max-w-[28vw]">@yield('page-heading', 'Ikhtisar')</span>
@@ -49,7 +50,7 @@
                         <i class="fa-solid fa-magnifying-glass w-4 text-center" aria-hidden="true"></i><span class="flex-1 text-left">Pencarian cepat</span><kbd class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">⌘ K</kbd>
                     </button>
                     <a href="{{ route('notifications.index') }}" @if(request()->routeIs('notifications.*')) aria-current="page" @endif class="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100 {{ request()->routeIs('notifications.*') ? 'bg-[#f1e2e5] text-[#651d32]' : '' }}">
-                        <i class="fa-regular fa-bell w-4 text-center" aria-hidden="true"></i><span class="flex-1">Notifikasi</span><span class="size-1.5 rounded-full bg-[#8f344f]" aria-hidden="true"></span>
+                        <i class="fa-regular fa-bell w-4 text-center" aria-hidden="true"></i><span class="flex-1">Notifikasi</span>@if($unreadNotificationsCount > 0)<span class="rounded-full bg-[#8f344f] px-2 py-0.5 text-[10px] font-semibold text-white">{{ $unreadNotificationsCount }}</span>@endif
                     </a>
                     <a href="{{ route('settings.index') }}" @if(request()->routeIs('settings.*')) aria-current="page" @endif class="flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100 {{ request()->routeIs('settings.*') ? 'bg-[#f1e2e5] text-[#651d32]' : '' }}">
                         <i class="fa-solid fa-gear w-4 text-center" aria-hidden="true"></i><span>Pengaturan</span>

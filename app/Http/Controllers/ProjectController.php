@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PrdVersion;
 use App\Models\Project;
 use App\Models\Workspace;
 use App\Support\ProjectAccess;
@@ -79,6 +80,8 @@ class ProjectController extends Controller
         $documents = collect();
         $repositories = collect();
         $scopeReviews = collect();
+        $changeRequests = collect();
+        $approvedPrdVersions = collect();
         $totalWeight = 0;
         $completedWeight = 0;
 
@@ -125,8 +128,12 @@ class ProjectController extends Controller
         } elseif ($section === 'milestones') {
             $milestones = $project->milestones()->with('tasks')->get();
         } elseif ($section === 'scope') {
-            $project->load('baseline');
-            $scopeReviews = $project->reviews()->with(['decisions.user'])->latest()->limit(30)->get();
+            $project->load(['baseline.prdVersion']);
+            $scopeReviews = $project->reviews()->with(['decisions.user', 'prdVersion'])->latest()->limit(30)->get();
+            $changeRequests = $project->changeRequests()->with(['requester', 'decider', 'sourcePrdVersion', 'draftPrdVersion'])->latest()->limit(30)->get();
+            $approvedPrdVersions = PrdVersion::query()->with('document')
+                ->where('status', 'approved')->whereHas('document', fn ($query) => $query->where('project_id', $project->id))
+                ->latest('approved_at')->get();
         } elseif ($section === 'prd') {
             $documents = $project->documents()->with('versions')->get();
             $project->load(['taskImports' => fn ($query) => $query->with('version.document')->latest()->limit(10)]);
@@ -136,7 +143,7 @@ class ProjectController extends Controller
 
         return view('projects.show', compact(
             'project', 'section', 'tasks', 'milestones', 'backlog', 'documents',
-            'repositories', 'totalWeight', 'completedWeight', 'scopeReviews', 'editingTask', 'participants', 'taskPlan'
+            'repositories', 'totalWeight', 'completedWeight', 'scopeReviews', 'changeRequests', 'approvedPrdVersions', 'editingTask', 'participants', 'taskPlan'
         ));
     }
 

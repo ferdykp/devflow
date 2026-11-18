@@ -3,7 +3,7 @@
 @section('page-heading', 'Proyek')
 @section('content')
 <header class="df-panel mb-5 flex flex-wrap items-end justify-between gap-4 rounded-2xl border p-5 sm:p-6">
-    <div><p class="mb-1 text-[11px] font-bold uppercase tracking-[.14em] text-[var(--df-secondary)]">Ruang kerja tim</p><h1 class="df-page-title">Proyek</h1><p class="df-page-description mt-2">Rencana, dokumen, dan pekerjaan yang sedang berjalan.</p></div>
+    <div><p class="mb-1 text-[11px] font-bold uppercase tracking-[.14em] text-[var(--df-secondary)]">Proyek &amp; ruang kerja</p><h1 class="df-page-title">Proyek</h1><p class="df-page-description mt-2">Rencana, dokumen, dan pekerjaan dari ruang pribadi maupun tim.</p></div>
     <div class="flex flex-wrap items-center gap-2"><a href="{{ route('workspaces.create') }}" class="df-button-secondary inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold"><i class="fa-solid fa-users" aria-hidden="true"></i>Ruang kerja baru</a><x-ui.button :href="route('projects.create', request()->filled('workspace_id') ? ['workspace' => request('workspace_id')] : [])"><i class="fa-solid fa-plus" aria-hidden="true"></i>Proyek baru</x-ui.button></div>
 </header>
 

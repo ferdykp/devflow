@@ -6,10 +6,10 @@ use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    public function test_guest_is_redirected_to_login(): void
+    public function test_guest_can_view_the_public_landing_page(): void
     {
         $response = $this->get('/');
 
-        $response->assertRedirect(route('login'));
+        $response->assertOk()->assertSee('DevFlow');
     }
 }

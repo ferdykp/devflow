@@ -1,6 +1,6 @@
 @php
     $projectActive = request()->routeIs('projects.*', 'scope.*', 'github.*', 'tasks.show', 'tasks.store', 'tasks.update', 'tasks.destroy', 'task-checklist.*', 'task-comments.*');
-    $isTeamContext = request()->routeIs('workspaces.*', 'projects.*', 'scope.*', 'github.*', 'tasks.show', 'task-checklist.*', 'task-comments.*');
+    $isProjectArea = request()->routeIs('workspaces.*', 'projects.*', 'scope.*', 'github.*', 'tasks.show', 'task-checklist.*', 'task-comments.*');
     $taskActive = request()->routeIs('tasks.index', 'personal-tasks.show');
     $navGroups = [
         [
@@ -50,17 +50,17 @@
 
     <div class="px-4 pt-4" data-sidebar-workspace>
         <details class="group relative" data-sidebar-workspace-switcher>
-            <summary class="df-sidebar-switcher flex min-h-14 cursor-pointer list-none items-center gap-3 px-3 py-2 transition [&::-webkit-details-marker]:hidden" aria-label="Pilih ruang kerja">
-                <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-[#651d32] text-xs font-bold text-white" aria-hidden="true">{{ $isTeamContext ? 'T' : 'D' }}</span>
+            <summary class="df-sidebar-switcher flex min-h-14 cursor-pointer list-none items-center gap-3 px-3 py-2 transition [&::-webkit-details-marker]:hidden" aria-label="Pindah area">
+                <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-[#651d32] text-xs font-bold text-white" aria-hidden="true">{{ $isProjectArea ? 'P' : 'D' }}</span>
                 <span class="df-sidebar-workspace-copy min-w-0 flex-1 text-left">
-                    <span class="block truncate text-[12px] font-semibold text-zinc-900">Ruang kerja {{ $isTeamContext ? 'tim' : 'pribadi' }}</span>
-                    <span class="mt-0.5 block text-[11px] text-zinc-500">{{ $isTeamContext ? 'Proyek & kolaborasi' : 'Mode personal' }}</span>
+                    <span class="block truncate text-[12px] font-semibold text-zinc-900">{{ $isProjectArea ? 'Proyek & tim' : 'Ruang pribadi' }}</span>
+                    <span class="mt-0.5 block text-[11px] text-zinc-500">{{ $isProjectArea ? 'Area proyek' : 'Area pribadi' }}</span>
                 </span>
                 <i class="df-sidebar-workspace-chevron fa-solid fa-chevron-down text-[10px] text-zinc-400 transition-transform group-open:rotate-180" aria-hidden="true"></i>
             </summary>
             <div data-sidebar-workspace-menu class="absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-xl">
-                <a href="{{ route('dashboard') }}" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-xs {{ $isTeamContext ? 'text-zinc-600 hover:bg-zinc-100' : 'bg-[#f1e2e5] font-semibold text-[#651d32]' }}" @if(!$isTeamContext) aria-current="page" @endif><i class="fa-solid fa-user w-4 text-center" aria-hidden="true"></i>Ruang pribadi</a>
-                <a href="{{ route('projects.index') }}" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-xs {{ $isTeamContext ? 'bg-[#f1e2e5] font-semibold text-[#651d32]' : 'text-zinc-600 hover:bg-zinc-100' }}" @if($isTeamContext) aria-current="page" @endif><i class="fa-solid fa-people-group w-4 text-center" aria-hidden="true"></i>Proyek & tim</a>
+                <a href="{{ route('dashboard') }}" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-xs {{ $isProjectArea ? 'text-zinc-600 hover:bg-zinc-100' : 'bg-[#f1e2e5] font-semibold text-[#651d32]' }}" @if(!$isProjectArea) aria-current="page" @endif><i class="fa-solid fa-user w-4 text-center" aria-hidden="true"></i>Ruang pribadi</a>
+                <a href="{{ route('projects.index') }}" class="flex min-h-11 items-center gap-3 rounded-lg px-3 text-xs {{ $isProjectArea ? 'bg-[#f1e2e5] font-semibold text-[#651d32]' : 'text-zinc-600 hover:bg-zinc-100' }}" @if($isProjectArea) aria-current="page" @endif><i class="fa-solid fa-layer-group w-4 text-center" aria-hidden="true"></i>Proyek & tim</a>
             </div>
         </details>
     </div>

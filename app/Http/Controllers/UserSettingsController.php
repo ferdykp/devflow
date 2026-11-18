@@ -143,6 +143,10 @@ class UserSettingsController extends Controller
 
     public function notificationCenter(Request $request): View
     {
-        return view('settings.notifications', ['preferences' => $request->user()->preferences ?? []]);
+        return view('settings.notifications', [
+            'preferences' => $request->user()->preferences ?? [],
+            'notifications' => $request->user()->notifications()->latest()->paginate(30),
+            'unreadCount' => $request->user()->unreadNotifications()->count(),
+        ]);
     }
 }

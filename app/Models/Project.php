@@ -71,4 +71,9 @@ class Project extends Model
     {
         return $this->hasOne(ScopeBaseline::class);
     }
+
+    public function changeRequests(): HasMany
+    {
+        return $this->hasMany(ChangeRequest::class);
+    }
 }

@@ -4,6 +4,7 @@
 @section('content')
 @include('projects._workspace_navigation', ['section' => 'tasks'])
 <x-ui.page-heading :title="$task->title" description="Detail tugas dan diskusi tim">
+    <x-ui.button :href="route('projects.tasks.development-context', [$project, $task])" variant="secondary"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>Siapkan konteks</x-ui.button>
     <x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list', 'edit' => $task->id])" variant="secondary">Ubah tugas</x-ui.button>
     <x-ui.button :href="route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list'])" variant="secondary">Kembali ke tugas</x-ui.button>
 </x-ui.page-heading>

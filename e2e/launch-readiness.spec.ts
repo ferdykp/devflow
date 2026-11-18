@@ -46,14 +46,23 @@ test('navigasi utama jelas dan menu tambahan dapat ditutup dengan keyboard atau 
   const panel = page.locator('[data-project-menu-panel]');
   await trigger.click();
   await expect(panel.getByRole('link', { name: 'Catatan', exact: true })).toBeVisible();
+  const githubLink = panel.getByRole('link', { name: 'GitHub', exact: true });
+  await expect(githubLink).toBeVisible();
   await expect.poll(async () => {
     const bounds = await panel.boundingBox();
     return !!bounds && bounds.x >= 0 && bounds.y >= 0 && bounds.y + bounds.height <= page.viewportSize()!.height;
   }).toBe(true);
+  await githubLink.click();
+  await expect(page).toHaveURL(/section=github/);
+  await expect(page.getByRole('heading', { name: 'GitHub', exact: true })).toBeVisible();
+
+  await page.goto(`${new URL(page.url()).pathname}?section=tasks`);
+  const tasksTrigger = page.locator('[data-project-menu] summary');
+  await tasksTrigger.click();
   await page.keyboard.press('Escape');
   await expect(panel).toBeHidden();
-  await expect(trigger).toBeFocused();
-  await trigger.click();
+  await expect(tasksTrigger).toBeFocused();
+  await tasksTrigger.click();
   await page.getByRole('banner').click({ position: { x: 180, y: 32 } });
   await expect(panel).toBeHidden();
 });
@@ -108,10 +117,20 @@ test('drag and drop tersimpan dan kegagalan request mengembalikan kartu', async 
   await expect(page.locator('[data-task-column="in_progress"] [data-task-card]')).toHaveCount(1);
   await page.reload();
   await expect(page.getByLabel('Status tugas Tugas pengujian')).toHaveValue('in_progress');
-  await page.route('**/tasks/*', route => route.request().method() === 'PATCH'
+  await page.route('**/projects/*/tasks/*', route => route.request().method() === 'PATCH'
     ? route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Layanan tidak tersedia' }) })
     : route.continue());
-  await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="todo"] h2'));
+  const failedMoveResponse = page.waitForResponse(response =>
+    response.status() === 503 && /^\/projects\/\d+\/tasks\/\d+$/.test(new URL(response.url()).pathname));
+  await page.locator('[data-task-card]').evaluate(card => {
+    const target = document.querySelector('[data-task-dropzone="todo"]');
+    if (!target) throw new Error('Todo column was not found.');
+    const dataTransfer = new DataTransfer();
+    card.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer }));
+    target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer }));
+    target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer }));
+  });
+  await failedMoveResponse;
   await expect(page.locator('[data-task-move-error]')).toBeVisible();
   await expect(page.locator('[data-task-column="in_progress"] [data-task-card]')).toHaveCount(1);
   await page.clock.install();

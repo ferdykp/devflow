@@ -19,14 +19,16 @@
     <div class="flex flex-wrap items-center gap-2"><a href="{{ route('projects.resume', $project) }}" class="df-button-secondary inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>Lanjutkan</span></a><x-ui.button :href="route('projects.edit', $project)" variant="ghost"><i class="fa-solid fa-pen text-xs" aria-hidden="true"></i>Edit proyek</x-ui.button></div>
 </header>
 <div class="min-w-0">
-    <nav class="df-panel mb-6 flex min-w-0 items-center gap-1 overflow-x-auto rounded-2xl border p-2" aria-label="Bagian proyek">
+    <div class="df-panel mb-6 flex min-w-0 items-center gap-1 rounded-2xl border p-2">
+    <nav class="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" aria-label="Bagian proyek">
         @foreach(['overview', 'tasks', 'prd'] as $key)
             <a href="{{ route('projects.show', ['project' => $project, 'section' => $key]) }}"
                 class="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-xs font-medium transition-colors duration-150 sm:text-sm motion-reduce:transition-none {{ $section === $key ? 'bg-[var(--df-action-soft)] text-[var(--df-action)]' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950' }}"
                 @if($section === $key) aria-current="page" @endif><i class="fa-solid {{ $sections[$key][1] }} w-4 text-center" aria-hidden="true"></i>{{ $sections[$key][0] }}</a>
         @endforeach
         <a href="{{ route('projects.resume', $project) }}" class="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950"><i class="fa-solid {{ $sections['resume'][1] }} w-4 text-center" aria-hidden="true"></i>{{ $sections['resume'][0] }}</a>
-        <details data-project-menu class="relative ml-auto" @if(in_array($section, $advanced, true)) data-current="true" @endif>
+    </nav>
+        <details data-project-menu class="relative shrink-0" @if(in_array($section, $advanced, true)) data-current="true" @endif>
             <summary aria-label="Menu proyek lainnya{{ in_array($section, $advanced, true) ? ', '.$sections[$section][0].' dipilih' : '' }}" class="flex min-h-11 shrink-0 cursor-pointer list-none items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-zinc-100 [&::-webkit-details-marker]:hidden {{ in_array($section, $advanced, true) ? 'bg-blue-50 text-blue-700' : 'text-zinc-600' }}">
                 <i class="fa-solid fa-ellipsis w-4 text-center" aria-hidden="true"></i><span class="hidden sm:inline">{{ in_array($section, $advanced, true) ? $sections[$section][0] : 'Lainnya' }}</span><span class="hidden sm:inline"><i class="fa-solid fa-chevron-down text-[10px]" aria-hidden="true"></i></span>
             </summary>
@@ -42,4 +44,4 @@
                 <a href="{{ route('projects.insights', $project) }}" class="flex min-h-11 items-center gap-3 rounded-lg border-t border-zinc-100 px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100"><i class="fa-solid fa-wand-magic-sparkles w-4 text-center" aria-hidden="true"></i>Analisis AI</a>
             </div>
         </details>
-    </nav>
+    </div>

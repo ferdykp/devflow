@@ -194,8 +194,46 @@ dfSearch?.addEventListener('keydown',event=>{const visible=dfVisibleItems();if(e
 dfPalette?.addEventListener('click',event=>{if(event.target===dfPalette)dfPalette.close()});
 document.querySelectorAll('[data-note-autosave]').forEach((form) => {
  let timer;
+ let saving = false;
+ let dirty = false;
  const status = form.querySelector('[data-note-save-status]');
+ const retryButton = form.querySelector('[data-note-save-retry]');
+ const recoveryPanel = form.querySelector('[data-note-recovery]');
+ const recoveryKey = `devflow:personal-note-draft:${form.dataset.noteOwner}:${form.dataset.noteId}`;
+ const saveLocalDraft = () => {
+   try {
+     const fields = [...form.querySelectorAll('[data-note-field]')].map((field) => ({
+       name: field.name,
+       type: field.type,
+       value: field.value,
+       checked: field instanceof HTMLInputElement && field.type === 'checkbox' ? field.checked : null,
+     }));
+     sessionStorage.setItem(recoveryKey, JSON.stringify({ savedAt: Date.now(), fields }));
+     if (recoveryPanel) recoveryPanel.hidden = false;
+     return true;
+   } catch (error) {
+     console.warn('DevFlow note recovery draft could not be stored in this tab:', error);
+     return false;
+   }
+ };
+ const clearLocalDraft = () => {
+   try {
+     sessionStorage.removeItem(recoveryKey);
+   } catch (error) {
+     console.warn('DevFlow note recovery draft could not be cleared:', error);
+   }
+   if (recoveryPanel) recoveryPanel.hidden = true;
+ };
+ try {
+   if (sessionStorage.getItem(recoveryKey) && recoveryPanel) recoveryPanel.hidden = false;
+ } catch (error) {
+   console.warn('DevFlow note recovery draft could not be read:', error);
+ }
  const save = async () => {
+   if (saving || !dirty) return;
+   saving = true;
+   dirty = false;
+   if (retryButton) retryButton.disabled = true;
    if (status) status.textContent = 'Menyimpan…';
    try {
      const response = await fetch(form.action, {
@@ -203,20 +241,60 @@ document.querySelectorAll('[data-note-autosave]').forEach((form) => {
        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
      });
      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+     if (response.redirected && new URL(response.url).pathname !== window.location.pathname) {
+       throw new Error('Sesi login berakhir; simpan ulang setelah masuk kembali.');
+     }
      if (status) status.textContent = `Tersimpan ${new Intl.DateTimeFormat('id', { hour: '2-digit', minute: '2-digit' }).format(new Date())}`;
+     if (dirty) timer = window.setTimeout(save, 0);
+     else clearLocalDraft();
    } catch (error) {
-     if (status) status.textContent = 'Belum tersimpan. Periksa koneksi lalu coba lagi.';
+     dirty = true;
+     const draftSaved = saveLocalDraft();
+     if (status) status.textContent = draftSaved
+       ? 'Belum tersimpan. Draf disimpan untuk pemulihan pada tab ini; periksa koneksi lalu coba lagi.'
+       : 'Belum tersimpan. Teks tetap di form; periksa koneksi lalu coba lagi.';
+     if (retryButton) retryButton.disabled = false;
      console.error('DevFlow note autosave failed:', error);
+   } finally {
+     saving = false;
    }
  };
  form.querySelectorAll('[data-note-field]').forEach((field) => {
    const scheduleSave = () => {
+     dirty = true;
+     if (status) status.textContent = 'Perubahan belum disimpan…';
      window.clearTimeout(timer);
      timer = window.setTimeout(save, 800);
    };
    field.addEventListener('input', scheduleSave);
    field.addEventListener('change', scheduleSave);
  });
+ retryButton?.addEventListener('click', () => {
+   window.clearTimeout(timer);
+   dirty = true;
+   save();
+ });
+ form.querySelector('[data-note-recovery-restore]')?.addEventListener('click', () => {
+   try {
+     const draft = JSON.parse(sessionStorage.getItem(recoveryKey) || '{}');
+     if (!Array.isArray(draft.fields)) throw new Error('Invalid recovery draft.');
+     draft.fields.forEach((savedField) => {
+       const field = [...form.querySelectorAll('[data-note-field]')].find((candidate) => candidate.name === savedField.name && candidate.type === savedField.type);
+       if (!field) return;
+       field.value = savedField.value;
+       if (field instanceof HTMLInputElement && field.type === 'checkbox' && savedField.checked !== null) field.checked = savedField.checked;
+     });
+     recoveryPanel.hidden = true;
+     dirty = true;
+     if (status) status.textContent = 'Draf dipulihkan. Menyimpan perubahan…';
+     window.clearTimeout(timer);
+     timer = window.setTimeout(save, 800);
+   } catch (error) {
+     if (status) status.textContent = 'Draf pemulihan tidak dapat dibaca. Isi form masih aman.';
+     console.error('DevFlow note recovery draft could not be restored:', error);
+   }
+ });
+ form.querySelector('[data-note-recovery-discard]')?.addEventListener('click', clearLocalDraft);
 });
 const dfRail=document.querySelector('[data-sidebar]');const dfScrim=document.querySelector('[data-sidebar-overlay]');
 const dfRailOpeners=[...document.querySelectorAll('[data-sidebar-open]')];let dfRailLastOpener=null;
@@ -706,3 +784,52 @@ document.querySelectorAll('[data-task-draft]').forEach((draft) => {
   choice.addEventListener('change', update);
   update();
 });
+
+const developmentContextBuilder = document.querySelector('[data-context-builder]');
+if (developmentContextBuilder) {
+  const sectionsElement = developmentContextBuilder.querySelector('[data-context-sections]');
+  const preview = developmentContextBuilder.querySelector('[data-context-preview]');
+  const format = developmentContextBuilder.querySelector('[data-context-format]');
+  const status = developmentContextBuilder.querySelector('[data-context-status]');
+  const copyButton = developmentContextBuilder.querySelector('[data-context-copy]');
+  let contextSections = [];
+  try {
+    contextSections = JSON.parse(sectionsElement?.textContent || '[]');
+  } catch (error) {
+    if (status) status.textContent = 'Preview konteks gagal dimuat. Muat ulang halaman untuk mencoba kembali.';
+    console.error('DevFlow development context could not be parsed:', error);
+  }
+  const selectedSections = () => {
+    const selectedKeys = new Set([...developmentContextBuilder.querySelectorAll('[data-context-section]:checked')].map((input) => input.value));
+    return contextSections.filter((section) => selectedKeys.has(section.key));
+  };
+  const renderPreview = () => {
+    if (!preview) return;
+    const selected = selectedSections();
+    const content = selected.map((section) => `## ${section.label} · ${section.source}\n${section.content}`).join('\n\n');
+    const taskContent = contextSections.find((section) => section.key === 'task')?.content || 'Tugas tidak tersedia.';
+    const introduction = {
+      developer: `Konteks tugas: ${taskContent}`,
+      assistant: 'Gunakan hanya konteks di bawah. Jangan mengklaim telah melihat file lokal, staged changes, atau keadaan repository yang tidak disediakan. Jangan memperluas scope; tanyakan bila bukti tidak cukup.',
+      team: 'Konteks untuk menyelaraskan pekerjaan dan membahas langkah berikutnya bersama tim.',
+    }[format?.value || 'developer'];
+    preview.value = `${introduction}\n\n${content || 'Pilih setidaknya satu sumber konteks.'}`;
+    if (copyButton) copyButton.disabled = selected.length === 0;
+    if (status && selected.length === 0) status.textContent = 'Pilih setidaknya satu sumber untuk membuat preview.';
+    else if (status) status.textContent = `${selected.length} sumber dipilih. Periksa isi sebelum menyalin.`;
+  };
+  developmentContextBuilder.querySelectorAll('[data-context-section]').forEach((input) => input.addEventListener('change', renderPreview));
+  format?.addEventListener('change', renderPreview);
+  copyButton?.addEventListener('click', async () => {
+    if (!preview || !status || copyButton.disabled) return;
+    try {
+      await navigator.clipboard.writeText(preview.value);
+      status.textContent = 'Konteks disalin ke clipboard.';
+    } catch (error) {
+      preview.focus();
+      preview.select();
+      status.textContent = 'Clipboard tidak tersedia. Preview dipilih agar dapat disalin manual.';
+    }
+  });
+  renderPreview();
+}
