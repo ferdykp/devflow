@@ -15,7 +15,7 @@
 
 <body class="min-h-screen bg-canvas font-sans text-ink antialiased">
     <a href="#konten" class="absolute -top-24 left-4 z-50 rounded-lg bg-white px-4 py-3 text-sm font-medium shadow-lg focus:top-3">Lewati ke konten</a>
-    <header class="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12">
+    <header class="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12 min-[1600px]:max-w-[1600px] min-[1920px]:max-w-[1800px] min-[2560px]:max-w-[2000px]">
         <a href="{{ route('home') }}" aria-label="DevFlow, halaman utama" class="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-zinc-950">
             <img src="{{ asset('icons/devflow-mark.svg') }}" alt="" class="size-9 rounded-xl">
             <span class="font-display">DevFlow<span class="text-[#8f344f]">.</span></span>
@@ -30,12 +30,12 @@
         </nav>
     </header>
 
-    <main id="konten" class="mx-auto w-full max-w-[1280px] px-5 pb-20 pt-5 sm:px-8 sm:pt-10 lg:px-12 lg:pb-28">
-        <section class="grid items-center gap-12 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-16" aria-labelledby="hero-title">
-            <div class="max-w-[620px]">
+    <main id="konten" class="mx-auto w-full max-w-[1280px] px-5 pb-20 pt-5 sm:px-8 sm:pt-10 lg:px-12 lg:pb-28 min-[1600px]:max-w-[1600px] min-[1920px]:max-w-[1800px] min-[2560px]:max-w-[2000px]">
+        <section class="grid items-center gap-12 xl:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] xl:gap-16 min-[1600px]:gap-20 min-[1920px]:gap-24" aria-labelledby="hero-title">
+            <div class="max-w-[620px] min-[1600px]:max-w-[740px] min-[1920px]:max-w-[820px]">
                 <p class="inline-flex min-h-8 items-center gap-2 rounded-full border border-[#ead7d9] bg-[#f1e2e5] px-3 text-xs font-semibold text-[#651d32]"><span class="size-1.5 rounded-full bg-[#8f344f]" aria-hidden="true"></span> Satu ruang untuk seluruh alur kerjamu</p>
-                <h1 id="hero-title" class="df-page-title mt-6 max-w-[12ch] text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04]">Kerja fokus.<br><span class="text-[#8f344f]">Tumbuh konsisten.</span></h1>
-                <p class="mt-6 max-w-[48ch] text-base leading-7 text-zinc-600 sm:text-lg sm:leading-8">DevFlow menyatukan tugas, proyek, kalender, fokus, dan pembelajaran dalam satu workspace yang terasa ringan dipakai setiap hari.</p>
+                <h1 id="hero-title" class="df-page-title mt-6 max-w-[12ch] text-[clamp(2.6rem,6vw,4.4rem)] leading-[1.04] min-[1920px]:text-[clamp(4rem,4.4vw,5.5rem)]">Kerja fokus.<br><span class="text-[#8f344f]">Tumbuh konsisten.</span></h1>
+                <p class="mt-6 max-w-[48ch] text-base leading-7 text-zinc-600 sm:text-lg sm:leading-8 min-[1920px]:text-xl min-[1920px]:leading-9">DevFlow menyatukan tugas, proyek, kalender, fokus, dan pembelajaran dalam satu workspace yang terasa ringan dipakai setiap hari.</p>
                 <div class="mt-8 flex flex-wrap items-center gap-3">
                     @auth
                         <a href="{{ route('dashboard') }}" class="inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#651d32] px-5 text-sm font-semibold text-white shadow-md shadow-[#651d32]/15 transition hover:bg-[#501528]">Buka workspace <i class="fa-solid fa-arrow-right text-xs" aria-hidden="true"></i></a>
@@ -86,17 +86,17 @@
 
         <section class="mt-20 border-t border-[#e7ded5] pt-8 sm:mt-24" aria-labelledby="modules-title">
             <div class="max-w-xl"><p class="text-xs font-semibold uppercase tracking-[.14em] text-[#8f344f]">Satu ritme kerja</p><h2 id="modules-title" class="mt-2 font-display text-2xl font-semibold tracking-tight text-[#242127] sm:text-3xl">Semua yang penting, terhubung.</h2></div>
-            <div class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Rencana personal</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Inbox, tugas, rutinitas, tujuan, kalender, dan sesi fokus mengikuti prioritasmu.</p></article>
-                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-code-branch" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Alur developer</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Ubah PRD menjadi pekerjaan, tautkan tugas ke GitHub, dan lanjutkan dari konteks terakhir.</p></article>
-                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Belajar konsisten</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Jaga jalur belajar dan catat kemajuan tanpa memisahkannya dari jadwal kerja.</p></article>
-                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-people-group" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Kolaborasi tim</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Pindah dari rencana pribadi ke proyek bersama dengan pola kerja yang tetap akrab.</p></article>
+            <div class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 min-[1920px]:gap-5">
+                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5 min-[1920px]:p-7"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Rencana personal</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Inbox, tugas, rutinitas, tujuan, kalender, dan sesi fokus mengikuti prioritasmu.</p></article>
+                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5 min-[1920px]:p-7"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-code-branch" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Alur developer</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Ubah PRD menjadi pekerjaan, tautkan tugas ke GitHub, dan lanjutkan dari konteks terakhir.</p></article>
+                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5 min-[1920px]:p-7"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Belajar konsisten</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Jaga jalur belajar dan catat kemajuan tanpa memisahkannya dari jadwal kerja.</p></article>
+                <article class="rounded-2xl border border-[#e7ded5] bg-[#fcfaf7] p-5 min-[1920px]:p-7"><span class="grid size-10 place-items-center rounded-xl bg-[#f1e2e5] text-[#651d32]"><i class="fa-solid fa-people-group" aria-hidden="true"></i></span><h3 class="mt-4 text-sm font-semibold text-[#242127]">Kolaborasi tim</h3><p class="mt-2 text-xs leading-5 text-[#706970]">Pindah dari rencana pribadi ke proyek bersama dengan pola kerja yang tetap akrab.</p></article>
             </div>
         </section>
     </main>
 
     <footer class="border-t border-[#e7ded5]">
-        <div class="mx-auto flex max-w-[1280px] flex-col gap-3 px-5 py-5 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+        <div class="mx-auto flex max-w-[1280px] flex-col gap-3 px-5 py-5 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12 min-[1600px]:max-w-[1600px] min-[1920px]:max-w-[1800px] min-[2560px]:max-w-[2000px]">
             <span>© {{ date('Y') }} DevFlow</span>
             <nav aria-label="Informasi layanan" class="flex flex-wrap gap-x-5 gap-y-2">
                 <a href="{{ route('privacy') }}" class="underline-offset-4 hover:text-[#651d32] hover:underline">Kebijakan privasi</a>
