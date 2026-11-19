@@ -47,7 +47,7 @@
 
             </div>
             <label class="flex items-center gap-2 text-sm text-zinc-600"><input name="remember" value="1"
-                    type="checkbox" class="rounded border-zinc-300 accent-blue-600"> Ingat saya</label>
+                    type="checkbox" checked class="rounded border-zinc-300 accent-blue-600"> Ingat saya</label>
             <x-ui.button class="w-full">Masuk
                 <span aria-hidden="true">→</span></x-ui.button>
         </form>

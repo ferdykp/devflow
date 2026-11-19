@@ -174,7 +174,7 @@ class GoogleAuthController extends Controller
         $user = $result['user'];
 
         if ($result['action'] === 'login') {
-            auth()->login($user);
+            auth()->login($user, true);
             $request->session()->regenerate();
 
             return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali!');

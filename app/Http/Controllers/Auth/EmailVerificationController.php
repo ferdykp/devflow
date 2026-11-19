@@ -51,7 +51,7 @@ class EmailVerificationController extends Controller
         $request->session()->forget('pending_email_verification_purpose');
         $request->session()->forget('pending_email_verification_can_cancel');
         $request->session()->forget('e2e_email_verification_code');
-        auth()->login($user);
+        auth()->login($user, true);
         $request->session()->regenerate();
 
         if ($purpose === 'google_login') {
