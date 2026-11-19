@@ -4,16 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f4eee8">
+    <meta name="theme-color" content="#1b181c">
     <title>DevFlow — Kerja dan berkembang dengan lebih terarah</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>try{const theme=localStorage.getItem('devflow.theme');document.documentElement.dataset.theme=theme==='light'?'light':'dark'}catch{document.documentElement.dataset.theme='dark'}</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen overflow-x-hidden bg-[#f4eee8] font-sans text-[#2b2026] antialiased">
+<body class="min-h-screen overflow-x-hidden bg-canvas font-sans text-ink antialiased">
     <a href="#konten" class="absolute -top-24 left-4 z-50 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#421627] shadow-xl focus:top-4">Lewati ke konten</a>
 
     <header class="px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
@@ -29,6 +30,7 @@
             </nav>
 
             <nav aria-label="Akun" class="flex items-center gap-2 sm:gap-3">
+                <button type="button" data-theme-toggle aria-label="Aktifkan tema terang" aria-pressed="true" class="grid size-11 shrink-0 place-items-center rounded-xl border border-white/20 text-white/85 transition hover:bg-white/10 hover:text-white" title="Ubah tema"><i class="fa-solid fa-sun" aria-hidden="true" data-theme-icon></i><span class="sr-only" data-theme-label>Tema terang</span></button>
                 @auth
                     <a href="{{ route('dashboard') }}" class="inline-flex min-h-11 items-center rounded-xl px-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-white sm:px-4">Buka workspace</a>
                 @else

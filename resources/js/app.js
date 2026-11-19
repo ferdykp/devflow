@@ -2,7 +2,7 @@
 const dfThemeKey = 'devflow.theme';
 function dfSyncThemeToggle() {
     const isDark = document.documentElement.dataset.theme === 'dark';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#1b181c' : '#651d32');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#1b181c' : '#f6f1ea');
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         button.setAttribute('aria-label', isDark ? 'Aktifkan tema terang' : 'Aktifkan tema gelap');
         button.setAttribute('aria-pressed', String(isDark));

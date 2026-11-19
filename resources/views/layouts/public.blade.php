@@ -5,17 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="@yield('description', 'Informasi layanan DevFlow.')">
-    <meta name="theme-color" content="#f6f1ea">
+    <meta name="theme-color" content="#1b181c">
     <title>@yield('title') · DevFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>try{const theme=localStorage.getItem('devflow.theme');document.documentElement.dataset.theme=theme==='light'?'light':'dark'}catch{document.documentElement.dataset.theme='dark'}</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer">
     <link rel="icon" type="image/svg+xml" href="{{ asset('icons/devflow-mark.svg') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="alternate icon" type="image/png" sizes="192x192" href="{{ asset('icons/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="min-h-screen bg-canvas font-sans text-ink antialiased">
@@ -27,6 +28,7 @@
                 <span class="font-display">DevFlow<span class="text-[#8f344f]">.</span></span>
             </a>
             <nav aria-label="Navigasi utama" class="flex items-center gap-2 sm:gap-3">
+                <button type="button" data-theme-toggle aria-label="Aktifkan tema terang" aria-pressed="true" class="grid size-10 place-items-center rounded-lg border border-hairline bg-surface text-ink transition hover:bg-surface-muted" title="Ubah tema"><i class="fa-solid fa-sun" aria-hidden="true" data-theme-icon></i><span class="sr-only" data-theme-label>Tema terang</span></button>
                 <a href="{{ route('home') }}" class="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-medium text-zinc-600 underline-offset-4 hover:text-[#651d32] hover:underline">Beranda</a>
                 <a href="{{ route('login') }}" class="inline-flex min-h-10 items-center rounded-lg bg-[#651d32] px-4 text-sm font-semibold text-white hover:bg-[#501528]">Masuk</a>
             </nav>

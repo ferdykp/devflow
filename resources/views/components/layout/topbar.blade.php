@@ -43,8 +43,8 @@
                     <div class="min-w-0"><p class="truncate text-sm font-semibold text-zinc-900">{{ auth()->user()->name }}</p><p class="truncate text-xs text-zinc-500">{{ auth()->user()->email }}</p></div>
                 </div>
                 <div class="space-y-1 py-2">
-                    <button type="button" data-theme-toggle aria-label="Aktifkan tema gelap" aria-pressed="false" class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100">
-                        <i class="fa-solid fa-moon w-4 text-center" aria-hidden="true" data-theme-icon></i><span class="flex-1 text-left" data-theme-label>Tema gelap</span><span class="text-[10px] text-zinc-400">Ubah</span>
+                    <button type="button" data-theme-toggle aria-label="Aktifkan tema terang" aria-pressed="true" class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100">
+                        <i class="fa-solid fa-sun w-4 text-center" aria-hidden="true" data-theme-icon></i><span class="flex-1 text-left" data-theme-label>Tema terang</span><span class="text-[10px] text-zinc-400">Ubah</span>
                     </button>
                     <button type="button" data-command-open aria-label="Buka pencarian cepat" class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm text-zinc-700 transition hover:bg-zinc-100">
                         <i class="fa-solid fa-magnifying-glass w-4 text-center" aria-hidden="true"></i><span class="flex-1 text-left">Pencarian cepat</span><kbd class="rounded border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">⌘ K</kbd>

@@ -5,12 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#651d32">
+    <meta name="theme-color" content="#1b181c">
     <title>@yield('title', 'Ruang kerja') — DevFlow</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>try{const theme=localStorage.getItem('devflow.theme');if(theme==='dark'||theme==='light'){document.documentElement.dataset.theme=theme}if(localStorage.getItem('devflow.sidebar.collapsed')==='true'){document.documentElement.dataset.sidebarCollapsed='true'}}catch{}</script>
+    <script>try{const theme=localStorage.getItem('devflow.theme');document.documentElement.dataset.theme=theme==='light'?'light':'dark';if(localStorage.getItem('devflow.sidebar.collapsed')==='true'){document.documentElement.dataset.sidebarCollapsed='true'}}catch{document.documentElement.dataset.theme='dark'}</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         referrerpolicy="no-referrer">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
