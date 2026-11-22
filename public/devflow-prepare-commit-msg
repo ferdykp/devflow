@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Populate a Git commit message from the staged diff using DevFlow."""
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
+from urllib.request import Request, urlopen
+
+MAX_DIFF_BYTES = 40 * 1024
+MAX_FILES = 100
+COMMIT_SUBJECT = re.compile(
+    r"^(feat|fix|docs|refactor|test|chore|style|perf|build|ci)(?:\([a-z0-9._-]+\))?!?: [^\r\n]+$"
+)
+
+
+def git(*args: str) -> str:
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def warn(message: str) -> None:
+    print(f"[DevFlow] {message}", file=sys.stderr)
+
+
+def valid_base_url(base_url: str) -> bool:
+    try:
+        parsed = urlsplit(base_url)
+        hostname = parsed.hostname
+    except ValueError:
+        return False
+
+    if parsed.username or parsed.password or parsed.query or parsed.fragment:
+        return False
+
+    return (parsed.scheme == "https" and bool(hostname)) or (
+        parsed.scheme == "http" and hostname in {"localhost", "127.0.0.1", "::1"}
+    )
+
+
+def request_suggestion(base_url: str, token: str, language: str, files: list[str], diff: str) -> str:
+    payload = json.dumps(
+        {"files": files, "diff": diff, "language": language},
+        ensure_ascii=False,
+    ).encode("utf-8")
+    request = Request(
+        f"{base_url.rstrip('/')}/api/commit-message",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "DevFlow-Commit-Hook",
+        },
+        method="POST",
+    )
+    with urlopen(request, timeout=30) as response:
+        body = json.loads(response.read().decode("utf-8"))
+    subject = body.get("message") if isinstance(body, dict) else None
+    if not isinstance(subject, str):
+        raise ValueError("DevFlow returned an invalid response.")
+    subject = subject.strip()
+    if len(subject) > 72 or not COMMIT_SUBJECT.fullmatch(subject):
+        raise ValueError("DevFlow returned a subject that does not match Conventional Commits.")
+    return subject
+
+
+def main(argv: list[str] | None = None) -> int:
+    arguments = sys.argv[1:] if argv is None else argv
+    if not arguments:
+        return 0
+
+    message_path = Path(arguments[0])
+    source = arguments[1] if len(arguments) > 1 else ""
+    if source:
+        return 0
+
+    try:
+        current_message = message_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return 0
+
+    if any(line.strip() and not line.lstrip().startswith("#") for line in current_message.splitlines()):
+        return 0
+
+    token = git("config", "--local", "--get", "devflow.token")
+    base_url = git("config", "--local", "--get", "devflow.url")
+    language = git("config", "--local", "--get", "devflow.language") or "en"
+    if not token or not base_url:
+        return 0
+    if not valid_base_url(base_url):
+        warn("Configure devflow.url with HTTPS before using the commit assistant.")
+        return 0
+    if language not in {"en", "id"}:
+        warn("devflow.language must be 'en' or 'id'; using English.")
+        language = "en"
+
+    files = git("diff", "--cached", "--name-only", "--diff-filter=ACDMRT").splitlines()
+    if not files:
+        return 0
+    if len(files) > MAX_FILES:
+        warn(f"There are more than {MAX_FILES} staged files; using the commit editor without a suggestion.")
+        return 0
+
+    diff = git("diff", "--cached", "--no-ext-diff", "--no-textconv", "--unified=2", "--", ".")
+    if not diff:
+        return 0
+    if len(diff.encode("utf-8")) > MAX_DIFF_BYTES:
+        warn("The staged diff exceeds 40 KiB; using the commit editor without a suggestion.")
+        return 0
+    if "Binary files " in diff or "GIT binary patch" in diff:
+        warn("The staged diff includes binary data; using the commit editor without a suggestion.")
+        return 0
+
+    try:
+        subject = request_suggestion(base_url, token, language, files, diff)
+    except HTTPError as exception:
+        warn(f"The suggestion request returned HTTP {exception.code}; you can enter a message manually.")
+        return 0
+    except (OSError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exception:
+        warn(f"Could not get a suggestion ({type(exception).__name__}); you can enter a message manually.")
+        return 0
+
+    comments = [line for line in current_message.splitlines() if line.lstrip().startswith("#")]
+    message = subject + "\n"
+    if comments:
+        message += "\n" + "\n".join(comments) + "\n"
+
+    try:
+        message_path.write_text(message, encoding="utf-8")
+    except OSError:
+        warn("Could not write the suggestion into the commit editor; enter a message manually.")
+        return 0
+
+    warn(f"Suggested subject: {subject}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

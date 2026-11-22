@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ChangeRequestController;
+use App\Http\Controllers\CommitHookTokenController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentTaskImportController;
 use App\Http\Controllers\FocusController;
@@ -209,6 +210,8 @@ Route::middleware(['auth', 'cache-history'])->group(function () {
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'dismiss'])->name('notifications.dismiss');
     Route::get('/settings/integrations', [UserSettingsController::class, 'integrations'])->name('settings.integrations');
+    Route::post('/settings/integrations/commit-hook-token', [CommitHookTokenController::class, 'store'])->middleware('throttle:5,1')->name('settings.commit-hook-token.store');
+    Route::delete('/settings/integrations/commit-hook-token', [CommitHookTokenController::class, 'destroy'])->name('settings.commit-hook-token.destroy');
     Route::get('/focus', [FocusController::class, 'index'])->name('focus.index');
     Route::post('/focus/reorder', [FocusController::class, 'reorder'])->name('focus.reorder');
     Route::post('/focus/{task}', [FocusController::class, 'toggle'])->name('focus.toggle');

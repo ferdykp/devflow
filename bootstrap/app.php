@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticateCommitHook;
 use App\Http\Middleware\CacheHistory;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeaders::class);
         $middleware->alias([
             'cache-history' => CacheHistory::class,
+            'auth.commit-hook' => AuthenticateCommitHook::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

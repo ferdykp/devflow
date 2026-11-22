@@ -29,5 +29,14 @@ class AppServiceProvider extends ServiceProvider
         ]);
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(5)->by('register:'.$request->ip())
         );
+        RateLimiter::for('commit-hook', function (Request $request) {
+            $token = $request->bearerToken();
+            $tokenKey = is_string($token) ? hash('sha256', $token) : 'missing';
+
+            return [
+                Limit::perMinute(8)->by('commit-hook-token:'.$tokenKey),
+                Limit::perMinute(30)->by('commit-hook-ip:'.$request->ip()),
+            ];
+        });
     }
 }

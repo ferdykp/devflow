@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AI\CommitMessageSuggestion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -132,11 +133,12 @@ class UserSettingsController extends Controller
         return back()->with('success', 'Preferensi pengingat disimpan.');
     }
 
-    public function integrations(Request $request): View
+    public function integrations(Request $request, CommitMessageSuggestion $commitMessageSuggestion): View
     {
         return view('settings.integrations', [
             'githubConfigured' => filled(config('services.github.client_id')),
-            'aiConfigured' => filled(config('devflow_ai.api_key')),
+            'aiConfigured' => $commitMessageSuggestion->ready(),
+            'commitHookToken' => $request->user()->commitHookToken,
             'preferences' => $request->user()->preferences ?? [],
         ]);
     }
