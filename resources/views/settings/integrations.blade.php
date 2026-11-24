@@ -32,7 +32,7 @@
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
                 <h2 class="font-semibold">Asisten pesan commit</h2>
-                <p class="mt-1 max-w-3xl text-sm leading-6 text-zinc-500">Git hook lokal menganalisis perubahan yang sudah di-stage, lalu mengisi draf pesan commit untuk kamu tinjau di editor Git.</p>
+                <p class="mt-1 max-w-3xl text-sm leading-6 text-zinc-500">Git hook lokal menganalisis perubahan yang sudah di-stage, menampilkan saran di Terminal, lalu menunggu konfirmasi tanpa membuka editor seperti Vim.</p>
             </div>
             <span class="rounded-full px-2.5 py-1 text-xs {{ $aiConfigured ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">{{ $aiConfigured ? 'AI siap' : 'AI belum aktif' }}</span>
         </div>
@@ -89,12 +89,13 @@ printf '\n'
 git config --local devflow.token "$DEVFLOW_TOKEN"
 unset DEVFLOW_TOKEN
 git config --local devflow.language en
+git config --local core.editor true
 HOOK_PATH="$(git rev-parse --git-path hooks/prepare-commit-msg)"
 curl -fsSL '{{ asset('devflow-prepare-commit-msg') }}' -o "$HOOK_PATH"
 chmod +x "$HOOK_PATH"</code></pre>
             </div>
             <p id="commit-hook-install-status" class="mt-2 text-sm text-zinc-600" role="status" aria-live="polite"></p>
-            <p class="mt-3 text-sm leading-6 text-zinc-600">Setelah itu gunakan <code>git add .</code> lalu <code>git commit</code> tanpa <code>-m</code>. Editor akan terbuka dengan saran yang bisa kamu edit. Lanjutkan dengan <code>git push origin main</code>. Jika memakai <code>-m</code>, Git memakai pesan yang kamu tulis dan hook dilewati. Gunakan <code>git config --local devflow.language id</code> untuk saran berbahasa Indonesia.</p>
+            <p class="mt-3 text-sm leading-6 text-zinc-600">Setelah itu gunakan <code>git add .</code> lalu <code>git commit</code> tanpa <code>-m</code>. Saran tampil di Terminal; tekan Enter untuk pakai, ketik <code>e</code> untuk mengubah, atau <code>n</code> untuk membatalkan. Git tidak membuka Vim. Jika saran tidak tersedia, buat commit manual dengan <code>git commit -m "pesan commit"</code>. Lanjutkan dengan <code>git push origin main</code>. Gunakan <code>git config --local devflow.language id</code> untuk saran berbahasa Indonesia.</p>
         </div>
     </x-ui.panel>
 </div>

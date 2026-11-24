@@ -39,6 +39,39 @@ def warn(message: str) -> None:
     print(f"[DevFlow] {message}", file=sys.stderr)
 
 
+def review_suggestion(subject: str) -> str | None:
+    try:
+        terminal = open("/dev/tty", "r+", encoding="utf-8")
+    except OSError:
+        warn(f"Suggested subject: {subject}")
+        return subject
+
+    with terminal:
+        terminal.write(
+            f"\n[DevFlow] Saran pesan commit:\n  {subject}\n\n"
+            "Tekan Enter untuk pakai, ketik e untuk mengubah, atau n untuk membatalkan: "
+        )
+        terminal.flush()
+        choice = terminal.readline().strip().lower()
+
+        if choice in {"", "y", "yes"}:
+            return subject
+        if choice in {"e", "edit"}:
+            terminal.write("Pesan commit baru: ")
+            terminal.flush()
+            edited_subject = terminal.readline().strip()
+            if edited_subject:
+                return edited_subject
+            warn("Pesan kosong; commit dibatalkan.")
+            return None
+        if choice in {"n", "no", "q", "quit"}:
+            warn("Commit dibatalkan sesuai pilihan.")
+            return None
+
+        warn("Pilihan tidak dikenali; saran DevFlow digunakan.")
+        return subject
+
+
 def valid_base_url(base_url: str) -> bool:
     try:
         parsed = urlsplit(base_url)
@@ -103,6 +136,7 @@ def main(argv: list[str] | None = None) -> int:
     base_url = git("config", "--local", "--get", "devflow.url")
     language = git("config", "--local", "--get", "devflow.language") or "en"
     if not token or not base_url:
+        warn("Hook belum dikonfigurasi untuk repo ini. Pasang hook dari Pengaturan → Integrasi, atau gunakan git commit -m 'your message'.")
         return 0
     if not valid_base_url(base_url):
         warn("Configure devflow.url with HTTPS before using the commit assistant.")
@@ -115,40 +149,44 @@ def main(argv: list[str] | None = None) -> int:
     if not files:
         return 0
     if len(files) > MAX_FILES:
-        warn(f"There are more than {MAX_FILES} staged files; using the commit editor without a suggestion.")
+        warn(f"There are more than {MAX_FILES} staged files; no suggestion was generated. Use git commit -m 'your message' to commit manually.")
         return 0
 
     diff = git("diff", "--cached", "--no-ext-diff", "--no-textconv", "--unified=2", "--", ".")
     if not diff:
         return 0
     if len(diff.encode("utf-8")) > MAX_DIFF_BYTES:
-        warn("The staged diff exceeds 40 KiB; using the commit editor without a suggestion.")
+        warn("The staged diff exceeds 40 KiB; no suggestion was generated. Use git commit -m 'your message' to commit manually.")
         return 0
     if "Binary files " in diff or "GIT binary patch" in diff:
-        warn("The staged diff includes binary data; using the commit editor without a suggestion.")
+        warn("The staged diff includes binary data; no suggestion was generated. Use git commit -m 'your message' to commit manually.")
         return 0
 
     try:
         subject = request_suggestion(base_url, token, language, files, diff)
     except HTTPError as exception:
-        warn(f"The suggestion request returned HTTP {exception.code}; you can enter a message manually.")
+        warn(f"The suggestion request returned HTTP {exception.code}; use git commit -m 'your message' to commit manually.")
         return 0
     except (OSError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exception:
-        warn(f"Could not get a suggestion ({type(exception).__name__}); you can enter a message manually.")
+        warn(f"Could not get a suggestion ({type(exception).__name__}); use git commit -m 'your message' to commit manually.")
         return 0
 
+    reviewed_subject = review_suggestion(subject)
+    if reviewed_subject is None:
+        return 1
+
     comments = [line for line in current_message.splitlines() if line.lstrip().startswith("#")]
-    message = subject + "\n"
+    message = reviewed_subject + "\n"
     if comments:
         message += "\n" + "\n".join(comments) + "\n"
 
     try:
         message_path.write_text(message, encoding="utf-8")
     except OSError:
-        warn("Could not write the suggestion into the commit editor; enter a message manually.")
+        warn("Could not write the suggestion to Git. Use git commit -m 'your message' to commit manually.")
         return 0
 
-    warn(f"Suggested subject: {subject}")
+    warn(f"Commit message ready: {reviewed_subject}")
     return 0
 
 
