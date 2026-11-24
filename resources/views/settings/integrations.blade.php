@@ -43,7 +43,11 @@
             <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                 <p class="text-sm font-semibold text-emerald-900">Salin token ini sekarang</p>
                 <p class="mt-1 text-sm text-emerald-800">Token lengkap hanya ditampilkan sekali. Jika hilang, cabut token lalu buat token baru.</p>
-                <code class="mt-3 block select-all break-all rounded-lg bg-white p-3 text-sm text-zinc-900">{{ session('generatedCommitHookToken') }}</code>
+                <div class="mt-3 flex flex-wrap items-center gap-3">
+                    <code id="commit-hook-token" class="min-w-0 flex-1 select-all break-all rounded-lg bg-white p-3 text-sm text-zinc-900">{{ session('generatedCommitHookToken') }}</code>
+                    <x-ui.button type="button" variant="secondary" data-clipboard-copy data-copy-target="commit-hook-token" data-copy-status="commit-hook-token-status">Salin token</x-ui.button>
+                </div>
+                <p id="commit-hook-token-status" class="mt-2 text-sm text-emerald-800" role="status" aria-live="polite"></p>
             </div>
         @endif
         @if($commitHookToken)
@@ -69,10 +73,13 @@
             <x-ui.button>{{ $commitHookToken ? 'Buat token baru' : 'Aktifkan Git hook' }}</x-ui.button>
         </form>
         <div class="mt-6 border-t border-zinc-200 pt-5">
-            <h3 class="text-sm font-semibold">Pasang di repo lokal</h3>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h3 class="text-sm font-semibold">Pasang di repo lokal</h3>
+                <x-ui.button type="button" variant="secondary" data-clipboard-copy data-copy-target="commit-hook-install-commands" data-copy-status="commit-hook-install-status">Salin perintah</x-ui.button>
+            </div>
             <p class="mt-1 text-sm leading-6 text-zinc-500">Jalankan dari folder repo yang ingin memakai hook. Perintah berikut meminta token tanpa menampilkannya atau memasukkannya ke riwayat shell. Git menyimpan token sebagai teks biasa di konfigurasi lokal repo; jangan membagikan folder <code>.git</code>.</p>
             @php $devflowBaseUrl = rtrim(url('/'), '/'); @endphp
-            <pre class="mt-3 overflow-x-auto rounded-xl bg-zinc-950 p-4 text-xs leading-6 text-zinc-100"><code>git config --local devflow.url '{{ $devflowBaseUrl }}'
+            <pre class="mt-3 overflow-x-auto rounded-xl bg-zinc-950 p-4 text-xs leading-6 text-zinc-100"><code id="commit-hook-install-commands">git config --local devflow.url '{{ $devflowBaseUrl }}'
 printf 'Tempel token DevFlow lalu tekan Enter: '
 stty -echo
 IFS= read -r DEVFLOW_TOKEN
@@ -84,6 +91,7 @@ git config --local devflow.language en
 HOOK_PATH="$(git rev-parse --git-path hooks/prepare-commit-msg)"
 curl -fsSL '{{ asset('devflow-prepare-commit-msg') }}' -o "$HOOK_PATH"
 chmod +x "$HOOK_PATH"</code></pre>
+            <p id="commit-hook-install-status" class="mt-2 text-sm text-zinc-600" role="status" aria-live="polite"></p>
             <p class="mt-3 text-sm leading-6 text-zinc-600">Setelah itu gunakan <code>git add .</code> lalu <code>git commit</code> tanpa <code>-m</code>. Editor akan terbuka dengan saran yang bisa kamu edit. Lanjutkan dengan <code>git push origin main</code>. Jika memakai <code>-m</code>, Git memakai pesan yang kamu tulis dan hook dilewati. Gunakan <code>git config --local devflow.language id</code> untuk saran berbahasa Indonesia.</p>
         </div>
     </x-ui.panel>

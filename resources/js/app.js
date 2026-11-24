@@ -835,3 +835,29 @@ if (developmentContextBuilder) {
   });
   renderPreview();
 }
+
+document.querySelectorAll('[data-clipboard-copy]').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const target = document.getElementById(button.dataset.copyTarget || '');
+    const status = document.getElementById(button.dataset.copyStatus || '');
+    if (!target || !status) return;
+
+    const text = target.textContent?.trim() || '';
+    if (!text) {
+      status.textContent = 'Tidak ada teks untuk disalin.';
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = button.dataset.copyTarget === 'commit-hook-token' ? 'Token disalin.' : 'Perintah pemasangan disalin.';
+    } catch (error) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(target);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      status.textContent = 'Clipboard tidak tersedia. Teks sudah dipilih; salin dengan Cmd+C atau Ctrl+C.';
+    }
+  });
+});
