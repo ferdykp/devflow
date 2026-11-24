@@ -12,7 +12,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
-MAX_DIFF_BYTES = 40 * 1024
+MAX_DIFF_BYTES = 128 * 1024
 MAX_FILES = 100
 COMMIT_SUBJECT = re.compile(
     r"^(feat|fix|docs|refactor|test|chore|style|perf|build|ci)(?:\([a-z0-9._-]+\))?!?: [^\r\n]+$"
@@ -176,9 +176,10 @@ def main(argv: list[str] | None = None) -> int:
     if not diff:
         return 0
     if len(diff.encode("utf-8")) > MAX_DIFF_BYTES:
-        warn("The staged diff exceeds 40 KiB; the commit assistant cannot process this commit.")
+        warn("The staged diff exceeds 128 KiB; the commit assistant cannot process this commit.")
         return 1
-    if "Binary files " in diff or "GIT binary patch" in diff:
+    numstat = git("diff", "--cached", "--numstat").splitlines()
+    if any(line.startswith("-\t-\t") for line in numstat):
         warn("The staged diff includes binary data; the commit assistant cannot process this commit.")
         return 1
 

@@ -16,8 +16,8 @@ class CommitMessageController extends Controller
     {
         $data = $request->validated();
 
-        if (strlen($data['diff']) > 40960) {
-            return response()->json(['message' => 'Diff staged melebihi batas 40 KiB.'], 413);
+        if (strlen($data['diff']) > 131072) {
+            return response()->json(['message' => 'Diff staged melebihi batas 128 KiB.'], 413);
         }
 
         if (! $suggestion->ready()) {
