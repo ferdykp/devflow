@@ -861,3 +861,50 @@ document.querySelectorAll('[data-clipboard-copy]').forEach((button) => {
     }
   });
 });
+
+document.querySelectorAll('[data-token-reveal]').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const target = document.getElementById(button.dataset.tokenTarget || '');
+    const copyButton = document.getElementById(button.dataset.tokenCopy || '');
+    const status = document.getElementById(button.dataset.tokenStatus || '');
+    if (!target || !copyButton || !status) return;
+
+    if (!target.hidden) {
+      target.textContent = '';
+      target.hidden = true;
+      copyButton.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+      button.textContent = 'Tampilkan token';
+      status.textContent = 'Token disembunyikan.';
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = 'Memuat token…';
+    try {
+      const response = await fetch(button.dataset.tokenUrl || '', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+        },
+        credentials: 'same-origin',
+      });
+      const result = await response.json();
+      if (!response.ok || typeof result.token !== 'string') {
+        throw new Error(result.message || 'Token tidak dapat ditampilkan.');
+      }
+
+      target.textContent = result.token;
+      target.hidden = false;
+      copyButton.hidden = false;
+      button.setAttribute('aria-expanded', 'true');
+      button.textContent = 'Sembunyikan token';
+      status.textContent = 'Token ditampilkan. Jangan bagikan token ini.';
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : 'Token tidak dapat ditampilkan.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+});

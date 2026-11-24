@@ -41,8 +41,8 @@
         @endif
         @if(session('generatedCommitHookToken'))
             <div class="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-                <p class="text-sm font-semibold text-emerald-900">Salin token ini sekarang</p>
-                <p class="mt-1 text-sm text-emerald-800">Token lengkap hanya ditampilkan sekali. Jika hilang, cabut token lalu buat token baru.</p>
+                <p class="text-sm font-semibold text-emerald-900">Token baru berhasil dibuat</p>
+                <p class="mt-1 text-sm text-emerald-800">Salin sekarang atau tampilkan lagi dari bagian Token hook aktif. Jangan bagikan token ini.</p>
                 <div class="mt-3 flex flex-wrap items-center gap-3">
                     <code id="commit-hook-token" class="min-w-0 flex-1 select-all break-all rounded-lg bg-white p-3 text-sm text-zinc-900">{{ session('generatedCommitHookToken') }}</code>
                     <x-ui.button type="button" variant="secondary" data-clipboard-copy data-copy-target="commit-hook-token" data-copy-status="commit-hook-token-status">Salin token</x-ui.button>
@@ -56,12 +56,28 @@
                     <p class="text-sm font-semibold">Token hook aktif <code class="break-all text-xs font-normal text-zinc-500">{{ $commitHookToken->token_prefix }}…</code></p>
                     <p class="mt-1 text-xs text-zinc-500">Dibuat {{ $commitHookToken->created_at->diffForHumans() }} · Terakhir dipakai {{ $commitHookToken->last_used_at?->diffForHumans() ?? 'Belum pernah' }}</p>
                 </div>
-                <form method="POST" action="{{ route('settings.commit-hook-token.destroy') }}">
-                    @csrf
-                    @method('DELETE')
-                    <x-ui.button type="submit" variant="danger">Cabut token</x-ui.button>
-                </form>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if($commitHookToken->encrypted_token)
+                        <x-ui.button type="button" variant="secondary" data-token-reveal data-token-url="{{ route('settings.commit-hook-token.reveal') }}" data-token-target="commit-hook-active-token" data-token-copy="commit-hook-active-token-copy" data-token-status="commit-hook-active-token-status" aria-expanded="false">Tampilkan token</x-ui.button>
+                    @endif
+                    <form method="POST" action="{{ route('settings.commit-hook-token.destroy') }}">
+                        @csrf
+                        @method('DELETE')
+                        <x-ui.button type="submit" variant="danger">Cabut token</x-ui.button>
+                    </form>
+                </div>
             </div>
+            @if($commitHookToken->encrypted_token)
+                <div class="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <code id="commit-hook-active-token" class="min-w-0 flex-1 break-all rounded-lg bg-white p-3 font-mono text-sm text-zinc-900" hidden></code>
+                        <x-ui.button type="button" variant="secondary" data-clipboard-copy data-copy-target="commit-hook-active-token" data-copy-status="commit-hook-active-token-status" id="commit-hook-active-token-copy" hidden>Salin token</x-ui.button>
+                    </div>
+                    <p id="commit-hook-active-token-status" class="mt-2 text-sm text-zinc-600" role="status" aria-live="polite">Token disembunyikan. Tekan “Tampilkan token” untuk melihat atau menyalinnya.</p>
+                </div>
+            @else
+                <p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">Token ini dibuat sebelum fitur tampilkan token tersedia, jadi token lengkapnya tidak bisa dipulihkan. Membuat token baru akan mengganti token ini; repo yang sudah terhubung perlu diperbarui dengan token baru.</p>
+            @endif
         @endif
         <form method="POST" action="{{ route('settings.commit-hook-token.store') }}" class="mt-5 space-y-4">
             @csrf
@@ -99,5 +115,5 @@ chmod +x "$HOOK_PATH"</code></pre>
         </div>
     </x-ui.panel>
 </div>
-<x-ui.panel class="mt-5"><h2 class="font-semibold">Privasi koneksi</h2><p class="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">Token commit hook hanya ditampilkan satu kali saat dibuat dan disimpan sebagai hash di DevFlow. Status koneksi repositori GitHub dapat diperiksa dan dilepas dari tab GitHub pada proyek terkait.</p></x-ui.panel>
+<x-ui.panel class="mt-5"><h2 class="font-semibold">Privasi koneksi</h2><p class="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">Token hook disimpan dalam bentuk hash untuk autentikasi serta terenkripsi agar bisa ditampilkan kembali saat kamu masuk ke akun. Token hanya dikirim ke browser setelah tombol “Tampilkan token” ditekan. Status koneksi repositori GitHub dapat diperiksa dan dilepas dari tab GitHub pada proyek terkait.</p></x-ui.panel>
 @endsection

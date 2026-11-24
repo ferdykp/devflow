@@ -211,6 +211,7 @@ Route::middleware(['auth', 'cache-history'])->group(function () {
     Route::delete('/notifications/{notification}', [NotificationController::class, 'dismiss'])->name('notifications.dismiss');
     Route::get('/settings/integrations', [UserSettingsController::class, 'integrations'])->name('settings.integrations');
     Route::post('/settings/integrations/commit-hook-token', [CommitHookTokenController::class, 'store'])->middleware('throttle:5,1')->name('settings.commit-hook-token.store');
+    Route::post('/settings/integrations/commit-hook-token/reveal', [CommitHookTokenController::class, 'reveal'])->middleware('throttle:5,1')->name('settings.commit-hook-token.reveal');
     Route::delete('/settings/integrations/commit-hook-token', [CommitHookTokenController::class, 'destroy'])->name('settings.commit-hook-token.destroy');
     Route::get('/focus', [FocusController::class, 'index'])->name('focus.index');
     Route::post('/focus/reorder', [FocusController::class, 'reorder'])->name('focus.reorder');
