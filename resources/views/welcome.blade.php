@@ -36,7 +36,7 @@
                 class="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg text-sm font-semibold tracking-tight text-white focus-visible:outline-white min-[360px]:gap-3 min-[360px]:text-lg">
                 <img src="{{ asset('icons/devflow-mark.svg') }}" alt=""
                     class="size-9 rounded-xl bg-white/10 p-0.5">
-                <span class="font-display">DevFlow777<span class="text-[#e3b8a8]">.</span></span>
+                <span class="font-display">DevFlow<span class="text-[#e3b8a8]">.</span></span>
             </a>
 
             <nav aria-label="Navigasi utama" class="hidden items-center gap-1 md:flex">
