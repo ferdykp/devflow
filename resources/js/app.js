@@ -92,46 +92,63 @@ confirmDialog.className = 'fixed inset-0 m-auto max-h-[calc(100dvh-32px)] w-[min
 confirmDialog.setAttribute('data-confirm-dialog', '');
 confirmDialog.setAttribute('aria-labelledby', 'confirmation-title');
 confirmDialog.setAttribute('aria-describedby', 'confirmation-message');
-confirmDialog.innerHTML = '<h2 id="confirmation-title" class="text-lg font-semibold">Konfirmasi tindakan</h2><p id="confirmation-message" data-dialog-message class="mt-2 text-sm leading-6 text-zinc-600 [overflow-wrap:anywhere]"></p><div class="mt-6 flex flex-wrap justify-end gap-2"><button type="button" data-dialog-cancel class="min-h-11 rounded-lg border border-zinc-200 px-4 py-2 text-sm">Batal</button><button type="button" data-dialog-confirm class="min-h-11 rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white">Lanjutkan</button></div>';
-if (document.querySelector('form[data-confirm]')) {
+confirmDialog.innerHTML = '<h2 id="confirmation-title" class="text-lg font-semibold">Konfirmasi tindakan</h2><p id="confirmation-message" data-dialog-message class="mt-2 text-sm leading-6 text-zinc-600 [overflow-wrap:anywhere]"></p><div class="mt-6 flex flex-wrap justify-end gap-2"><button type="button" data-dialog-cancel class="min-h-11 rounded-lg border border-zinc-200 px-4 py-2 text-sm">Batal</button><button type="button" data-dialog-confirm class="min-h-11 rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white">Ya, lanjutkan</button></div>';
+const confirmationForms = [...document.querySelectorAll('form')].filter((form) => {
+  const method = (form.querySelector('input[name="_method"]')?.value || form.method).toUpperCase();
+  return method !== 'GET' && !form.matches('[data-no-confirm]');
+});
+let pendingConfirmation = null;
+let previousOverflow = '';
+const closeConfirmation = (confirmed) => {
+  if (!pendingConfirmation) return;
+  const { resolve, submitter } = pendingConfirmation;
+  pendingConfirmation = null;
+  document.body.style.overflow = previousOverflow;
+  if (!confirmed) submitter?.focus({ preventScroll: true });
+  resolve(confirmed);
+};
+const requestConfirmation = (message, { label = 'Ya, lanjutkan', danger = false, trigger = null } = {}) => new Promise((resolve) => {
+  if (confirmDialog.open || pendingConfirmation) {
+    resolve(false);
+    return;
+  }
+  pendingConfirmation = { resolve, submitter: trigger };
+  confirmDialog.querySelector('[data-dialog-message]').textContent = message;
+  const confirmButton = confirmDialog.querySelector('[data-dialog-confirm]');
+  confirmButton.textContent = label;
+  confirmButton.classList.toggle('bg-red-700', danger);
+  confirmButton.classList.toggle('hover:bg-red-800', danger);
+  confirmButton.classList.toggle('bg-blue-700', !danger);
+  confirmButton.classList.toggle('hover:bg-blue-800', !danger);
+  previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
   document.body.append(confirmDialog);
-  const confirmedForms = new WeakSet();
-  let pendingForm = null;
-  let pendingSubmitter = null;
-  let previousOverflow = '';
-  const clearConfirmation = (restoreFocus = true) => {
-    document.body.style.overflow = previousOverflow;
-    if (restoreFocus) pendingSubmitter?.focus({ preventScroll: true });
-    pendingForm = null;
-    pendingSubmitter = null;
-  };
-  document.querySelectorAll('form[data-confirm]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-      if (confirmedForms.has(form)) return;
-      event.preventDefault();
-      if (confirmDialog.open) return;
-      pendingForm = form;
-      pendingSubmitter = event.submitter;
-      confirmDialog.querySelector('[data-dialog-message]').textContent = form.dataset.confirm;
-      previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      confirmDialog.showModal();
-      confirmDialog.querySelector('[data-dialog-cancel]').focus();
+  confirmDialog.showModal();
+  confirmDialog.querySelector('[data-dialog-cancel]').focus();
+});
+window.dfConfirmAction = requestConfirmation;
+const confirmedForms = new WeakSet();
+const getSubmitterLabel = (submitter) => submitter?.getAttribute('aria-label')?.trim()
+  || submitter?.value?.trim()
+  || submitter?.textContent?.trim()
+  || 'Simpan';
+confirmationForms.forEach((form) => {
+  form.addEventListener('submit', async (event) => {
+    if (confirmedForms.has(form)) return;
+    event.preventDefault();
+    const submitter = event.submitter;
+    const label = getSubmitterLabel(submitter);
+    const actionName = label.replace(/\s+/g, ' ');
+    const danger = /hapus|delete|cabut|keluarkan|putuskan|batalkan/i.test(actionName)
+      || (form.querySelector('input[name="_method"]')?.value || '').toUpperCase() === 'DELETE';
+    const message = form.dataset.confirm
+      || `Lanjutkan tindakan “${actionName}”? Perubahan akan diproses setelah dikonfirmasi.`;
+    const confirmed = await requestConfirmation(message, {
+      label: danger ? 'Ya, lanjutkan' : actionName,
+      danger,
+      trigger: submitter,
     });
-  });
-  confirmDialog.querySelector('[data-dialog-cancel]').addEventListener('click', () => {
-    confirmDialog.close();
-    clearConfirmation();
-  });
-  confirmDialog.addEventListener('close', () => {
-    if (!confirmDialog.open && pendingForm) clearConfirmation();
-  });
-  confirmDialog.querySelector('[data-dialog-confirm]').addEventListener('click', () => {
-    const form = pendingForm;
-    const submitter = pendingSubmitter;
-    if (!form) return;
-    confirmDialog.close();
-    clearConfirmation(false);
+    if (!confirmed) return;
     confirmedForms.add(form);
     try {
       if (submitter && form.contains(submitter)) form.requestSubmit(submitter);
@@ -140,13 +157,26 @@ if (document.querySelector('form[data-confirm]')) {
       confirmedForms.delete(form);
     }
   });
-  window.addEventListener('pageshow', (event) => {
-    if (event.persisted && pendingForm) {
-      confirmDialog.close();
-      clearConfirmation();
-    }
-  });
-}
+});
+confirmDialog.querySelector('[data-dialog-cancel]').addEventListener('click', () => {
+  confirmDialog.close();
+  closeConfirmation(false);
+});
+confirmDialog.addEventListener('close', () => closeConfirmation(false));
+confirmDialog.querySelector('[data-dialog-confirm]').addEventListener('click', () => {
+  if (!pendingConfirmation) return;
+  const resolve = pendingConfirmation.resolve;
+  pendingConfirmation = null;
+  document.body.style.overflow = previousOverflow;
+  confirmDialog.close();
+  resolve(true);
+});
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted && pendingConfirmation) {
+    confirmDialog.close();
+    closeConfirmation(false);
+  }
+});
 
 // Keep native submit controls enabled during form submission.
 // Disabling the submitter synchronously inside `submit` can prevent a form
@@ -269,7 +299,8 @@ document.querySelectorAll('[data-note-autosave]').forEach((form) => {
    field.addEventListener('input', scheduleSave);
    field.addEventListener('change', scheduleSave);
  });
- retryButton?.addEventListener('click', () => {
+ retryButton?.addEventListener('click', async () => {
+   if (!await window.dfConfirmAction('Coba simpan perubahan catatan lagi?', { label: 'Simpan lagi', trigger: retryButton })) return;
    window.clearTimeout(timer);
    dirty = true;
    save();
@@ -458,6 +489,9 @@ if (taskRoot) {
      const url = card.dataset.taskUpdateUrl;
      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
      if (!url || !csrf) { showMoveError('Tugas gagal disimpan. Muat ulang halaman lalu coba lagi.'); return; }
+     const taskTitle = card.dataset.taskTitle || card.querySelector('h3 a')?.textContent?.trim() || 'tugas ini';
+     const destination = zone.getAttribute('aria-label') || 'status baru';
+     if (!await window.dfConfirmAction(`Pindahkan “${taskTitle}” ke ${destination}?`, { label: 'Pindahkan' })) return;
 
      moving = true;
      const prior = card.parentElement;
@@ -501,6 +535,13 @@ document.querySelectorAll('[data-focus-sortable]').forEach((list) => {
    if (rank) rank.textContent = `P${index + 1}`;
  });
  const persistOrder = async (previousOrder) => {
+   if (!await window.dfConfirmAction('Simpan urutan fokus yang baru?', { label: 'Simpan urutan' })) {
+     const items = new Map([...list.querySelectorAll('[data-focus-task]')].map((item) => [item.dataset.focusTask, item]));
+     previousOrder.forEach((id) => { const item = items.get(id); if (item) list.appendChild(item); });
+     refreshRanks();
+     if (feedback) feedback.textContent = 'Perubahan urutan dibatalkan.';
+     return;
+   }
    refreshRanks();
    if (feedback) feedback.textContent = 'Menyimpan urutan…';
    try {
@@ -612,6 +653,7 @@ if (calendarRoot) {
    const result = await response.json().catch(() => null);
    if (!response.ok || !result?.event) throw new Error(result?.message || `HTTP ${response.status}`);
    window.location.reload();
+   return true;
  };
  calendarRoot.querySelectorAll('[data-calendar-event-id]').forEach((eventCard) => {
    eventCard.addEventListener('dragstart', (event) => {
@@ -635,8 +677,10 @@ if (calendarRoot) {
      const nextEnd = wallDateTime(wallMinutes(eventCard.dataset.calendarEventEnd) + Number(button.dataset.calendarDurationAdjust));
      if (wallMinutes(nextEnd) - wallMinutes(startsAt) < 15) { setCalendarFeedback('Durasi agenda minimum 15 menit.', true); return; }
      try {
+       if (!await window.dfConfirmAction(`Simpan perubahan durasi agenda “${eventCard.dataset.calendarEventTitle}”?`, { label: 'Simpan durasi', trigger: button })) return;
        setCalendarFeedback('Menyimpan durasi agenda…');
-       await saveEventTime(eventCard, startsAt, nextEnd);
+       const saved = await saveEventTime(eventCard, startsAt, nextEnd);
+       if (!saved) setCalendarFeedback('Perubahan agenda dibatalkan.');
      } catch (error) {
        setCalendarFeedback(`Durasi gagal diperbarui. ${error?.message || 'Coba lagi.'}`, true);
      }
@@ -679,8 +723,10 @@ if (calendarRoot) {
        const endsAt = wallDateTime(wallMinutes(startsAt) + Math.max(15, duration));
        calendarEvent = null;
        try {
+         if (!await window.dfConfirmAction(`Pindahkan agenda “${eventCard.dataset.calendarEventTitle}” ke waktu ini?`, { label: 'Pindahkan agenda' })) return;
          setCalendarFeedback(`Memindahkan “${eventCard.dataset.calendarEventTitle}”…`);
-         await saveEventTime(eventCard, startsAt, endsAt);
+         const saved = await saveEventTime(eventCard, startsAt, endsAt);
+         if (!saved) setCalendarFeedback('Perubahan agenda dibatalkan.');
        } catch (error) {
          console.error('DevFlow calendar move failed:', error);
          setCalendarFeedback(`Agenda gagal dipindahkan. ${error?.message || 'Coba lagi.'}`, true);
@@ -701,6 +747,7 @@ if (calendarRoot) {
      const endDate = new Date(Date.UTC(year, month - 1, day, hour + 1));
      const endDateString = `${endDate.getUTCFullYear()}-${String(endDate.getUTCMonth() + 1).padStart(2, '0')}-${String(endDate.getUTCDate()).padStart(2, '0')}`;
      const endsAt = `${endDateString}T${String(endDate.getUTCHours()).padStart(2, '0')}:${String(endDate.getUTCMinutes()).padStart(2, '0')}`;
+     if (!await window.dfConfirmAction(`Jadwalkan tugas “${title}” pada ${date}?`, { label: 'Jadwalkan tugas' })) return;
      setCalendarFeedback(`Menjadwalkan “${title}”…`);
      try {
        const response = await fetch(calendarRoot.dataset.calendarStoreUrl, {

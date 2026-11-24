@@ -6,6 +6,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -92,19 +93,38 @@ def request_suggestion(base_url: str, token: str, language: str, files: list[str
         {"files": files, "diff": diff, "language": language},
         ensure_ascii=False,
     ).encode("utf-8")
-    request = Request(
-        f"{base_url.rstrip('/')}/api/commit-message",
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "User-Agent": "DevFlow-Commit-Hook",
-        },
-        method="POST",
-    )
-    with urlopen(request, timeout=30) as response:
-        body = json.loads(response.read().decode("utf-8"))
+    retryable_statuses = {408, 429, 500, 502, 503, 504}
+    body = None
+
+    for attempt in range(3):
+        request = Request(
+            f"{base_url.rstrip('/')}/api/commit-message",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "DevFlow-Commit-Hook",
+            },
+            method="POST",
+        )
+
+        try:
+            with urlopen(request, timeout=25) as response:
+                body = json.loads(response.read().decode("utf-8"))
+            break
+        except HTTPError as exception:
+            if exception.code not in retryable_statuses or attempt == 2:
+                raise
+            exception.close()
+            warn(f"DevFlow returned HTTP {exception.code}; retrying suggestion ({attempt + 1}/2).")
+        except (URLError, TimeoutError):
+            if attempt == 2:
+                raise
+            warn(f"DevFlow is temporarily unreachable; retrying suggestion ({attempt + 1}/2).")
+
+        time.sleep(attempt + 1)
+
     subject = body.get("message") if isinstance(body, dict) else None
     if not isinstance(subject, str):
         raise ValueError("DevFlow returned an invalid response.")
@@ -136,11 +156,11 @@ def main(argv: list[str] | None = None) -> int:
     base_url = git("config", "--local", "--get", "devflow.url")
     language = git("config", "--local", "--get", "devflow.language") or "en"
     if not token or not base_url:
-        warn("Hook belum dikonfigurasi untuk repo ini. Pasang hook dari Pengaturan → Integrasi, atau gunakan git commit -m 'your message'.")
-        return 0
+        warn("Hook belum dikonfigurasi untuk repo ini. Pasang hook dari Pengaturan → Integrasi sebelum melakukan commit.")
+        return 1
     if not valid_base_url(base_url):
         warn("Configure devflow.url with HTTPS before using the commit assistant.")
-        return 0
+        return 1
     if language not in {"en", "id"}:
         warn("devflow.language must be 'en' or 'id'; using English.")
         language = "en"
@@ -149,27 +169,33 @@ def main(argv: list[str] | None = None) -> int:
     if not files:
         return 0
     if len(files) > MAX_FILES:
-        warn(f"There are more than {MAX_FILES} staged files; no suggestion was generated. Use git commit -m 'your message' to commit manually.")
-        return 0
+        warn(f"There are more than {MAX_FILES} staged files; the commit assistant cannot process this commit.")
+        return 1
 
     diff = git("diff", "--cached", "--no-ext-diff", "--no-textconv", "--unified=2", "--", ".")
     if not diff:
         return 0
     if len(diff.encode("utf-8")) > MAX_DIFF_BYTES:
-        warn("The staged diff exceeds 40 KiB; no suggestion was generated. Use git commit -m 'your message' to commit manually.")
-        return 0
+        warn("The staged diff exceeds 40 KiB; the commit assistant cannot process this commit.")
+        return 1
     if "Binary files " in diff or "GIT binary patch" in diff:
-        warn("The staged diff includes binary data; no suggestion was generated. Use git commit -m 'your message' to commit manually.")
-        return 0
+        warn("The staged diff includes binary data; the commit assistant cannot process this commit.")
+        return 1
 
     try:
         subject = request_suggestion(base_url, token, language, files, diff)
     except HTTPError as exception:
-        warn(f"The suggestion request returned HTTP {exception.code}; use git commit -m 'your message' to commit manually.")
-        return 0
+        try:
+            error_body = json.loads(exception.read().decode("utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            error_body = {}
+        provider_message = error_body.get("message") if isinstance(error_body, dict) else None
+        diagnostic = f": {provider_message}" if isinstance(provider_message, str) and provider_message else ""
+        warn(f"The suggestion request failed after retries with HTTP {exception.code}{diagnostic}. Commit canceled; retry later or check the DevFlow server.")
+        return 1
     except (OSError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exception:
-        warn(f"Could not get a suggestion ({type(exception).__name__}); use git commit -m 'your message' to commit manually.")
-        return 0
+        warn(f"Could not get a suggestion after retries ({type(exception).__name__}). Commit canceled; retry later or check the DevFlow server.")
+        return 1
 
     reviewed_subject = review_suggestion(subject)
     if reviewed_subject is None:
@@ -183,8 +209,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         message_path.write_text(message, encoding="utf-8")
     except OSError:
-        warn("Could not write the suggestion to Git. Use git commit -m 'your message' to commit manually.")
-        return 0
+        warn("Could not write the suggestion to Git. Commit canceled.")
+        return 1
 
     warn(f"Commit message ready: {reviewed_subject}")
     return 0

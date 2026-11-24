@@ -29,7 +29,7 @@ class CommitMessageController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
-            return response()->json(['message' => 'Saran commit belum tersedia. Periksa koneksi AI server atau lanjutkan dengan pesan manual.'], JsonResponse::HTTP_SERVICE_UNAVAILABLE);
+            return response()->json(['message' => 'Penyedia AI belum merespons setelah beberapa percobaan. Coba commit lagi sebentar.'], JsonResponse::HTTP_SERVICE_UNAVAILABLE);
         }
 
         return response()->json(['message' => $message]);

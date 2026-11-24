@@ -3,8 +3,10 @@
 namespace App\Services\AI;
 
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
+use Throwable;
 
 class CommitMessageSuggestion
 {
@@ -32,6 +34,24 @@ class CommitMessageSuggestion
             $response = Http::withToken((string) config('devflow_ai.api_key'))
                 ->acceptJson()->asJson()->connectTimeout(5)
                 ->timeout(max(5, min(30, (int) config('devflow_ai.timeout'))))
+                ->retry(
+                    3,
+                    fn (int $attempt, Throwable $exception): int => ($attempt * 1000) + random_int(0, 250),
+                    function (Throwable $exception): bool {
+                        if ($exception instanceof ConnectionException) {
+                            return true;
+                        }
+
+                        if (! $exception instanceof RequestException) {
+                            return false;
+                        }
+
+                        $status = $exception->response->status();
+
+                        return $status === 408 || $status === 429 || $status >= 500;
+                    },
+                    throw: false,
+                )
                 ->post((string) config('devflow_ai.endpoint'), [
                     'model' => config('devflow_ai.model'),
                     'temperature' => 0.1,
@@ -48,7 +68,18 @@ class CommitMessageSuggestion
         }
 
         if (! $response->successful()) {
-            throw new RuntimeException('The AI provider returned an unsuccessful response.');
+            $providerStatus = $response->json('error.status');
+            $providerCode = $response->json('error.code');
+            $diagnostic = implode(', ', array_filter([
+                is_string($providerStatus) ? $providerStatus : null,
+                is_int($providerCode) ? "code {$providerCode}" : null,
+            ]));
+
+            throw new RuntimeException(sprintf(
+                'The AI provider returned HTTP %d%s.',
+                $response->status(),
+                $diagnostic !== '' ? " ({$diagnostic})" : '',
+            ));
         }
 
         $content = $response->json('choices.0.message.content');
