@@ -73,13 +73,14 @@
             <x-ui.button>{{ $commitHookToken ? 'Buat token baru' : 'Aktifkan Git hook' }}</x-ui.button>
         </form>
         <div class="mt-6 border-t border-zinc-200 pt-5">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-                <h3 class="text-sm font-semibold">Pasang di repo lokal</h3>
-                <x-ui.button type="button" variant="secondary" data-clipboard-copy data-copy-target="commit-hook-install-commands" data-copy-status="commit-hook-install-status">Salin perintah</x-ui.button>
-            </div>
+            <h3 class="text-sm font-semibold">Pasang di repo lokal</h3>
             <p class="mt-1 text-sm leading-6 text-zinc-500">Jalankan dari folder repo yang ingin memakai hook. Perintah berikut meminta token tanpa menampilkannya atau memasukkannya ke riwayat shell. Git menyimpan token sebagai teks biasa di konfigurasi lokal repo; jangan membagikan folder <code>.git</code>.</p>
             @php $devflowBaseUrl = rtrim(url('/'), '/'); @endphp
-            <pre class="mt-3 overflow-x-auto rounded-xl bg-zinc-950 p-4 text-xs leading-6 text-zinc-100"><code id="commit-hook-install-commands">git config --local devflow.url '{{ $devflowBaseUrl }}'
+            <div class="relative mt-3 overflow-hidden rounded-xl bg-zinc-950">
+                <button type="button" class="absolute right-3 top-3 z-10 inline-flex size-10 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-sm transition-colors hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" data-clipboard-copy data-copy-target="commit-hook-install-commands" data-copy-status="commit-hook-install-status" aria-label="Salin perintah pemasangan" title="Salin perintah">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                </button>
+                <pre class="overflow-x-auto bg-transparent p-4 pr-16 text-xs leading-6 text-zinc-100"><code id="commit-hook-install-commands">git config --local devflow.url '{{ $devflowBaseUrl }}'
 printf 'Tempel token DevFlow lalu tekan Enter: '
 stty -echo
 IFS= read -r DEVFLOW_TOKEN
@@ -91,6 +92,7 @@ git config --local devflow.language en
 HOOK_PATH="$(git rev-parse --git-path hooks/prepare-commit-msg)"
 curl -fsSL '{{ asset('devflow-prepare-commit-msg') }}' -o "$HOOK_PATH"
 chmod +x "$HOOK_PATH"</code></pre>
+            </div>
             <p id="commit-hook-install-status" class="mt-2 text-sm text-zinc-600" role="status" aria-live="polite"></p>
             <p class="mt-3 text-sm leading-6 text-zinc-600">Setelah itu gunakan <code>git add .</code> lalu <code>git commit</code> tanpa <code>-m</code>. Editor akan terbuka dengan saran yang bisa kamu edit. Lanjutkan dengan <code>git push origin main</code>. Jika memakai <code>-m</code>, Git memakai pesan yang kamu tulis dan hook dilewati. Gunakan <code>git config --local devflow.language id</code> untuk saran berbahasa Indonesia.</p>
         </div>
