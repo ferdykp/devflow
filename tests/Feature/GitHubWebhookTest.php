@@ -5,10 +5,11 @@ namespace Tests\Feature;
 use App\Jobs\SyncGitHubRepository;
 use App\Models\GithubDelivery;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Http;
 use App\Services\GitHub\GitHubActivitySync;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class GitHubWebhookTest extends TestCase
@@ -17,12 +18,16 @@ class GitHubWebhookTest extends TestCase
 
     private function payload(int $githubId): array
     {
-        return ['repository' => ['id' => $githubId, 'private' => false]];
+        return [
+            'repository' => ['id' => $githubId, 'private' => false],
+            'commits' => [['id' => str_repeat('a', 40)]],
+        ];
     }
 
     private function signedRequest(array $payload, string $delivery = '01234567-89ab-cdef-0123-456789abcdef')
     {
         $body = json_encode($payload, JSON_THROW_ON_ERROR);
+
         return $this->call('POST', '/api/webhooks/github', [], [], [], [
             'CONTENT_TYPE' => 'application/json',
             'HTTP_X_HUB_SIGNATURE_256' => 'sha256='.hash_hmac('sha256', $body, 'test-secret'),
@@ -55,6 +60,23 @@ class GitHubWebhookTest extends TestCase
         $this->assertSame(1, GithubDelivery::firstOrFail()->pending_jobs);
     }
 
+    public function test_signed_push_without_commits_does_not_create_sync_work(): void
+    {
+        config()->set('services.github.webhook_secret', 'test-secret');
+        Queue::fake();
+        $owner = User::factory()->create();
+        $project = $owner->workspaces()->create(['name' => 'Personal'])
+            ->projects()->create(['name' => 'Demo']);
+        $project->repositories()->create(['github_id' => 123, 'full_name' => 'owner/repo']);
+
+        $this->signedRequest([
+            'repository' => ['id' => 123, 'private' => false],
+            'commits' => [],
+        ])->assertAccepted();
+
+        $this->assertDatabaseCount('github_deliveries', 0);
+        Queue::assertNothingPushed();
+    }
 
     public function test_signed_webhook_rejects_non_json_content_type(): void
     {
@@ -128,6 +150,7 @@ class GitHubWebhookTest extends TestCase
         config()->set('services.github.webhook_secret', null);
         $this->postJson('/api/webhooks/github', $this->payload(123))->assertServiceUnavailable();
     }
+
     public function test_duplicate_job_completion_is_counted_once(): void
     {
         config()->set('services.github.webhook_secret', 'test-secret');
@@ -156,18 +179,17 @@ class GitHubWebhookTest extends TestCase
             ->projects()->create(['name' => 'Demo']);
         $project->repositories()->create(['github_id' => 123, 'full_name' => 'owner/repo']);
         $this->signedRequest($this->payload(123))->assertAccepted();
-        $rowId = \Illuminate\Support\Facades\DB::table('github_delivery_jobs')->value('id');
-        \Illuminate\Support\Facades\DB::table('github_delivery_jobs')->where('id', $rowId)
+        $rowId = DB::table('github_delivery_jobs')->value('id');
+        DB::table('github_delivery_jobs')->where('id', $rowId)
             ->update(['last_dispatched_at' => now()->subHour()]);
         $this->artisan('devflow:github-reconcile')->assertSuccessful();
         Queue::assertPushed(SyncGitHubRepository::class, 2);
-        $this->assertSame(1, (int) \Illuminate\Support\Facades\DB::table('github_delivery_jobs')->value('recovery_attempts'));
-        \Illuminate\Support\Facades\DB::table('github_delivery_jobs')->where('id', $rowId)
+        $this->assertSame(1, (int) DB::table('github_delivery_jobs')->value('recovery_attempts'));
+        DB::table('github_delivery_jobs')->where('id', $rowId)
             ->update(['last_dispatched_at' => now()->subHour()]);
         $this->artisan('devflow:github-reconcile')->assertSuccessful();
         Queue::assertPushed(SyncGitHubRepository::class, 2);
         $this->assertSame('failed', GithubDelivery::firstOrFail()->status);
         $this->assertSame(0, GithubDelivery::firstOrFail()->pending_jobs);
     }
-
 }

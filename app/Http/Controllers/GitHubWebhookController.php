@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SyncGitHubRepository;
-use App\Models\GithubDelivery;
 use App\Models\GithubRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +45,9 @@ class GitHubWebhookController extends Controller
         if (! is_int($repoId)) {
             return response()->json(['message' => 'Unrecognized repository'], 202);
         }
+        if (! is_array($data['commits'] ?? null) || $data['commits'] === []) {
+            return response()->json(['message' => 'No commits to sync'], 202);
+        }
         $installationId = data_get($data, 'installation.id');
         $isPrivate = data_get($data, 'repository.private') === true;
         $repos = GithubRepository::query()->where('github_id', $repoId)
@@ -82,6 +84,7 @@ class GitHubWebhookController extends Controller
                     'updated_at' => now(),
                 ]);
             }
+
             return true;
         });
         if (! $created) {
@@ -90,6 +93,7 @@ class GitHubWebhookController extends Controller
         foreach ($repos as $id) {
             SyncGitHubRepository::dispatch((int) $id, $delivery);
         }
+
         return response()->json(['message' => 'Accepted'], 202);
     }
 }

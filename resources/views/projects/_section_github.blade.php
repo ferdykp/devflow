@@ -1,6 +1,6 @@
 <x-ui.panel>
     <h2 class="mb-3 font-semibold">Aktivitas GitHub</h2>
-    <p class="mb-4 text-xs text-[#747571]">Hubungkan repositori publik secara langsung, atau gunakan GitHub App untuk repositori privat. Sinkronisasi hanya membaca data.</p>
+    <p class="mb-4 text-xs text-[#747571]">Sinkronisasi hanya membaca data dan berjalan saat GitHub mengirim event push. GitHub App mengirim webhook otomatis. Untuk repositori publik yang ditautkan langsung, tambahkan webhook push ke <code>{{ route('github.webhook') }}</code> dengan secret yang sama seperti <code>GITHUB_WEBHOOK_SECRET</code>.</p>
     <a href="{{ route('github.app.authorize', $project) }}" class="mb-4 inline-flex min-h-11 items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-4 text-sm font-semibold text-white transition hover:border-black hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900">
         <i class="fa-brands fa-github" aria-hidden="true"></i>Hubungkan GitHub App
     </a>

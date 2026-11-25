@@ -9,6 +9,4 @@ Artisan::command('inspire', function () {
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('devflow:github-sync --stale=60')->hourly()->withoutOverlapping();
-
 Schedule::command('devflow:github-reconcile --stale=30')->everyTenMinutes()->withoutOverlapping();

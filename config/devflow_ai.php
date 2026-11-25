@@ -7,4 +7,5 @@ return [
     'api_key' => env('DEVFLOW_AI_API_KEY'),
     'model' => env('DEVFLOW_AI_MODEL', 'gpt-4o-mini'),
     'timeout' => (int) env('DEVFLOW_AI_TIMEOUT', 15),
+    'commit_message_max_diff_bytes' => 256 * 1024,
 ];

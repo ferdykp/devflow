@@ -24,7 +24,7 @@ class SuggestCommitMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'diff' => ['required', 'string', 'max:131072'],
+            'diff' => ['required', 'string', 'max:'.(int) config('devflow_ai.commit_message_max_diff_bytes', 256 * 1024)],
             'files' => ['required', 'array', 'min:1', 'max:100'],
             'files.*' => ['required', 'string', 'max:255'],
             'language' => ['nullable', Rule::in(['en', 'id'])],

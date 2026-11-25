@@ -4,7 +4,7 @@
 @section('content')
 
 @include('projects._workspace_navigation', ['section' => $section])
-<section class="relative min-w-0 w-full min-h-[400px]" aria-label="Proyek section">
+<section class="relative min-w-0 w-full min-h-[400px]" aria-label="Proyek section" @if($section === 'github' && $repositories->isNotEmpty()) data-github-channel="projects.{{ $project->id }}.github" @endif>
 
  @if($section==='overview') @include('projects._section_overview')
  @else

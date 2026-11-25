@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\GitHubActivityUpdated;
 use App\Models\GithubDelivery;
 use App\Models\GithubRepository;
 use App\Services\GitHub\GitHubActivitySync;
@@ -30,7 +31,10 @@ class SyncGitHubRepository implements ShouldQueue
     {
         $repo = GithubRepository::with('project')->find($this->repositoryId);
         if ($repo) {
-            $service->sync($repo);
+            $newActivities = $service->sync($repo);
+            if ($newActivities > 0) {
+                GitHubActivityUpdated::dispatch($repo->project_id);
+            }
         }
 
         // A deleted repository is no longer actionable; it still counts as resolved.

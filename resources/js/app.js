@@ -14,6 +14,11 @@ function dfSyncThemeToggle() {
     });
 }
 dfSyncThemeToggle();
+const githubActivitySection = document.querySelector('[data-github-channel]');
+if (githubActivitySection && window.Echo) {
+  window.Echo.private(githubActivitySection.dataset.githubChannel)
+    .listen('.github.activity.updated', () => window.location.reload());
+}
 document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
     button.addEventListener('click', () => {
         const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
@@ -955,3 +960,11 @@ document.querySelectorAll('[data-token-reveal]').forEach((button) => {
     }
   });
 });
+
+/**
+ * Echo exposes an expressive API for subscribing to channels and listening
+ * for events that are broadcast by Laravel. Echo and event broadcasting
+ * allow your team to quickly build robust real-time web applications.
+ */
+
+import './echo';

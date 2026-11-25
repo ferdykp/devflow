@@ -15,9 +15,10 @@ class CommitMessageController extends Controller
     public function __invoke(SuggestCommitMessageRequest $request, CommitMessageSuggestion $suggestion): JsonResponse
     {
         $data = $request->validated();
+        $maxDiffBytes = (int) config('devflow_ai.commit_message_max_diff_bytes', 256 * 1024);
 
-        if (strlen($data['diff']) > 131072) {
-            return response()->json(['message' => 'Diff staged melebihi batas 128 KiB.'], 413);
+        if (strlen($data['diff']) > $maxDiffBytes) {
+            return response()->json(['message' => 'Diff staged melebihi batas '.intdiv($maxDiffBytes, 1024).' KiB.'], 413);
         }
 
         if (! $suggestion->ready()) {
