@@ -8,7 +8,7 @@
         'settings' => ['Pengaturan', 'fa-gear'],
     ];
     $section = isset($section) && is_string($section) && array_key_exists($section, $sections) ? $section : 'overview';
-    $advanced = ['notes', 'activity', 'milestones', 'scope', 'backlog', 'github', 'settings'];
+    $advanced = ['notes', 'activity', 'milestones', 'scope', 'backlog', 'settings'];
 @endphp
 <header class="df-page-heading df-panel mb-4 flex flex-col items-start justify-between gap-4 rounded-2xl border p-5 sm:flex-row sm:items-center sm:p-6">
     <div class="min-w-0">
@@ -27,6 +27,9 @@
                 @if($section === $key) aria-current="page" @endif><i class="fa-solid {{ $sections[$key][1] }} w-4 text-center" aria-hidden="true"></i>{{ $sections[$key][0] }}</a>
         @endforeach
         <a href="{{ route('projects.resume', $project) }}" class="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950"><i class="fa-solid {{ $sections['resume'][1] }} w-4 text-center" aria-hidden="true"></i>{{ $sections['resume'][0] }}</a>
+        <a href="{{ route('projects.show', ['project' => $project, 'section' => 'github']) }}"
+            class="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-xs font-medium transition-colors duration-150 sm:text-sm motion-reduce:transition-none {{ $section === 'github' ? 'bg-[var(--df-action-soft)] text-[var(--df-action)]' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950' }}"
+            @if($section === 'github') aria-current="page" @endif><i class="fa-solid {{ $sections['github'][1] }} w-4 text-center" aria-hidden="true"></i>{{ $sections['github'][0] }}</a>
     </nav>
         <details data-project-menu class="relative shrink-0" @if(in_array($section, $advanced, true)) data-current="true" @endif>
             <summary aria-label="Menu proyek lainnya{{ in_array($section, $advanced, true) ? ', '.$sections[$section][0].' dipilih' : '' }}" class="flex min-h-11 shrink-0 cursor-pointer list-none items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-zinc-100 [&::-webkit-details-marker]:hidden {{ in_array($section, $advanced, true) ? 'bg-blue-50 text-blue-700' : 'text-zinc-600' }}">

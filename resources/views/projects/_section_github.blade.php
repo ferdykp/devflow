@@ -13,7 +13,13 @@
         @foreach($repositories as $repository)
             <div class="rounded-xl border border-zinc-200 bg-zinc-50/70 p-4">
                 <p class="break-all text-sm font-semibold">{{ $repository->full_name }}</p>
-                <p class="mt-1 text-xs text-[#747571]">Sinkronisasi terakhir: {{ $repository->last_synced_at?->diffForHumans() ?? 'Belum pernah' }}</p>
+                <p class="mt-1 text-xs text-[#747571]">Sinkronisasi terakhir:
+                    @if($repository->last_synced_at)
+                        <time datetime="{{ $repository->last_synced_at->toIso8601String() }}" data-relative-timestamp="{{ $repository->last_synced_at->timestamp }}">{{ $repository->last_synced_at->diffForHumans() }}</time>
+                    @else
+                        Belum pernah
+                    @endif
+                </p>
                 <div class="mt-3 flex flex-wrap gap-2 border-t border-zinc-200 pt-3">
                     <form method="POST" action="{{ route('github.sync', [$project, $repository]) }}">
                         @csrf

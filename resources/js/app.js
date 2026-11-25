@@ -14,6 +14,37 @@ function dfSyncThemeToggle() {
     });
 }
 dfSyncThemeToggle();
+const relativeTimeElements = [...document.querySelectorAll('[data-relative-timestamp]')];
+if (relativeTimeElements.length && typeof Intl.RelativeTimeFormat === 'function') {
+  const relativeTimeFormatter = new Intl.RelativeTimeFormat(document.documentElement.lang || 'id', { numeric: 'auto' });
+  const updateRelativeTimes = () => {
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    relativeTimeElements.forEach((element) => {
+      const timestamp = Number(element.dataset.relativeTimestamp);
+      if (!Number.isFinite(timestamp)) return;
+
+      const elapsedSeconds = Math.max(0, nowInSeconds - timestamp);
+      const [value, unit] = elapsedSeconds < 60
+        ? [elapsedSeconds, 'second']
+        : elapsedSeconds < 3600
+          ? [Math.floor(elapsedSeconds / 60), 'minute']
+          : elapsedSeconds < 86400
+            ? [Math.floor(elapsedSeconds / 3600), 'hour']
+            : elapsedSeconds < 604800
+              ? [Math.floor(elapsedSeconds / 86400), 'day']
+              : elapsedSeconds < 2629800
+                ? [Math.floor(elapsedSeconds / 604800), 'week']
+                : elapsedSeconds < 31557600
+                  ? [Math.floor(elapsedSeconds / 2629800), 'month']
+                  : [Math.floor(elapsedSeconds / 31557600), 'year'];
+
+      element.textContent = relativeTimeFormatter.format(-value, unit);
+    });
+  };
+
+  updateRelativeTimes();
+  window.setInterval(updateRelativeTimes, 1000);
+}
 const githubActivitySection = document.querySelector('[data-github-channel]');
 if (githubActivitySection && window.Echo) {
   window.Echo.private(githubActivitySection.dataset.githubChannel)
