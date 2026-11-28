@@ -9,6 +9,7 @@ use App\Models\Task;
 use App\Models\TaskHistoryEntry;
 use App\Services\TaskRecurrenceService;
 use Carbon\CarbonInterface;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -75,7 +76,7 @@ class MyDayController extends Controller
         return view('my-day.index', compact('tasks', 'priorityTasks', 'unscheduledTasks', 'agendaItems', 'routines', 'events', 'sessions', 'reflection', 'completedToday', 'date', 'localDate', 'timezone', 'plannedMinutes', 'availableMinutes', 'plannedLoadPercent'));
     }
 
-    public function complete(Request $request, int $task, TaskRecurrenceService $recurrenceService): RedirectResponse
+    public function complete(Request $request, int $task, TaskRecurrenceService $recurrenceService): RedirectResponse|JsonResponse
     {
         $taskModel = $this->accessibleTask($request, $task);
         $previousStatus = $taskModel->status;
@@ -83,6 +84,10 @@ class MyDayController extends Controller
         $recurrenceService->createNextOccurrence($taskModel, $request->user());
         TaskHistoryEntry::query()->create(['task_id' => $taskModel->id, 'user_id' => $request->user()->id, 'action' => 'completed', 'from_status' => $previousStatus, 'to_status' => 'done']);
         FocusItem::query()->where('user_id', $request->user()->id)->where('task_id', $taskModel->id)->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Tugas selesai.', 'task' => ['id' => $taskModel->id, 'status' => 'done']]);
+        }
 
         return back()->with('success', 'Tugas selesai.');
     }
@@ -110,7 +115,7 @@ class MyDayController extends Controller
         return back()->with('success', 'Refleksi harian tersimpan.');
     }
 
-    public function routineCheckIn(Request $request, int $routine): RedirectResponse
+    public function routineCheckIn(Request $request, int $routine): RedirectResponse|JsonResponse
     {
         $routineModel = $request->user()->routines()->findOrFail($routine);
         $data = $request->validate([
@@ -127,7 +132,12 @@ class MyDayController extends Controller
             );
         });
 
-        return back()->with('success', $data['status'] === 'completed' ? 'Rutinitas dicatat selesai.' : 'Rutinitas dilewati untuk hari ini.');
+        $message = $data['status'] === 'completed' ? 'Rutinitas dicatat selesai.' : 'Rutinitas dilewati untuk hari ini.';
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message, 'status' => $data['status']]);
+        }
+
+        return back()->with('success', $message);
     }
 
     private function accessibleTask(Request $request, int $taskId): Task

@@ -112,7 +112,7 @@ test('undangan menghubungkan dua akun dan pencabutan anggota mencabut akses proy
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto(teamUrl);
   await page.getByRole('button', { name: 'Keluarkan anggota', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Konfirmasi tindakan' }).getByRole('button', { name: 'Lanjutkan', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Konfirmasi tindakan' }).getByRole('button', { name: 'Ya, lanjutkan', exact: true }).click();
   await expect(page.getByText('Anggota Tim', { exact: true })).toHaveCount(0);
   await page.context().clearCookies();
   await page.goto('/login');
@@ -246,7 +246,7 @@ test('halaman pembuatan terpisah, proyek bisa diedit dan hapus perlu konfirmasi'
   await expect(page.locator('[data-task-card]')).toHaveCount(1);
   await page.getByRole('link', { name: 'Edit proyek', exact: true }).click();
   await page.getByRole('button', { name: 'Hapus proyek', exact: true }).click();
-  await dialog.getByRole('button', { name: 'Lanjutkan', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Ya, lanjutkan', exact: true }).click();
   await expect(page).toHaveURL(/\/projects$/);
   await expect(page.getByRole('heading', { name: 'Rencana tim diperbarui', exact: true })).toHaveCount(0);
   expect((await page.goto(project))?.status()).toBe(404);

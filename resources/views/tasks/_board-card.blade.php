@@ -1,20 +1,18 @@
 @php($updateUrl = $task->project ? route('tasks.update', [$task->project, $task]) : route('inbox.update', $task))
-<article data-task-card draggable="true" data-task-id="{{ $task->id }}" data-task-status="{{ $task->status }}" data-task-update-url="{{ $updateUrl }}" aria-label="Tugas {{ $task->title }}. Seret ke kolom status lain." class="group min-w-0 cursor-grab rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-blue-300 hover:shadow-sm active:cursor-grabbing [&.is-dragging]:opacity-50">
+<article data-task-card draggable="true" data-task-id="{{ $task->id }}" data-task-status="{{ $task->status }}" data-task-update-url="{{ $updateUrl }}" aria-label="Tugas {{ $task->title }}. Seret ke kolom status lain." class="group min-w-0 cursor-grab rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition hover:border-blue-300 hover:shadow-sm active:cursor-grabbing [&.is-dragging]:z-20 [&.is-dragging]:opacity-95 [&.is-dragging]:shadow-xl [&.is-dragging]:ring-2 [&.is-dragging]:ring-blue-300">
     <div class="flex min-w-0 flex-wrap items-center gap-2">
-        @if(in_array($task->status, ['backlog', 'in_review', 'blocked'], true))
-            <span class="inline-flex items-center rounded-full bg-violet-50 px-2 py-1 text-[11px] font-semibold text-violet-700">{{ \App\Support\UiLabel::status($task->status) }}</span>
-        @endif
+        <span data-task-status-label @if(!in_array($task->status, ['backlog', 'in_review', 'blocked'], true)) hidden @endif class="inline-flex items-center rounded-full bg-violet-50 px-2 py-1 text-[11px] font-semibold text-violet-700">{{ \App\Support\UiLabel::status($task->status) }}</span>
         @if($task->priority === 'high')
             <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-700"><i class="fa-solid fa-flag" aria-hidden="true"></i>Prioritas tinggi</span>
         @elseif($task->priority === 'low')
             <span class="rounded-full bg-zinc-100 px-2 py-1 text-[10px] font-medium text-zinc-600">Prioritas rendah</span>
         @endif
-        @if($task->due_date && $task->due_date->isPast() && $task->status !== 'done')
-            <span class="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700">Terlambat</span>
+        @if($task->due_date && $task->due_date->isPast())
+            <span data-task-overdue @if($task->status === 'done') hidden @endif class="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700">Terlambat</span>
         @endif
     </div>
 
-    <h3 class="mt-2 min-w-0 break-words text-sm font-semibold leading-5 [overflow-wrap:anywhere] {{ $task->status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-900' }}"><a draggable="false" href="{{ $task->project ? route('tasks.show', [$task->project, $task]) : route('personal-tasks.show', $task) }}" class="rounded-sm hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600">{{ $task->title }}</a></h3>
+    <h3 data-task-status-title class="mt-2 min-w-0 break-words text-sm font-semibold leading-5 [overflow-wrap:anywhere] {{ $task->status === 'done' ? 'text-zinc-400 line-through' : 'text-zinc-900' }}"><a draggable="false" href="{{ $task->project ? route('tasks.show', [$task->project, $task]) : route('personal-tasks.show', $task) }}" class="rounded-sm hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600">{{ $task->title }}</a></h3>
 
     @if($task->description)
         <p class="mt-2 line-clamp-2 break-words text-xs leading-5 text-zinc-600 [overflow-wrap:anywhere]">{{ $task->description }}</p>
@@ -27,11 +25,8 @@
     </div>
 
     <div class="mt-3 flex items-center justify-between gap-2 border-t border-zinc-100 pt-3">
-        @if($task->status !== 'done')
-            <form method="POST" action="{{ $updateUrl }}">@csrf @method('PATCH')<input type="hidden" name="status" value="done"><button class="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-check" aria-hidden="true"></i>Selesaikan</button></form>
-        @else
-            <form method="POST" action="{{ $updateUrl }}">@csrf @method('PATCH')<input type="hidden" name="status" value="todo"><button class="min-h-9 rounded-lg px-2.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100">Buka kembali</button></form>
-        @endif
+        <form data-task-completion-action="complete" data-async-form data-async-action="task-status" @if($task->status === 'done') hidden @endif method="POST" action="{{ $updateUrl }}">@csrf @method('PATCH')<input type="hidden" name="status" value="done"><button class="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-check" aria-hidden="true"></i>Selesaikan</button></form>
+        <form data-task-completion-action="reopen" data-async-form data-async-action="task-status" @if($task->status !== 'done') hidden @endif method="POST" action="{{ $updateUrl }}">@csrf @method('PATCH')<input type="hidden" name="status" value="todo"><button class="min-h-9 rounded-lg px-2.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100">Buka kembali</button></form>
         <a href="{{ $task->project ? route('tasks.show', [$task->project, $task]) : route('personal-tasks.show', $task) }}" class="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs font-medium text-blue-700 hover:bg-blue-50">Detail <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i></a>
     </div>
 </article>

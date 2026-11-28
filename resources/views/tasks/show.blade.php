@@ -23,7 +23,7 @@
                 <ul class="mt-2 space-y-2">
                     @foreach($task->checklist as $index => $item)
                         <li>
-                            <form method="POST" action="{{ route('inbox.checklist.update', [$task, $index]) }}" class="flex min-h-11 items-center gap-3">
+                            <form method="POST" action="{{ route('inbox.checklist.update', [$task, $index]) }}" class="flex min-h-11 items-center gap-3" data-async-form data-async-action="checklist">
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="done" value="{{ $item['done'] ? 0 : 1 }}">

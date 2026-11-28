@@ -103,7 +103,7 @@ test('status alternatif tersimpan, konfirmasi batal aman, dan penghapusan bekerj
   await dialog.getByRole('button', { name: 'Batal', exact: true }).click();
   await expect(page.getByText('Tugas pengujian', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Hapus Tugas pengujian', exact: true }).click();
-  await dialog.getByRole('button', { name: 'Lanjutkan', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Ya, lanjutkan', exact: true }).click();
   await expect(page.getByText('Tugas pengujian', { exact: true })).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -113,10 +113,19 @@ test('drag and drop tersimpan dan kegagalan request mengembalikan kartu', async 
   const project = await createProject(page);
   await createTask(page, project);
   await page.getByRole('link', { name: 'Papan', exact: true }).click();
-  await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="in_progress"]'));
+  let boardNavigations = 0;
+  page.on('request', request => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) boardNavigations++;
+  });
+  const successfulMove = page.waitForResponse(response => response.request().method() === 'PATCH'
+    && /^\/projects\/\d+\/tasks\/\d+$/.test(new URL(response.url()).pathname)
+    && response.status() === 200);
+  await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="in_progress"]'), { sourcePosition: { x: 80, y: 35 } });
+  await successfulMove;
+  await expect(page.locator('[data-confirm-dialog]')).toBeHidden();
   await expect(page.locator('[data-task-column="in_progress"] [data-task-card]')).toHaveCount(1);
-  await page.reload();
   await expect(page.getByLabel('Status tugas Tugas pengujian')).toHaveValue('in_progress');
+  expect(boardNavigations).toBe(0);
   await page.route('**/projects/*/tasks/*', route => route.request().method() === 'PATCH'
     ? route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Layanan tidak tersedia' }) })
     : route.continue());
@@ -164,7 +173,7 @@ test('pencarian, menu mobile, PRD dan pengaturan bekerja', async ({ page, isMobi
   await page.getByText('Versi 1 · Draf', { exact: true }).click();
   await expect(page.getByText('Data harus tersimpan.', { exact: false }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Setujui versi ini' }).click();
-  await page.getByRole('dialog', { name: 'Konfirmasi tindakan' }).getByRole('button', { name: 'Lanjutkan' }).click();
+  await page.getByRole('dialog', { name: 'Konfirmasi tindakan' }).getByRole('button', { name: 'Setujui versi ini' }).click();
   await expect(page.getByText('Versi 1 · Disetujui', { exact: true })).toBeVisible();
   await page.getByLabel('Isi versi baru').fill('# Kebutuhan baru');
   await page.getByRole('button', { name: 'Buat versi baru', exact: true }).click();
@@ -172,6 +181,7 @@ test('pencarian, menu mobile, PRD dan pengaturan bekerja', async ({ page, isMobi
   await page.goto(`${project}?section=settings`);
   await page.getByLabel('Nama proyek', { exact: true }).fill('Proyek diperbarui');
   await page.getByRole('button', { name: 'Simpan pengaturan' }).click();
+  await expect(page.locator('[data-confirm-dialog]')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Proyek diperbarui', exact: true })).toBeVisible();
 });
 

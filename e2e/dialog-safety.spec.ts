@@ -60,7 +60,7 @@ test('konfirmasi berada di tengah saat scroll dan resize; batal aman serta konfi
   await opener.click();
   await page.setViewportSize({ width: 375, height: 667 });
   await expectCentered(page);
-  await dialog.getByRole('button', { name: 'Lanjutkan', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Ya, lanjutkan', exact: true }).click();
   await expect(page).toHaveURL(/\/projects$/);
   expect(deletes).toBe(1);
   expect(errors).toEqual([]);
@@ -73,7 +73,7 @@ test('batal konfirmasi tidak mengunci form dan persetujuan tetap dikirim setelah
   await page.getByLabel('Isi PRD', { exact: true }).fill('# Rencana\n- Buat fitur');
   await page.getByRole('button', { name: 'Buat draf', exact: true }).click();
   await page.getByText('Versi 1 · Draf', { exact: true }).click();
-  const approve = page.getByRole('button', { name: 'Setujui versi ini', exact: true });
+  const approve = page.getByLabel('Proyek section').getByRole('button', { name: 'Setujui versi ini', exact: true });
   const dialog = page.getByRole('dialog', { name: 'Konfirmasi tindakan', exact: true });
   await approve.click();
   await dialog.getByRole('button', { name: 'Batal', exact: true }).click();
@@ -81,7 +81,7 @@ test('batal konfirmasi tidak mengunci form dan persetujuan tetap dikirim setelah
   await expect(approve).toBeFocused();
   await approve.click();
   await expectCentered(page);
-  await dialog.getByRole('button', { name: 'Lanjutkan', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Setujui versi ini', exact: true }).click();
   await expect(page.getByText('Versi 1 · Disetujui', { exact: true })).toBeVisible();
   await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
 });

@@ -54,6 +54,9 @@ class PersonalProductivityWorkflowTest extends TestCase
 
         $note = $owner->personalNotes()->sole();
         $this->assertSame(['rahasia', 'belajar'], $note->tags);
+        $this->actingAs($owner)->withHeader('Accept', 'application/json')->patch(route('personal-notes.update', $note), ['is_pinned' => true])
+            ->assertOk()->assertJsonPath('note.is_pinned', true);
+        $this->assertTrue($note->fresh()->is_pinned);
         $this->actingAs($stranger)->patch(route('personal-notes.update', $note), ['title' => 'Diubah'])->assertNotFound();
         $this->actingAs($owner)->patch(route('settings.update'), ['timezone' => 'Asia/Jakarta'])
             ->assertSessionHasNoErrors();
@@ -68,7 +71,7 @@ class PersonalProductivityWorkflowTest extends TestCase
         $this->patch(route('settings.profile.update'), [
             'name' => 'Akun Pemilik',
             'email' => $stranger->email,
-        ])->assertSessionHasErrors('email');
+        ])->assertJsonValidationErrors('email');
         $this->assertSame('owner-renamed@example.test', $owner->fresh()->email);
     }
 
@@ -109,10 +112,10 @@ class PersonalProductivityWorkflowTest extends TestCase
 
         $this->actingAs($user)->get(route('calendar.index', ['date' => $start->toDateString(), 'view' => 'day']))
             ->assertOk()->assertSee('Latihan bahasa');
-        $this->post(route('calendar.events.complete', $event), [
+        $this->withHeader('Accept', 'application/json')->post(route('calendar.events.complete', $event), [
             'original_start' => $start->utc()->format('Y-m-d H:i:s'),
             'actual_minutes' => 35,
-        ])->assertSessionHasNoErrors();
+        ])->assertOk()->assertJsonPath('status', 'completed');
 
         $this->assertSame('planned', $event->fresh()->status);
         $this->assertSame('completed', $event->exceptions()->sole()->action);
@@ -152,8 +155,8 @@ class PersonalProductivityWorkflowTest extends TestCase
             $this->get(route($route))->assertOk();
         }
 
-        $this->post(route('routines.check-in', $routine), ['status' => 'completed', 'activity_level' => 'minimum'])
-            ->assertSessionHasNoErrors();
+        $this->withHeader('Accept', 'application/json')->post(route('routines.check-in', $routine), ['status' => 'completed', 'activity_level' => 'minimum'])
+            ->assertOk()->assertJsonPath('status', 'completed');
         $this->post(route('routines.check-in', $routine), ['status' => 'completed', 'note' => 'Sesi singkat'])
             ->assertSessionHasNoErrors();
         $this->assertCount(1, $routine->checkIns()->get());
@@ -162,6 +165,21 @@ class PersonalProductivityWorkflowTest extends TestCase
         $this->post(route('routines.check-in', $skippedRoutine), ['status' => 'skipped', 'note' => 'Jadwal berubah'])
             ->assertSessionHasNoErrors();
         $this->assertSame('skipped', $skippedRoutine->checkIns()->sole()->status);
+    }
+
+    public function test_calendar_async_task_scheduling_returns_the_rendered_event_card(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->withHeader('Accept', 'application/json')->post(route('calendar.events.store'), [
+            'title' => 'Fokus menulis',
+            'starts_at' => '2026-11-28T10:00',
+            'ends_at' => '2026-11-28T11:00',
+            'timezone' => 'Asia/Jakarta',
+        ])->assertCreated()
+            ->assertJsonPath('event.title', 'Fokus menulis')
+            ->assertJsonPath('event.id', fn ($id) => is_int($id))
+            ->assertJsonPath('event.html', fn ($html) => str_contains($html, 'Fokus menulis'));
     }
 
     public function test_task_hub_has_open_and_all_status_filters_and_legacy_inbox_redirects_to_open(): void

@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Workspace;
 use App\Support\ProjectAccess;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TaskChecklistController extends Controller
 {
-    public function update(Request $request, int $project, int $task, int $item): RedirectResponse
+    public function update(Request $request, int $project, int $task, int $item): RedirectResponse|JsonResponse
     {
         $project = ProjectAccess::find($project);
         $data = $request->validate(['done' => ['required', 'boolean']]);
@@ -22,6 +23,10 @@ class TaskChecklistController extends Controller
             $checklist[$item]['done'] = (bool) $data['done'];
             $task->update(['checklist' => $checklist]);
         });
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Checklist diperbarui.', 'done' => (bool) $data['done']]);
+        }
 
         return back()->with('success', 'Checklist diperbarui.');
     }

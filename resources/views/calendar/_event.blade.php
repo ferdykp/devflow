@@ -33,7 +33,7 @@
                         aria-label="Tambah durasi 15 menit"><i class="fa-solid fa-plus text-[10px]"
                             aria-hidden="true"></i></button></div>
             @endunless
-            <form method="POST" action="{{ route('calendar.events.complete', $event) }}">@csrf @if ($event->recurrence_rule)<input type="hidden" name="original_start"
+            <form method="POST" action="{{ route('calendar.events.complete', $event) }}" data-async-form data-async-action="calendar-complete">@csrf @if ($event->recurrence_rule)<input type="hidden" name="original_start"
                         value="{{ $item['original_start']->utc()->format('Y-m-d H:i:s') }}">@endif <button
                     class="min-h-10 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-emerald-700">Tandai
                     selesai</button></form>

@@ -284,7 +284,7 @@ class TaskInboxController extends Controller
         return back()->with('success', 'Tugas pribadi dihapus.');
     }
 
-    public function updateChecklist(Request $request, int $task, int $item): RedirectResponse
+    public function updateChecklist(Request $request, int $task, int $item): RedirectResponse|JsonResponse
     {
         $taskModel = $this->findAccessibleTask($request, $task);
         $data = $request->validate(['done' => ['required', 'boolean']]);
@@ -292,6 +292,10 @@ class TaskInboxController extends Controller
         abort_unless(array_key_exists($item, $checklist), 404);
         $checklist[$item]['done'] = (bool) $data['done'];
         $taskModel->update(['checklist' => $checklist]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Checklist diperbarui.', 'done' => (bool) $data['done']]);
+        }
 
         return back()->with('success', 'Checklist diperbarui.');
     }

@@ -142,9 +142,24 @@ class CalendarController extends Controller
             ->where('status', 'planned')->where('starts_at', '<', $endsAt)->where('ends_at', '>', $startsAt)->count();
 
         if ($request->expectsJson()) {
+            $event->load('task');
+
             return response()->json([
                 'message' => 'Agenda berhasil dijadwalkan.',
-                'event' => ['id' => $event->id, 'title' => $event->title],
+                'event' => [
+                    'id' => $event->id,
+                    'title' => $event->title,
+                    'html' => view('calendar._event', [
+                        'item' => [
+                            'event' => $event,
+                            'status' => 'planned',
+                            'starts_at' => $startsAt->setTimezone($data['timezone']),
+                            'ends_at' => $endsAt->setTimezone($data['timezone']),
+                        ],
+                        'timezone' => $data['timezone'],
+                        'compact' => false,
+                    ])->render(),
+                ],
             ], 201);
         }
 
@@ -236,7 +251,7 @@ class CalendarController extends Controller
         return back()->with('success', 'Agenda dibatalkan.');
     }
 
-    public function complete(Request $request, int $event, TaskRecurrenceService $recurrenceService): RedirectResponse
+    public function complete(Request $request, int $event, TaskRecurrenceService $recurrenceService): RedirectResponse|JsonResponse
     {
         $eventModel = $request->user()->calendarEvents()->with(['task', 'lesson.module.path', 'routine', 'exceptions'])->findOrFail($event);
         abort_unless($eventModel->status === 'planned', 404);
@@ -288,6 +303,10 @@ class CalendarController extends Controller
                 ]);
             }
         });
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Agenda selesai dan aktivitas terkait diperbarui.', 'status' => 'completed']);
+        }
 
         return back()->with('success', 'Agenda selesai dan aktivitas terkait diperbarui.');
     }

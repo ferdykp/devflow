@@ -130,8 +130,7 @@ confirmDialog.setAttribute('aria-labelledby', 'confirmation-title');
 confirmDialog.setAttribute('aria-describedby', 'confirmation-message');
 confirmDialog.innerHTML = '<h2 id="confirmation-title" class="text-lg font-semibold">Konfirmasi tindakan</h2><p id="confirmation-message" data-dialog-message class="mt-2 text-sm leading-6 text-zinc-600 [overflow-wrap:anywhere]"></p><div class="mt-6 flex flex-wrap justify-end gap-2"><button type="button" data-dialog-cancel class="min-h-11 rounded-lg border border-zinc-200 px-4 py-2 text-sm">Batal</button><button type="button" data-dialog-confirm class="min-h-11 rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white">Ya, lanjutkan</button></div>';
 const confirmationForms = [...document.querySelectorAll('form')].filter((form) => {
-  const method = (form.querySelector('input[name="_method"]')?.value || form.method).toUpperCase();
-  return method !== 'GET' && !form.matches('[data-no-confirm]');
+  return form.hasAttribute('data-confirm');
 });
 let pendingConfirmation = null;
 let previousOverflow = '';
@@ -162,7 +161,6 @@ const requestConfirmation = (message, { label = 'Ya, lanjutkan', danger = false,
   confirmDialog.showModal();
   confirmDialog.querySelector('[data-dialog-cancel]').focus();
 });
-window.dfConfirmAction = requestConfirmation;
 const confirmedForms = new WeakSet();
 const getSubmitterLabel = (submitter) => submitter?.getAttribute('aria-label')?.trim()
   || submitter?.value?.trim()
@@ -336,7 +334,6 @@ document.querySelectorAll('[data-note-autosave]').forEach((form) => {
    field.addEventListener('change', scheduleSave);
  });
  retryButton?.addEventListener('click', async () => {
-   if (!await window.dfConfirmAction('Coba simpan perubahan catatan lagi?', { label: 'Simpan lagi', trigger: retryButton })) return;
    window.clearTimeout(timer);
    dirty = true;
    save();
@@ -458,6 +455,158 @@ function initializeToast(toast) {
   start();
 }
 document.querySelectorAll('[data-toast]').forEach(initializeToast);
+const showAsyncActionError = (message) => {
+  const stack = document.querySelector('[data-toast-stack]');
+  const template = document.querySelector('[data-error-toast-template]');
+  if (!stack || !template) return;
+  const toast = template.content.firstElementChild.cloneNode(true);
+  toast.querySelector('[data-error-message]').textContent = message;
+  stack.appendChild(toast);
+  initializeToast(toast);
+};
+const fadeAndRemove = (element) => {
+  if (!element) return;
+  element.style.transition = 'opacity 160ms ease, transform 160ms ease';
+  element.style.opacity = '0';
+  element.style.transform = 'translateY(-4px)';
+  window.setTimeout(() => element.remove(), 170);
+};
+document.addEventListener('submit', async (event) => {
+  const form = event.target.closest('form[data-async-form]');
+  if (!form || form.dataset.asyncSubmitting === 'true') return;
+  event.preventDefault();
+  form.dataset.asyncSubmitting = 'true';
+  const submitters = [...form.querySelectorAll('button[type="submit"], button:not([type]), select, input[type="submit"]')];
+  submitters.forEach((button) => { button.disabled = true; });
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+      body: new FormData(form),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      const validationMessage = payload?.errors ? Object.values(payload.errors).flat()[0] : null;
+      throw new Error(validationMessage || payload?.message || 'Perubahan gagal disimpan. Coba lagi.');
+    }
+    const action = form.dataset.asyncAction;
+    if (action === 'task-status') {
+      const card = form.closest('[data-task-card]');
+      const status = payload?.task?.status || new FormData(form).get('status');
+      if (card && status) {
+        if (typeof window.dfUpdateTaskCardStatus === 'function') window.dfUpdateTaskCardStatus(card, status);
+        else {
+          card.dataset.taskStatus = status;
+          card.querySelectorAll('[data-task-completion-action]').forEach((item) => {
+            item.hidden = (item.dataset.taskCompletionAction === 'complete') === (status === 'done');
+          });
+        }
+      }
+    } else if (action === 'checklist') {
+      const done = Boolean(payload?.done ?? new FormData(form).get('done') === '1');
+      const doneField = form.querySelector('input[name="done"]');
+      if (doneField) doneField.value = done ? '0' : '1';
+      const checkbox = form.querySelector('[role="checkbox"]');
+      checkbox?.setAttribute('aria-checked', String(done));
+      const icon = checkbox?.querySelector('i');
+      if (icon) icon.className = done ? 'fa-solid fa-square-check' : 'fa-regular fa-square';
+      const label = form.querySelector('span');
+      label?.classList.toggle('text-zinc-400', done);
+      label?.classList.toggle('line-through', done);
+      label?.classList.toggle('text-zinc-700', !done);
+    } else if (action === 'my-day-complete') {
+      const taskId = form.dataset.myDayTaskId;
+      const taskForms = [...document.querySelectorAll('[data-my-day-task-id]')].filter((item) => item.dataset.myDayTaskId === taskId);
+      const taskArticles = [...new Set(taskForms.map((item) => item.closest('article')).filter(Boolean))];
+      const wasPriority = taskForms.some((item) => item.closest('[data-priority-task]'));
+      taskArticles.forEach(fadeAndRemove);
+      const completedCount = document.querySelector('[data-my-day-completed-count]');
+      const remainingCount = document.querySelector('[data-my-day-remaining-count]');
+      if (completedCount) completedCount.textContent = String(Number(completedCount.textContent) + 1);
+      if (remainingCount) remainingCount.textContent = String(Math.max(0, Number(remainingCount.textContent) - 1));
+      if (wasPriority) {
+        const priorityCount = document.querySelector('[data-my-day-priority-count]');
+        if (priorityCount) priorityCount.textContent = String(Math.max(0, Number(priorityCount.textContent) - 1));
+      }
+    } else if (action === 'simple-task-complete') {
+      fadeAndRemove(form.closest('li'));
+    } else if (action === 'calendar-complete') {
+      const eventCard = form.closest('[data-calendar-event-id]');
+      if (eventCard) {
+        const statusBadge = [...eventCard.querySelectorAll('span')].find((badge) => ['Direncanakan', 'Selesai'].includes(badge.textContent.trim()));
+        if (statusBadge) {
+          statusBadge.textContent = 'Selesai';
+          statusBadge.className = 'rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-700';
+        }
+        eventCard.removeAttribute('draggable');
+        eventCard.removeAttribute('data-calendar-event-id');
+        eventCard.querySelector('[data-calendar-duration-adjust]')?.parentElement?.remove();
+        eventCard.querySelector('details')?.remove();
+        form.remove();
+        eventCard.classList.remove('cursor-grab', 'active:cursor-grabbing');
+      } else {
+        fadeAndRemove(form.closest('article'));
+      }
+    } else if (action === 'routine-checkin') {
+      const badge = document.createElement('span');
+      const completed = payload?.status !== 'skipped';
+      badge.className = completed
+        ? 'rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700'
+        : 'rounded-full bg-zinc-100 px-2 py-1 text-[10px] font-semibold text-zinc-600';
+      badge.textContent = completed ? 'Selesai' : 'Dilewati';
+      form.replaceWith(badge);
+    } else if (action === 'notification-dismiss') {
+      const row = form.closest('[data-notification-row]');
+      if (row?.dataset.unread === 'true') {
+        const count = document.querySelector('[data-unread-count]');
+        if (count) count.textContent = String(Math.max(0, Number(count.textContent) - 1));
+      }
+      fadeAndRemove(row);
+    } else if (action === 'notification-read-all') {
+      document.querySelectorAll('[data-notification-row]').forEach((row) => {
+        row.classList.remove('bg-blue-50/50');
+        row.dataset.unread = 'false';
+        row.querySelector('[aria-label="Belum dibaca"]')?.remove();
+      });
+      const count = document.querySelector('[data-unread-count]');
+      if (count) count.textContent = '0';
+      form.remove();
+    } else if (action === 'personal-note') {
+      const note = payload?.note;
+      const row = form.closest('[data-personal-note]');
+      if (note && row) {
+        row.dataset.pinned = String(note.is_pinned);
+        row.dataset.archived = String(note.archived);
+        if (form.dataset.noteAction === 'archive') {
+          fadeAndRemove(row);
+        } else {
+          const pinField = form.querySelector('input[name="is_pinned"]');
+          if (pinField) pinField.value = note.is_pinned ? '0' : '1';
+          const pinButton = form.querySelector('button');
+          if (pinButton) pinButton.textContent = note.is_pinned ? 'Lepas pin' : 'Sematkan';
+          let badge = row.querySelector('[data-note-pin-badge]');
+          if (note.is_pinned && !badge) {
+            badge = document.createElement('span');
+            badge.dataset.notePinBadge = '';
+            badge.className = 'rounded-full bg-amber-50 px-2.5 py-1 text-[11px] text-amber-700';
+            badge.textContent = 'Disematkan';
+            row.querySelector('h2')?.parentElement?.appendChild(badge);
+          } else if (!note.is_pinned) {
+            badge?.remove();
+          }
+        }
+      }
+    }
+  } catch (error) {
+    showAsyncActionError(error?.message || 'Perubahan gagal disimpan. Coba lagi.');
+  } finally {
+    if (form.isConnected) {
+      delete form.dataset.asyncSubmitting;
+      submitters.forEach((button) => { button.disabled = false; });
+    }
+  }
+});
 const taskRoot = document.querySelector('[data-tasks-root]');
 if (taskRoot) {
  const composer = taskRoot.querySelector('#new-task-panel');
@@ -473,6 +622,83 @@ if (taskRoot) {
  taskRoot.querySelector('[data-task-form-cancel]')?.addEventListener('click', () => toggle(false));
  let dragged = null;
  let moving = false;
+ const moveTaskCard = (card, destination, before = null) => {
+   const previousPositions = new Map([...taskRoot.querySelectorAll('[data-task-card]')].map((item) => [item, item.getBoundingClientRect()]));
+   if (before) destination.insertBefore(card, before);
+   else destination.appendChild(card);
+   card.classList.remove('is-dragging');
+   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+   taskRoot.querySelectorAll('[data-task-card]').forEach((item) => {
+     const previous = previousPositions.get(item);
+     if (!previous) return;
+     const current = item.getBoundingClientRect();
+     const deltaX = previous.left - current.left;
+     const deltaY = previous.top - current.top;
+     if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+     item.animate([
+       { transform: `translate(${deltaX}px, ${deltaY}px)` },
+       { transform: 'translate(0, 0)' },
+     ], { duration: 280, easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)' });
+   });
+ };
+ const refreshTaskColumn = (column) => {
+   if (!column) return;
+   const count = column.querySelector('[data-task-column-count]');
+   const taskCount = column.querySelectorAll('[data-task-card]').length;
+   if (count) count.textContent = String(taskCount);
+   const emptyState = column.querySelector('[data-task-column-empty]');
+   if (emptyState) emptyState.hidden = taskCount > 0;
+ };
+ const updateTaskCardStatus = (card, status) => {
+   const statusLabels = {
+     backlog: 'Backlog',
+     todo: 'Akan dikerjakan',
+     in_progress: 'Sedang dikerjakan',
+     in_review: 'Ditinjau',
+     blocked: 'Terhambat',
+     done: 'Selesai',
+   };
+   card.dataset.taskStatus = status;
+   const statusSelect = card.querySelector('[data-task-status]');
+   if (statusSelect) statusSelect.value = status;
+   const statusTitle = card.querySelector('[data-task-status-title]');
+   if (statusTitle) {
+     const isDone = status === 'done';
+     statusTitle.classList.toggle('text-zinc-400', isDone);
+     statusTitle.classList.toggle('line-through', isDone);
+     statusTitle.classList.toggle('text-zinc-900', !isDone);
+   }
+   const statusBadge = card.querySelector('[data-task-status-label]');
+   if (statusBadge) {
+     statusBadge.textContent = statusLabels[status] || status;
+     statusBadge.hidden = !['backlog', 'in_review', 'blocked'].includes(status);
+   }
+   const overdueBadge = card.querySelector('[data-task-overdue]');
+   if (overdueBadge) overdueBadge.hidden = status === 'done';
+   card.querySelectorAll('[data-task-completion-action]').forEach((action) => {
+     action.hidden = (action.dataset.taskCompletionAction === 'complete') === (status === 'done');
+   });
+ };
+ window.dfUpdateTaskCardStatus = (card, status) => {
+   const columnByStatus = { backlog: 'todo', todo: 'todo', in_progress: 'in_progress', in_review: 'in_progress', blocked: 'in_progress', done: 'done' };
+   const destination = taskRoot.querySelector(`[data-task-dropzone][data-task-column="${columnByStatus[status] || ''}"]`);
+   const source = card.closest('[data-task-dropzone]');
+   if (destination && source !== destination) {
+     moveTaskCard(card, destination);
+     refreshTaskColumn(source);
+     refreshTaskColumn(destination);
+   }
+   updateTaskCardStatus(card, status);
+   if (!taskMatchesCurrentStatusFilter(status)) {
+     const column = card.closest('[data-task-dropzone]');
+     card.remove();
+     refreshTaskColumn(column);
+   }
+ };
+ const taskMatchesCurrentStatusFilter = (status) => {
+   const filter = taskRoot.dataset.taskStatusFilter || '';
+   return filter === '' || filter === 'all' || (filter === 'open' ? status !== 'done' : filter === status);
+ };
  const showMoveError = (message) => {
    const stack = document.querySelector('[data-toast-stack]');
    if (!stack) return;
@@ -525,14 +751,13 @@ if (taskRoot) {
      const url = card.dataset.taskUpdateUrl;
      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
      if (!url || !csrf) { showMoveError('Tugas gagal disimpan. Muat ulang halaman lalu coba lagi.'); return; }
-     const taskTitle = card.dataset.taskTitle || card.querySelector('h3 a')?.textContent?.trim() || 'tugas ini';
-     const destination = zone.getAttribute('aria-label') || 'status baru';
-     if (!await window.dfConfirmAction(`Pindahkan “${taskTitle}” ke ${destination}?`, { label: 'Pindahkan' })) return;
-
      moving = true;
      const prior = card.parentElement;
+     const sourceZone = card.closest('[data-task-dropzone]');
      const next = card.nextSibling;
-     zone.appendChild(card);
+     moveTaskCard(card, zone);
+     refreshTaskColumn(sourceZone);
+     refreshTaskColumn(zone);
      try {
        const response = await fetch(url, {
          method: 'PATCH', credentials: 'same-origin', redirect: 'error',
@@ -549,11 +774,15 @@ if (taskRoot) {
          const detail = payload?.message || `HTTP ${response.status}`;
          throw new Error(detail);
        }
-       if (select) select.value = status;
-       card.dataset.taskStatus = status;
-       window.location.reload();
+       updateTaskCardStatus(card, status);
+       if (!taskMatchesCurrentStatusFilter(status)) {
+         card.remove();
+         refreshTaskColumn(zone);
+       }
      } catch (error) {
-       if (prior) prior.insertBefore(card, next && next.parentNode === prior ? next : null);
+       if (prior) moveTaskCard(card, prior, next && next.parentNode === prior ? next : null);
+       refreshTaskColumn(sourceZone);
+       refreshTaskColumn(zone);
        console.error('DevFlow task move failed:', error);
        showMoveError('Tugas gagal dipindahkan. ' + (error?.message || 'Coba lagi.'));
      } finally {
@@ -571,13 +800,6 @@ document.querySelectorAll('[data-focus-sortable]').forEach((list) => {
    if (rank) rank.textContent = `P${index + 1}`;
  });
  const persistOrder = async (previousOrder) => {
-   if (!await window.dfConfirmAction('Simpan urutan fokus yang baru?', { label: 'Simpan urutan' })) {
-     const items = new Map([...list.querySelectorAll('[data-focus-task]')].map((item) => [item.dataset.focusTask, item]));
-     previousOrder.forEach((id) => { const item = items.get(id); if (item) list.appendChild(item); });
-     refreshRanks();
-     if (feedback) feedback.textContent = 'Perubahan urutan dibatalkan.';
-     return;
-   }
    refreshRanks();
    if (feedback) feedback.textContent = 'Menyimpan urutan…';
    try {
@@ -688,7 +910,14 @@ if (calendarRoot) {
    });
    const result = await response.json().catch(() => null);
    if (!response.ok || !result?.event) throw new Error(result?.message || `HTTP ${response.status}`);
-   window.location.reload();
+   eventCard.dataset.calendarEventStart = startsAt;
+   eventCard.dataset.calendarEventEnd = endsAt;
+   const timeLabel = eventCard.querySelector('h4')?.parentElement?.parentElement?.nextElementSibling;
+   if (timeLabel) {
+     const startLabel = startsAt.split('T')[1];
+     const endLabel = endsAt.split('T')[1];
+     timeLabel.textContent = `${startLabel}–${endLabel}${eventCard.dataset.calendarEventTimezone ? ` · ${eventCard.dataset.calendarEventTimezone}` : ''}`;
+   }
    return true;
  };
  calendarRoot.querySelectorAll('[data-calendar-event-id]').forEach((eventCard) => {
@@ -713,7 +942,6 @@ if (calendarRoot) {
      const nextEnd = wallDateTime(wallMinutes(eventCard.dataset.calendarEventEnd) + Number(button.dataset.calendarDurationAdjust));
      if (wallMinutes(nextEnd) - wallMinutes(startsAt) < 15) { setCalendarFeedback('Durasi agenda minimum 15 menit.', true); return; }
      try {
-       if (!await window.dfConfirmAction(`Simpan perubahan durasi agenda “${eventCard.dataset.calendarEventTitle}”?`, { label: 'Simpan durasi', trigger: button })) return;
        setCalendarFeedback('Menyimpan durasi agenda…');
        const saved = await saveEventTime(eventCard, startsAt, nextEnd);
        if (!saved) setCalendarFeedback('Perubahan agenda dibatalkan.');
@@ -752,6 +980,8 @@ if (calendarRoot) {
      zone.classList.remove('is-over');
      if (calendarEvent) {
        const eventCard = calendarEvent;
+       const previousParent = eventCard.parentElement;
+       const previousNext = eventCard.nextSibling;
        const date = zone.dataset.calendarDropDate;
        const hour = Number(zone.dataset.calendarDropHour || 9);
        const startsAt = `${date}T${String(hour).padStart(2, '0')}:00`;
@@ -759,11 +989,12 @@ if (calendarRoot) {
        const endsAt = wallDateTime(wallMinutes(startsAt) + Math.max(15, duration));
        calendarEvent = null;
        try {
-         if (!await window.dfConfirmAction(`Pindahkan agenda “${eventCard.dataset.calendarEventTitle}” ke waktu ini?`, { label: 'Pindahkan agenda' })) return;
          setCalendarFeedback(`Memindahkan “${eventCard.dataset.calendarEventTitle}”…`);
+         zone.appendChild(eventCard);
          const saved = await saveEventTime(eventCard, startsAt, endsAt);
          if (!saved) setCalendarFeedback('Perubahan agenda dibatalkan.');
        } catch (error) {
+         if (previousParent) previousParent.insertBefore(eventCard, previousNext?.parentNode === previousParent ? previousNext : null);
          console.error('DevFlow calendar move failed:', error);
          setCalendarFeedback(`Agenda gagal dipindahkan. ${error?.message || 'Coba lagi.'}`, true);
        }
@@ -783,7 +1014,6 @@ if (calendarRoot) {
      const endDate = new Date(Date.UTC(year, month - 1, day, hour + 1));
      const endDateString = `${endDate.getUTCFullYear()}-${String(endDate.getUTCMonth() + 1).padStart(2, '0')}-${String(endDate.getUTCDate()).padStart(2, '0')}`;
      const endsAt = `${endDateString}T${String(endDate.getUTCHours()).padStart(2, '0')}:${String(endDate.getUTCMinutes()).padStart(2, '0')}`;
-     if (!await window.dfConfirmAction(`Jadwalkan tugas “${title}” pada ${date}?`, { label: 'Jadwalkan tugas' })) return;
      setCalendarFeedback(`Menjadwalkan “${title}”…`);
      try {
        const response = await fetch(calendarRoot.dataset.calendarStoreUrl, {
@@ -792,9 +1022,31 @@ if (calendarRoot) {
          body: JSON.stringify({ title, task_id: Number(taskId), starts_at: startsAt, ends_at: endsAt, timezone: calendarRoot.dataset.calendarTimezone }),
        });
        const payload = await response.json().catch(() => null);
-       if (!response.ok || !payload?.event) throw new Error(payload?.message || `HTTP ${response.status}`);
+       if (!response.ok || !payload?.event?.html) throw new Error(payload?.message || `HTTP ${response.status}`);
+       const eventTemplate = document.createElement('template');
+       eventTemplate.innerHTML = payload.event.html.trim();
+       const eventCard = eventTemplate.content.firstElementChild;
+       if (eventCard) {
+         eventCard.addEventListener('dragstart', (dragEvent) => {
+           if (dragEvent.target.closest('button, a, input, select, textarea, form, summary')) { dragEvent.preventDefault(); return; }
+           calendarEvent = eventCard;
+           dragEvent.dataTransfer.effectAllowed = 'move';
+           dragEvent.dataTransfer.setData('text/plain', eventCard.dataset.calendarEventId || '');
+           eventCard.classList.add('opacity-50');
+         });
+         eventCard.addEventListener('dragend', () => {
+           eventCard.classList.remove('opacity-50');
+           calendarEvent = null;
+           calendarRoot.querySelectorAll('[data-calendar-drop-date]').forEach((dropZone) => dropZone.classList.remove('is-over'));
+         });
+         zone.appendChild(eventCard);
+       }
+       const unscheduledRow = calendarTask.closest('li');
+       unscheduledRow?.remove();
+       const unscheduledCount = calendarRoot.querySelector('[data-calendar-unscheduled-count]');
+       if (unscheduledCount) unscheduledCount.textContent = String(Math.max(0, Number(unscheduledCount.textContent) - 1));
+       calendarTask = null;
        setCalendarFeedback(`“${title}” dijadwalkan.`);
-       window.setTimeout(() => window.location.reload(), 350);
      } catch (error) {
        console.error('DevFlow calendar scheduling failed:', error);
        setCalendarFeedback(`Tugas gagal dijadwalkan. ${error?.message || 'Coba lagi.'}`, true);
@@ -834,6 +1086,7 @@ document.querySelectorAll('[data-project-menu], [data-task-menu]').forEach((menu
 document.querySelectorAll('[data-busy-form]').forEach((form) => {
   let submitting = false;
   form.addEventListener('submit', (event) => {
+    if (form.matches('[data-async-form]')) return;
     if (event.defaultPrevented) return;
     if (submitting) {
       event.preventDefault();

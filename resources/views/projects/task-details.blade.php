@@ -20,7 +20,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-2"><h2 class="font-semibold">Checklist</h2><span class="text-sm text-zinc-500">{{ collect($task->checklist)->where('done', true)->count() }}/{{ count($task->checklist) }} selesai</span></div>
                 <div class="mt-4 divide-y divide-zinc-100">
                     @foreach($task->checklist as $index => $check)
-                        <form action="{{ route('task-checklist.update', [$project, $task, $index]) }}" method="POST" class="flex items-start gap-3 py-3">@csrf @method('PATCH')
+                        <form action="{{ route('task-checklist.update', [$project, $task, $index]) }}" method="POST" class="flex items-start gap-3 py-3" data-async-form data-async-action="checklist">@csrf @method('PATCH')
                             <input type="hidden" name="done" value="{{ $check['done'] ? '0' : '1' }}">
                             <button type="submit" role="checkbox" aria-checked="{{ $check['done'] ? 'true' : 'false' }}" aria-label="{{ $check['title'] }}" class="grid size-11 shrink-0 place-items-center rounded-lg border border-zinc-200 text-blue-700 hover:bg-blue-50"><i class="{{ $check['done'] ? 'fa-solid fa-square-check' : 'fa-regular fa-square' }}" aria-hidden="true"></i></button>
                             <span class="min-w-0 break-words pt-2.5 text-sm leading-6 {{ $check['done'] ? 'text-zinc-400 line-through' : 'text-zinc-700' }}">{{ $check['title'] }}</span>

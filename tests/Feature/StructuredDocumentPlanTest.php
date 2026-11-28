@@ -129,7 +129,8 @@ MD;
         $project = $task->project;
         $member = User::factory()->create();
         $project->workspace->members()->attach($member);
-        $this->actingAs($member)->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => true])->assertSessionHasNoErrors();
+        $this->actingAs($member)->withHeader('Accept', 'application/json')->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => true])
+            ->assertOk()->assertJsonPath('done', true);
         $this->assertTrue($task->fresh()->checklist[0]['done']);
         $this->assertSame('todo', $task->fresh()->status);
         $this->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => true])->assertSessionHasNoErrors();
@@ -137,7 +138,7 @@ MD;
         $this->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => false])->assertSessionHasNoErrors();
         $this->assertFalse($task->fresh()->checklist[0]['done']);
         $this->patch(route('task-checklist.update', [$project, $task, 9]), ['done' => true])->assertNotFound();
-        $this->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => 'malicious'])->assertSessionHasErrors('done');
+        $this->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => 'malicious'])->assertJsonValidationErrors('done');
         $this->actingAs(User::factory()->create())->patch(route('task-checklist.update', [$project, $task, 0]), ['done' => true])->assertNotFound();
         $this->assertFalse($task->fresh()->checklist[0]['done']);
     }

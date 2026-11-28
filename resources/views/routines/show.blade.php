@@ -48,7 +48,7 @@
             <h2 class="font-semibold">Tindakan hari ini</h2>
             <div class="mt-3 grid grid-cols-2 gap-2">
                 @foreach(['completed' => 'Selesai', 'skipped' => 'Lewati'] as $status => $label)
-                    <form method="POST" action="{{ route('routines.check-in', $routine) }}">
+                    <form method="POST" action="{{ route('routines.check-in', $routine) }}" data-async-form data-async-action="routine-checkin">
                         @csrf
                         <input type="hidden" name="status" value="{{ $status }}">
                         <button class="min-h-11 flex-1 rounded-lg border px-3 text-sm font-semibold transition focus-visible:outline-2 {{ $status === 'completed' ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700 focus-visible:outline-blue-700' : 'border-zinc-200 bg-zinc-100 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-200 focus-visible:outline-zinc-700' }}">{{ $label }}</button>

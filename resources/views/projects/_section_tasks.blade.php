@@ -1,7 +1,7 @@
 @php
     $view = in_array(request('view'), ['list','board'], true) ? request('view') : 'board';
 @endphp
-<div class="df-task-page" data-tasks-root>
+<div class="df-task-page" data-tasks-root data-task-status-filter="{{ request('status') }}">
  <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
   <div><h2 class="text-lg font-semibold tracking-tight">Tugas <span class="ml-1 text-sm font-normal text-zinc-400">{{ $taskPlan ? $tasks->total() : $project->tasks_count }}</span></h2><p class="mt-1 text-sm text-zinc-500">Tulis to-do, kerjakan bersama, lalu tandai selesai.</p></div>
   <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Tampilan tugas">
@@ -45,11 +45,11 @@
   @foreach($boardColumns as $columnKey => $column)
    @php($items = $tasks->getCollection()->whereIn('status', $column['statuses']))
    <section data-task-dropzone="{{ $column['drop_status'] }}" data-task-column="{{ $columnKey }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400" aria-label="{{ $column['label'] }}">
-    <header class="flex items-center justify-between gap-3 px-1 py-1"><h2 class="text-sm font-semibold text-zinc-800">{{ $column['label'] }}</h2><span title="Tugas pada halaman ini" class="rounded-full bg-white px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-500">{{ $items->count() }}</span></header>
+    <header class="flex items-center justify-between gap-3 px-1 py-1"><h2 class="text-sm font-semibold text-zinc-800">{{ $column['label'] }}</h2><span data-task-column-count title="Tugas pada halaman ini" class="rounded-full bg-white px-2 py-0.5 text-xs font-medium tabular-nums text-zinc-500">{{ $items->count() }}</span></header>
      @foreach($items as $task)
       @include('projects._task_card',['task'=>$task,'columns'=>$columns,'statusGroups'=>$statusGroups])
      @endforeach
-     @if($items->isEmpty()) <p class="rounded-xl border border-dashed border-zinc-300 px-3 py-5 text-center text-xs text-zinc-500">Lepas tugas di sini</p> @endif
+     <p data-task-column-empty @if($items->isNotEmpty()) hidden @endif class="rounded-xl border border-dashed border-zinc-300 px-3 py-5 text-center text-xs text-zinc-500">Lepas tugas di sini</p>
    </section>
   @endforeach
  </div></div>

@@ -14,9 +14,9 @@
         <a href="{{ route('my-day.index') }}" class="inline-flex min-h-11 items-center rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-[#f8f9ff]">Hari ini</a>
     </div>
     <div class="flex flex-wrap items-center gap-2 rounded-xl border border-[#e2e7ee] bg-white px-3 py-2 text-xs shadow-sm">
-        <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700"><span class="size-2 rounded-full bg-emerald-600"></span>{{ $completedToday }} selesai</span>
+        <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700"><span class="size-2 rounded-full bg-emerald-600"></span><span data-my-day-completed-count>{{ $completedToday }}</span> selesai</span>
         <span class="h-4 w-px bg-zinc-200" aria-hidden="true"></span>
-        <span class="inline-flex items-center gap-1.5 text-zinc-600"><span class="size-2 rounded-full bg-[#2463eb]"></span>{{ $tasks->count() }} tersisa</span>
+        <span class="inline-flex items-center gap-1.5 text-zinc-600"><span class="size-2 rounded-full bg-[#2463eb]"></span><span data-my-day-remaining-count>{{ $tasks->count() }}</span> tersisa</span>
         <span class="h-4 w-px bg-zinc-200" aria-hidden="true"></span>
         <a href="{{ route('calendar.index', ['date' => $localDate, 'view' => 'day']) }}" class="font-medium text-[#004bc6] hover:underline">{{ $events->count() }} agenda</a>
     </div>
@@ -32,16 +32,16 @@
 
 <section aria-labelledby="today-priorities" class="mb-8">
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5"><span class="grid size-8 place-items-center rounded-lg bg-[#e9efff] text-[#004bc6]"><i class="fa-solid fa-star" aria-hidden="true"></i></span><div><h2 id="today-priorities" class="text-lg font-semibold tracking-tight">{{ $priorityTasks->count() }} prioritas utama</h2><p class="text-xs text-zinc-500">Pilihan fokusmu hari ini, maksimal tiga tugas.</p></div></div>
+        <div class="flex items-center gap-2.5"><span class="grid size-8 place-items-center rounded-lg bg-[#e9efff] text-[#004bc6]"><i class="fa-solid fa-star" aria-hidden="true"></i></span><div><h2 id="today-priorities" class="text-lg font-semibold tracking-tight"><span data-my-day-priority-count>{{ $priorityTasks->count() }}</span> prioritas utama</h2><p class="text-xs text-zinc-500">Pilihan fokusmu hari ini, maksimal tiga tugas.</p></div></div>
         <a href="{{ route('focus.index') }}" class="inline-flex min-h-10 items-center gap-2 rounded-lg px-3 text-sm font-medium text-zinc-600 hover:bg-white hover:text-[#004bc6]"><i class="fa-solid fa-arrow-up-wide-short" aria-hidden="true"></i>Atur prioritas</a>
     </div>
     @if ($priorityTasks->isNotEmpty())
         <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             @foreach ($priorityTasks as $index => $task)
-                <article class="df-panel relative overflow-hidden p-4 pl-5">
+                <article data-priority-task class="df-panel relative overflow-hidden p-4 pl-5">
                     <span class="absolute inset-y-0 left-0 w-1 {{ $task->priority === 'high' ? 'bg-red-500' : ($task->priority === 'low' ? 'bg-[#2463eb]' : 'bg-amber-500') }}" aria-hidden="true"></span>
                     <div class="mb-3 flex items-center justify-between gap-2"><span class="rounded-md px-2 py-1 text-[11px] font-semibold {{ $task->priority === 'high' ? 'bg-red-50 text-red-700' : ($task->priority === 'low' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-800') }}">P{{ $index + 1 }} · {{ $task->priority === 'high' ? 'Tinggi' : ($task->priority === 'low' ? 'Rendah' : 'Normal') }}</span>@if ($task->estimated_minutes)<span class="inline-flex items-center gap-1 text-xs text-zinc-500"><i class="fa-regular fa-clock" aria-hidden="true"></i>{{ $task->estimated_minutes }} mnt</span>@endif</div>
-                    <div class="flex items-start gap-3"><form method="POST" action="{{ route('my-day.tasks.complete', $task) }}">@csrf<button class="mt-0.5 grid size-5 place-items-center rounded border border-zinc-300 text-transparent hover:border-emerald-600 hover:bg-emerald-50 hover:text-emerald-700" aria-label="Tandai selesai: {{ $task->title }}"><i class="fa-solid fa-check text-xs" aria-hidden="true"></i></button></form><div class="min-w-0 flex-1"><h3 class="font-semibold leading-5 text-zinc-900">{{ $task->title }}</h3><p class="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">{{ $task->project?->name ?? $task->personalGoal?->title ?? 'Tugas pribadi' }}</p></div></div>
+                    <div class="flex items-start gap-3"><form method="POST" action="{{ route('my-day.tasks.complete', $task) }}" data-my-day-task-id="{{ $task->id }}" data-async-form data-async-action="my-day-complete">@csrf<button class="mt-0.5 grid size-5 place-items-center rounded border border-zinc-300 text-transparent hover:border-emerald-600 hover:bg-emerald-50 hover:text-emerald-700" aria-label="Tandai selesai: {{ $task->title }}"><i class="fa-solid fa-check text-xs" aria-hidden="true"></i></button></form><div class="min-w-0 flex-1"><h3 class="font-semibold leading-5 text-zinc-900">{{ $task->title }}</h3><p class="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">{{ $task->project?->name ?? $task->personalGoal?->title ?? 'Tugas pribadi' }}</p></div></div>
                 </article>
             @endforeach
         </div>
@@ -61,7 +61,7 @@
                     <span class="mt-1 h-10 w-1 shrink-0 rounded-full {{ $agendaItem['kind'] === 'event' ? ($item->is_flexible ? 'bg-amber-500' : 'bg-[#2463eb]') : 'bg-emerald-600' }}" aria-hidden="true"></span>
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-start justify-between gap-2"><div class="min-w-0"><div class="mb-1 flex flex-wrap items-center gap-2"><span class="rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide {{ $agendaItem['kind'] === 'event' ? ($item->is_flexible ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-700') : 'bg-emerald-50 text-emerald-700' }}">{{ $agendaItem['kind'] === 'event' ? ($item->is_flexible ? 'Fleksibel' : 'Agenda') : 'Tugas' }}</span>@if ($agendaItem['kind'] === 'task' && $item->priority === 'high')<span class="text-[10px] font-semibold text-red-700">Prioritas tinggi</span>@endif</div><h3 class="break-words text-sm font-semibold text-zinc-900">{{ $item->title }}</h3><p class="mt-1 text-xs leading-5 text-zinc-500">{{ $agendaItem['kind'] === 'task' ? ($item->project?->name ?? 'Tugas pribadi') : ($item->description ?: 'Agenda personal') }}</p></div>
-                            @if ($agendaItem['kind'] === 'task')<form method="POST" action="{{ route('my-day.tasks.complete', $item) }}">@csrf<button class="min-h-10 rounded-lg px-3 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Tandai selesai</button></form>@else<form method="POST" action="{{ route('calendar.events.complete', $item) }}">@csrf<input type="hidden" name="original_start" value="{{ $item->starts_at->utc()->format('Y-m-d H:i:s') }}"><button class="min-h-10 rounded-lg px-3 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Tandai selesai</button></form>@endif
+                            @if ($agendaItem['kind'] === 'task')<form method="POST" action="{{ route('my-day.tasks.complete', $item) }}" data-my-day-task-id="{{ $item->id }}" data-async-form data-async-action="my-day-complete">@csrf<button class="min-h-10 rounded-lg px-3 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Tandai selesai</button></form>@else<form method="POST" action="{{ route('calendar.events.complete', $item) }}" data-async-form data-async-action="calendar-complete">@csrf<input type="hidden" name="original_start" value="{{ $item->starts_at->utc()->format('Y-m-d H:i:s') }}"><button class="min-h-10 rounded-lg px-3 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Tandai selesai</button></form>@endif
                         </div>
                     </div>
                 </article>
@@ -90,7 +90,7 @@
                 @forelse ($routines as $routine)
                     @php($checkIn = $routine->checkIns->first())
                     <li class="flex items-center justify-between gap-2 rounded-xl bg-[#f8f9ff] p-3"><div class="min-w-0"><p class="truncate text-sm font-medium">{{ $routine->title }}</p><p class="mt-1 text-xs text-zinc-500">{{ $routine->preferred_time ? substr($routine->preferred_time, 0, 5).' · ' : '' }}{{ $routine->estimated_minutes }} menit</p></div>
-                        @if ($checkIn)<span class="rounded-full px-2 py-1 text-[10px] font-semibold {{ $checkIn->status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600' }}">{{ $checkIn->status === 'completed' ? 'Selesai' : 'Dilewati' }}</span>@else<form method="POST" action="{{ route('my-day.routines.check-in', $routine) }}">@csrf<input type="hidden" name="status" value="completed"><input type="hidden" name="activity_level" value="normal"><button class="min-h-9 rounded-lg bg-white px-3 text-xs font-semibold text-[#004bc6] shadow-sm">Catat</button></form>@endif
+                        @if ($checkIn)<span class="rounded-full px-2 py-1 text-[10px] font-semibold {{ $checkIn->status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600' }}">{{ $checkIn->status === 'completed' ? 'Selesai' : 'Dilewati' }}</span>@else<form method="POST" action="{{ route('my-day.routines.check-in', $routine) }}" data-async-form data-async-action="routine-checkin">@csrf<input type="hidden" name="status" value="completed"><input type="hidden" name="activity_level" value="normal"><button class="min-h-9 rounded-lg bg-white px-3 text-xs font-semibold text-[#004bc6] shadow-sm">Catat</button></form>@endif
                     </li>
                 @empty<li class="py-3 text-sm text-zinc-500">Tidak ada rutinitas terjadwal hari ini.</li>@endforelse
             </ul>

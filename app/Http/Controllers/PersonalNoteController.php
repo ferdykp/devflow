@@ -6,6 +6,7 @@ use App\Models\LearningLesson;
 use App\Models\Project;
 use App\Models\Task;
 use App\Support\ProjectAccess;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -52,7 +53,7 @@ class PersonalNoteController extends Controller
         return back()->with('success', 'Catatan pribadi disimpan.');
     }
 
-    public function update(Request $request, int $note): RedirectResponse
+    public function update(Request $request, int $note): RedirectResponse|JsonResponse
     {
         $noteModel = $request->user()->personalNotes()->findOrFail($note);
         $data = $request->validate($this->rules($request, true));
@@ -77,6 +78,17 @@ class PersonalNoteController extends Controller
             LearningLesson::query()->whereKey($data['learning_lesson_id'])->whereHas('module.path', fn ($path) => $path->where('owner_id', $request->user()->id))->firstOrFail();
         }
         $noteModel->update($data);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Catatan diperbarui.',
+                'note' => [
+                    'id' => $noteModel->id,
+                    'is_pinned' => $noteModel->is_pinned,
+                    'archived' => $noteModel->archived_at !== null,
+                ],
+            ]);
+        }
 
         return back()->with('success', 'Catatan diperbarui.');
     }

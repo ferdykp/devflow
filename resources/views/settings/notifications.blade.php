@@ -6,15 +6,15 @@
 
 <x-ui.panel>
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p class="text-sm text-zinc-600"><span class="font-semibold text-zinc-900">{{ $unreadCount }}</span> belum dibaca</p>
+        <p class="text-sm text-zinc-600"><span class="font-semibold text-zinc-900" data-unread-count>{{ $unreadCount }}</span> belum dibaca</p>
         @if($unreadCount > 0)
-            <form method="POST" action="{{ route('notifications.read-all') }}">@csrf @method('PATCH')<button class="min-h-10 rounded-lg border border-zinc-300 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50">Tandai semua dibaca</button></form>
+            <form method="POST" action="{{ route('notifications.read-all') }}" data-async-form data-async-action="notification-read-all">@csrf @method('PATCH')<button class="min-h-10 rounded-lg border border-zinc-300 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50">Tandai semua dibaca</button></form>
         @endif
     </div>
 
     @forelse($notifications as $notification)
         @php($data = $notification->data)
-        <article class="flex flex-wrap items-start justify-between gap-3 border-t border-zinc-100 py-4 {{ $notification->read_at ? '' : 'bg-blue-50/50' }}">
+        <article data-notification-row data-unread="{{ $notification->read_at ? 'false' : 'true' }}" class="flex flex-wrap items-start justify-between gap-3 border-t border-zinc-100 py-4 {{ $notification->read_at ? '' : 'bg-blue-50/50' }}">
             <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-zinc-900">{{ data_get($data, 'title', 'Pembaruan proyek') }} @unless($notification->read_at)<span class="ml-1 inline-block size-2 rounded-full bg-blue-600" aria-label="Belum dibaca"></span>@endunless</p>
                 <p class="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-600">{{ data_get($data, 'message', '') }}</p>
@@ -22,7 +22,7 @@
             </div>
             <div class="flex shrink-0 items-center gap-2">
                 <form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf @method('PATCH')<button class="min-h-10 rounded-lg px-3 text-sm font-semibold text-blue-700 hover:bg-blue-50">Buka</button></form>
-                <form method="POST" action="{{ route('notifications.dismiss', $notification->id) }}">@csrf @method('DELETE')<button aria-label="Hapus notifikasi" class="grid size-10 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>
+                <form method="POST" action="{{ route('notifications.dismiss', $notification->id) }}" data-async-form data-async-action="notification-dismiss">@csrf @method('DELETE')<button aria-label="Hapus notifikasi" class="grid size-10 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>
             </div>
         </article>
     @empty

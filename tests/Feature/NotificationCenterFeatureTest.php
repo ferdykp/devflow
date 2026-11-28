@@ -36,7 +36,8 @@ class NotificationCenterFeatureTest extends TestCase
             ->assertRedirect(route('tasks.show', [$project, $task]));
         $this->assertSame(0, $member->fresh()->unreadNotifications()->count());
 
-        $this->actingAs($member)->delete(route('notifications.dismiss', $notification->id))->assertRedirect();
+        $this->actingAs($member)->withHeader('Accept', 'application/json')->delete(route('notifications.dismiss', $notification->id))
+            ->assertOk()->assertJsonPath('message', 'Notifikasi dihapus.');
         $this->assertDatabaseMissing('notifications', ['id' => $notification->id]);
     }
 
@@ -63,7 +64,8 @@ class NotificationCenterFeatureTest extends TestCase
         $user->notify(new WorkspaceActivityNotification('one', 'One', 'One', route('dashboard')));
         $otherUser->notify(new WorkspaceActivityNotification('two', 'Two', 'Two', route('dashboard')));
 
-        $this->actingAs($user)->patch(route('notifications.read-all'))->assertRedirect();
+        $this->actingAs($user)->withHeader('Accept', 'application/json')->patch(route('notifications.read-all'))
+            ->assertOk()->assertJsonPath('message', 'Semua notifikasi ditandai sudah dibaca.');
 
         $this->assertSame(0, $user->fresh()->unreadNotifications()->count());
         $this->assertSame(1, $otherUser->fresh()->unreadNotifications()->count());

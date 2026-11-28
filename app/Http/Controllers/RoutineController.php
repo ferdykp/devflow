@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -88,7 +89,7 @@ class RoutineController extends Controller
         return back()->with('success', 'Status rutinitas diperbarui.');
     }
 
-    public function checkIn(Request $request, int $routine): RedirectResponse
+    public function checkIn(Request $request, int $routine): RedirectResponse|JsonResponse
     {
         $routineModel = $request->user()->routines()->findOrFail($routine);
         $data = $request->validate([
@@ -105,6 +106,11 @@ class RoutineController extends Controller
             );
         });
 
-        return back()->with('success', $data['status'] === 'completed' ? 'Rutinitas dicatat selesai.' : 'Rutinitas dilewati.');
+        $message = $data['status'] === 'completed' ? 'Rutinitas dicatat selesai.' : 'Rutinitas dilewati.';
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message, 'status' => $data['status']]);
+        }
+
+        return back()->with('success', $message);
     }
 }
