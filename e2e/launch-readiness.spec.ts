@@ -28,12 +28,12 @@ async function createProject(page: Page) {
   return new URL(page.url()).pathname;
 }
 
-async function createTask(page: Page, project: string) {
+async function createTask(page: Page, project: string, title = 'Tugas pengujian') {
   await page.goto(`${project}?section=tasks`);
   await page.getByRole('button', { name: 'Tugas baru', exact: true }).click();
-  await page.locator('#new-task-panel').getByLabel('Nama tugas').fill('Tugas pengujian');
+  await page.locator('#new-task-panel').getByLabel('Nama tugas').fill(title);
   await page.getByRole('button', { name: 'Buat tugas', exact: true }).click();
-  await expect(page.getByText('Tugas pengujian', { exact: true })).toBeVisible();
+  await expect(page.getByText(title, { exact: true })).toBeVisible();
 }
 
 test('navigasi utama jelas dan menu tambahan dapat ditutup dengan keyboard atau klik luar', async ({ page }) => {
@@ -112,26 +112,54 @@ test('drag and drop tersimpan dan kegagalan request mengembalikan kartu', async 
   test.skip(isMobile, 'Perangkat sentuh memakai kontrol status alternatif.');
   const project = await createProject(page);
   await createTask(page, project);
+  for (const title of ['Tugas kedua', 'Tugas ketiga', 'Tugas keempat', 'Tugas kelima', 'Tugas keenam']) {
+    await createTask(page, project, title);
+  }
   await page.getByRole('link', { name: 'Papan', exact: true }).click();
+  const notStartedCards = page.locator('[data-task-column="not_started"] [data-task-card]');
+  await expect(notStartedCards).toHaveCount(6);
+  const initialOrder = await notStartedCards.locator('[data-task-status-title]').allTextContents();
+  const reordered = page.waitForResponse(response => response.request().method() === 'POST'
+    && new URL(response.url()).pathname === '/task-board/reorder' && response.status() === 200);
+  await notStartedCards.first().getByRole('button', { name: /Pindahkan .* ke bawah/ }).click();
+  await reordered;
+  await expect.poll(() => notStartedCards.locator('[data-task-status-title]').allTextContents())
+    .toEqual([initialOrder[1], initialOrder[0], ...initialOrder.slice(2)]);
+  const taskToMove = notStartedCards.last();
+  const movedTaskTitle = (await taskToMove.locator('[data-task-status-title]').textContent())!.trim();
+  const taskToMoveId = await taskToMove.getAttribute('data-task-id');
+  const taskToMoveCard = page.locator(`[data-task-card][data-task-id="${taskToMoveId}"]`);
   let boardNavigations = 0;
   page.on('request', request => {
     if (request.isNavigationRequest() && request.frame() === page.mainFrame()) boardNavigations++;
   });
-  const successfulMove = page.waitForResponse(response => response.request().method() === 'PATCH'
-    && /^\/projects\/\d+\/tasks\/\d+$/.test(new URL(response.url()).pathname)
+  const moveRequest = page.waitForRequest(request => request.method() === 'POST'
+    && new URL(request.url()).pathname === '/task-board/reorder');
+  const successfulMove = page.waitForResponse(response => response.request().method() === 'POST'
+    && new URL(response.url()).pathname === '/task-board/reorder'
     && response.status() === 200);
-  await page.locator('[data-task-card]').dragTo(page.locator('[data-task-dropzone="in_progress"]'), { sourcePosition: { x: 80, y: 35 } });
+  await taskToMoveCard.evaluate(card => {
+    const target = document.querySelector('[data-task-dropzone="in_progress"]');
+    if (!target) throw new Error('In-progress column was not found.');
+    const dataTransfer = new DataTransfer();
+    card.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer }));
+    target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer }));
+    target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer }));
+  });
   await successfulMove;
+  const movePayload = (await moveRequest).postDataJSON();
+  expect(movePayload.active_task_id).toBe(Number(taskToMoveId));
+  expect(movePayload.status).toBe('in_progress');
   await expect(page.locator('[data-confirm-dialog]')).toBeHidden();
   await expect(page.locator('[data-task-column="in_progress"] [data-task-card]')).toHaveCount(1);
-  await expect(page.getByLabel('Status tugas Tugas pengujian')).toHaveValue('in_progress');
+  await expect(page.getByLabel(`Status tugas ${movedTaskTitle}`)).toHaveValue('in_progress');
   expect(boardNavigations).toBe(0);
-  await page.route('**/projects/*/tasks/*', route => route.request().method() === 'PATCH'
+  await page.route('**/task-board/reorder', route => route.request().method() === 'POST'
     ? route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Layanan tidak tersedia' }) })
     : route.continue());
   const failedMoveResponse = page.waitForResponse(response =>
-    response.status() === 503 && /^\/projects\/\d+\/tasks\/\d+$/.test(new URL(response.url()).pathname));
-  await page.locator('[data-task-card]').evaluate(card => {
+    response.status() === 503 && new URL(response.url()).pathname === '/task-board/reorder');
+  await page.locator('[data-task-column="in_progress"] [data-task-card]').evaluate(card => {
     const target = document.querySelector('[data-task-dropzone="todo"]');
     if (!target) throw new Error('Todo column was not found.');
     const dataTransfer = new DataTransfer();
@@ -149,7 +177,7 @@ test('drag and drop tersimpan dan kegagalan request mengembalikan kartu', async 
   await page.clock.fastForward(300);
   await expect(page.locator('[data-task-move-error]')).toHaveCount(0);
   await page.reload();
-  await expect(page.getByLabel('Status tugas Tugas pengujian')).toHaveValue('in_progress');
+  await expect(page.getByLabel(`Status tugas ${movedTaskTitle}`)).toHaveValue('in_progress');
 });
 
 test('pencarian, menu mobile, PRD dan pengaturan bekerja', async ({ page, isMobile }) => {

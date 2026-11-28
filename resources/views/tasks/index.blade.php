@@ -4,7 +4,7 @@
 @section('page-heading', 'Tugas')
 @section('content')
 <x-ui.page-heading title="Tugas" description="Kelola tugas personal dan proyek dalam satu daftar. Pilih tugas terbuka atau tampilkan semua status."><button type="button" data-create-open="task" class="df-button-primary inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold"><i class="fa-solid fa-plus" aria-hidden="true"></i>Tambah tugas</button></x-ui.page-heading>
-<div class="min-w-0" data-tasks-root data-task-status-filter="{{ $status }}">
+<div class="min-w-0" data-tasks-root data-task-reorder-url="{{ route('task-board.reorder') }}" data-task-status-filter="{{ $status }}">
     <section class="min-w-0 space-y-4">
         <div class="df-panel mb-4 rounded-2xl border p-4 sm:p-5">
         <nav aria-label="Filter cepat tugas" class="mb-4 flex flex-wrap items-center gap-2 border-b border-[var(--df-edge)] pb-4">
@@ -36,7 +36,7 @@
         @if($taskView === 'board')
             <p class="text-xs text-zinc-500">Seret kartu untuk memperbarui status, atau ubah status lewat pilihan pada kartu. Kolom menyesuaikan lebar layar.</p>
             <div class="min-w-0 pb-3" aria-label="Papan tugas, kolom status menyesuaikan lebar layar">
-                <div class="grid min-w-0 grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4 min-[2200px]:grid-cols-6">
+                <div class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4 min-[2200px]:grid-cols-6">
                 @foreach($boardColumns as $columnKey => $column)
                     @php($statusTasks = $tasks->getCollection()->whereIn('status', $column['statuses']))
                     <section data-task-dropzone="{{ $column['drop_status'] }}" data-task-column="{{ $columnKey }}" class="min-h-52 space-y-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-3 transition-colors [&.is-over]:bg-blue-50 [&.is-over]:outline-2 [&.is-over]:outline-dashed [&.is-over]:outline-blue-400" aria-label="{{ $column['label'] }}">

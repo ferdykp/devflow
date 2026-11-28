@@ -13,6 +13,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -69,6 +70,10 @@ class TaskInboxController extends Controller
                 $query->where('title', 'like', '%'.$search.'%')
                     ->orWhere('description', 'like', '%'.$search.'%');
             }));
+
+        if (($filters['view'] ?? 'board') === 'board') {
+            $query->orderByRaw('CASE WHEN sort_order IS NULL THEN 1 ELSE 0 END')->orderBy('sort_order');
+        }
 
         $tasks = $query->orderByRaw("CASE priority WHEN 'high' THEN 0 WHEN 'normal' THEN 1 WHEN 'low' THEN 2 ELSE 3 END")
             ->orderBy('due_date')->orderByDesc('created_at')->paginate(25)->withQueryString();
@@ -128,6 +133,64 @@ class TaskInboxController extends Controller
 
         return redirect()->route($data['return_to'] === 'tasks' ? 'tasks.index' : 'inbox.index', $filters)
             ->with('success', 'Tampilan tugas disimpan.');
+    }
+
+    public function reorder(Request $request, TaskRecurrenceService $recurrenceService): JsonResponse
+    {
+        $data = $request->validate([
+            'task_ids' => ['required', 'array', 'min:1', 'max:60'],
+            'task_ids.*' => ['required', 'integer', 'distinct', 'min:1'],
+            'active_task_id' => ['required', 'integer', 'min:1'],
+            'column' => ['required', Rule::in(array_keys(TaskWorkflow::boardColumns()))],
+            'status' => ['nullable', Rule::in(['todo', 'in_progress', 'done'])],
+        ]);
+        $column = TaskWorkflow::boardColumns()[$data['column']];
+        $columnStatuses = $column['statuses'];
+        $targetStatus = $data['status'] ?? null;
+        abort_if($targetStatus !== null && ! in_array($targetStatus, $columnStatuses, true), 422);
+        abort_unless(in_array($data['active_task_id'], $data['task_ids'], true), 422);
+
+        DB::transaction(function () use ($request, $data, $columnStatuses, $targetStatus, $recurrenceService): void {
+            $userId = $request->user()->id;
+            $tasks = Task::query()->whereIn('id', $data['task_ids'])
+                ->where(fn ($query) => $query->where(fn ($personal) => $personal->where('owner_id', $userId)->whereNull('project_id'))
+                    ->orWhereHas('project.workspace', fn ($workspace) => $workspace->accessibleTo($userId)))
+                ->lockForUpdate()->get()->keyBy('id');
+            abort_unless($tasks->count() === count($data['task_ids']), 404);
+
+            foreach ($tasks as $task) {
+                if ($task->id !== $data['active_task_id']) {
+                    abort_unless(in_array($task->status, $columnStatuses, true), 422);
+                }
+            }
+
+            $activeTask = $tasks->get($data['active_task_id']);
+            $previousStatus = $activeTask->status;
+            if ($targetStatus !== null && $targetStatus !== $previousStatus) {
+                $activeTask->update([
+                    'status' => $targetStatus,
+                    'completed_at' => $targetStatus === 'done' ? now() : null,
+                ]);
+                TaskHistoryEntry::query()->create([
+                    'task_id' => $activeTask->id,
+                    'user_id' => $userId,
+                    'action' => 'updated',
+                    'from_status' => $previousStatus,
+                    'to_status' => $targetStatus,
+                    'metadata' => ['changed_fields' => ['status']],
+                ]);
+
+                if ($previousStatus !== 'done' && $targetStatus === 'done') {
+                    $recurrenceService->createNextOccurrence($activeTask, $request->user());
+                }
+            }
+
+            foreach ($data['task_ids'] as $position => $taskId) {
+                $tasks->get($taskId)->update(['sort_order' => $position + 1]);
+            }
+        });
+
+        return response()->json(['message' => 'Urutan tugas tersimpan.']);
     }
 
     public function destroyView(Request $request, string $viewKey): RedirectResponse

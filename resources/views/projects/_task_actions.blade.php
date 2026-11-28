@@ -13,6 +13,10 @@
         </select>
     </form>
     <div class="flex items-center justify-end gap-1">
+        @if($view === 'board')
+            <button type="button" data-task-move="up" class="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-blue-600" aria-label="Pindahkan {{ $task->title }} ke atas" title="Pindahkan ke atas"><i class="fa-solid fa-chevron-up text-xs" aria-hidden="true"></i></button>
+            <button type="button" data-task-move="down" class="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-blue-600" aria-label="Pindahkan {{ $task->title }} ke bawah" title="Pindahkan ke bawah"><i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i></button>
+        @endif
         <a href="{{ route('tasks.show', [$project, $task]) }}" aria-label="Diskusi {{ $task->title }}" title="Detail dan diskusi" class="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"><i class="fa-regular fa-comment" aria-hidden="true"></i></a>
         <a href="{{ route('projects.show', ['project' => $project, 'section' => 'tasks', 'view' => 'list', 'edit' => $task->id]) }}" aria-label="Ubah {{ $task->title }}" title="Ubah tugas" class="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
         <form action="{{ route('tasks.destroy', [$project, $task]) }}" method="POST" data-confirm="Hapus tugas ini? Tindakan ini tidak dapat dibatalkan.">

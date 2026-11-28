@@ -142,6 +142,7 @@ Route::middleware(['auth', 'cache-history'])->group(function () {
     ))->name('inbox.index');
     Route::post('/inbox', [TaskInboxController::class, 'store'])->name('inbox.store');
     Route::get('/tasks', [TaskInboxController::class, 'index'])->name('tasks.index');
+    Route::post('/task-board/reorder', [TaskInboxController::class, 'reorder'])->name('task-board.reorder');
     Route::post('/task-views', [TaskInboxController::class, 'storeView'])->name('task-views.store');
     Route::delete('/task-views/{viewKey}', [TaskInboxController::class, 'destroyView'])->name('task-views.destroy');
     Route::get('/tasks/{task}', [PersonalDetailController::class, 'task'])->whereNumber('task')->name('personal-tasks.show');

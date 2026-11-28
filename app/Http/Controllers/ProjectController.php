@@ -118,8 +118,9 @@ class ProjectController extends Controller
                 ->when($filters['priority'] ?? null, fn ($query, $value) => $query->where('priority', $value))
                 ->when(($filters['assignee'] ?? null) === 'me', fn ($query) => $query->where('assignee_id', auth()->id()))
                 ->when(($filters['assignee'] ?? null) === 'unassigned', fn ($query) => $query->whereNull('assignee_id'))
+                ->orderByRaw('CASE WHEN sort_order IS NULL THEN 1 ELSE 0 END')->orderBy('sort_order')
                 ->when($taskPlan, fn ($query) => $query->orderBy('source_index'))
-                ->orderByRaw('COALESCE(sort_order, id)')->orderBy('id')->paginate(60)->withQueryString();
+                ->orderBy('id')->paginate(60)->withQueryString();
             $participants = $project->workspace->participants();
             $milestones = $project->milestones()->orderBy('title')->get();
         } elseif ($section === 'activity') {

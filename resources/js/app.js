@@ -621,12 +621,15 @@ if (taskRoot) {
  opener?.addEventListener('click', () => toggle(composer?.hidden));
  taskRoot.querySelector('[data-task-form-cancel]')?.addEventListener('click', () => toggle(false));
  let dragged = null;
+ let dragOrigin = null;
  let moving = false;
- const moveTaskCard = (card, destination, before = null) => {
+ const moveTaskCard = (card, destination, before = null, keepDragging = false) => {
    const previousPositions = new Map([...taskRoot.querySelectorAll('[data-task-card]')].map((item) => [item, item.getBoundingClientRect()]));
+   const emptyState = destination.querySelector('[data-task-column-empty]');
    if (before) destination.insertBefore(card, before);
+   else if (emptyState) destination.insertBefore(card, emptyState);
    else destination.appendChild(card);
-   card.classList.remove('is-dragging');
+   if (!keepDragging) card.classList.remove('is-dragging');
    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
    taskRoot.querySelectorAll('[data-task-card]').forEach((item) => {
      const previous = previousPositions.get(item);
@@ -687,6 +690,10 @@ if (taskRoot) {
      moveTaskCard(card, destination);
      refreshTaskColumn(source);
      refreshTaskColumn(destination);
+     persistTaskOrder(card, destination).catch((error) => {
+       console.error('DevFlow task order save failed:', error);
+       showMoveError('Status tersimpan, tetapi urutan kartu gagal disimpan. ' + (error?.message || 'Coba lagi.'));
+     });
    }
    updateTaskCardStatus(card, status);
    if (!taskMatchesCurrentStatusFilter(status)) {
@@ -698,6 +705,34 @@ if (taskRoot) {
  const taskMatchesCurrentStatusFilter = (status) => {
    const filter = taskRoot.dataset.taskStatusFilter || '';
    return filter === '' || filter === 'all' || (filter === 'open' ? status !== 'done' : filter === status);
+ };
+ const persistTaskOrder = async (card, column, status = null) => {
+   const response = await fetch(taskRoot.dataset.taskReorderUrl, {
+     method: 'POST', credentials: 'same-origin', redirect: 'error',
+     headers: {
+       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+       'X-Requested-With': 'XMLHttpRequest',
+       'Accept': 'application/json',
+       'Content-Type': 'application/json',
+     },
+     body: JSON.stringify({
+       active_task_id: Number(card.dataset.taskId),
+       column: column.dataset.taskColumn,
+       status,
+       task_ids: [...column.querySelectorAll('[data-task-card]')].map((item) => Number(item.dataset.taskId)),
+     }),
+   });
+   const payload = await response.json().catch(() => null);
+   if (!response.ok || !payload?.message) throw new Error(payload?.message || `HTTP ${response.status}`);
+   return payload;
+ };
+ const restoreTaskOrder = (column, taskIds) => {
+   const cards = new Map([...column.querySelectorAll('[data-task-card]')].map((card) => [Number(card.dataset.taskId), card]));
+   taskIds.forEach((taskId) => {
+     const card = cards.get(taskId);
+     if (card) moveTaskCard(card, column);
+   });
+   refreshTaskColumn(column);
  };
  const showMoveError = (message) => {
    const stack = document.querySelector('[data-toast-stack]');
@@ -714,14 +749,27 @@ if (taskRoot) {
  taskRoot.querySelectorAll('[data-task-card]').forEach((card) => {
    card.addEventListener('dragstart', (event) => {
      if (moving) { event.preventDefault(); return; }
+     if (dragged && dragged !== card) { event.preventDefault(); return; }
+     if (event.target.closest('button, a, input, select, textarea, form')) { event.preventDefault(); return; }
      dragged = card;
+     const originColumn = card.closest('[data-task-dropzone]');
+     dragOrigin = {
+       column: originColumn,
+       next: card.nextSibling,
+       status: card.dataset.taskStatus,
+       order: [...originColumn.querySelectorAll('[data-task-card]')].map((item) => Number(item.dataset.taskId)),
+     };
      event.dataTransfer.effectAllowed = 'move';
      event.dataTransfer.setData('text/plain', card.dataset.taskId || '');
      card.classList.add('is-dragging');
    });
    card.addEventListener('dragend', () => {
+     if (dragOrigin && !moving) {
+       moveTaskCard(card, dragOrigin.column, dragOrigin.next?.parentNode === dragOrigin.column ? dragOrigin.next : null);
+       refreshTaskColumn(dragOrigin.column);
+     }
      card.classList.remove('is-dragging');
-     if (!moving) dragged = null;
+     if (!moving) { dragged = null; dragOrigin = null; }
      taskRoot.querySelectorAll('[data-task-dropzone]').forEach(zone => zone.classList.remove('is-over'));
    });
  });
@@ -731,6 +779,15 @@ if (taskRoot) {
      event.preventDefault();
      event.dataTransfer.dropEffect = 'move';
      zone.classList.add('is-over');
+     if (event.clientY < 72) window.scrollBy(0, -18);
+     else if (event.clientY > window.innerHeight - 72) window.scrollBy(0, 18);
+     const targetCard = event.target.closest('[data-task-card]');
+     if (targetCard && targetCard !== dragged && targetCard.parentElement === zone) {
+       const bounds = targetCard.getBoundingClientRect();
+       moveTaskCard(dragged, zone, event.clientY < bounds.top + bounds.height / 2 ? targetCard : targetCard.nextSibling, true);
+     } else if (event.target === zone || event.target.closest('[data-task-column-empty]')) {
+       moveTaskCard(dragged, zone, null, true);
+     }
    });
    zone.addEventListener('dragleave', (event) => {
      if (!zone.contains(event.relatedTarget)) zone.classList.remove('is-over');
@@ -743,48 +800,55 @@ if (taskRoot) {
      const card = dragged;
      dragged = null;
      const status = zone.dataset.taskDropzone;
-     const select = card.querySelector('[data-task-status]');
-     const currentStatus = card.dataset.taskStatus || select?.value;
-     const currentColumn = card.closest('[data-task-column]')?.dataset.taskColumn;
-     const nextColumn = zone.dataset.taskColumn;
-     if (!status || currentStatus === status || (currentColumn && currentColumn === nextColumn)) return;
-     const url = card.dataset.taskUpdateUrl;
-     const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-     if (!url || !csrf) { showMoveError('Tugas gagal disimpan. Muat ulang halaman lalu coba lagi.'); return; }
+     const origin = dragOrigin;
+     dragOrigin = null;
+     if (!status || !origin?.column) return;
+     const sourceZone = origin.column;
+     const sameColumn = sourceZone === zone;
+     const currentOrder = [...zone.querySelectorAll('[data-task-card]')].map((item) => Number(item.dataset.taskId));
+     if (sameColumn && origin.order?.join(',') === currentOrder.join(',')) { card.classList.remove('is-dragging'); return; }
      moving = true;
-     const prior = card.parentElement;
-     const sourceZone = card.closest('[data-task-dropzone]');
-     const next = card.nextSibling;
-     moveTaskCard(card, zone);
+     if (card.parentElement !== zone) moveTaskCard(card, zone);
+     else card.classList.remove('is-dragging');
      refreshTaskColumn(sourceZone);
      refreshTaskColumn(zone);
      try {
-       const response = await fetch(url, {
-         method: 'PATCH', credentials: 'same-origin', redirect: 'error',
-         headers: {
-           'X-CSRF-TOKEN': csrf,
-           'X-Requested-With': 'XMLHttpRequest',
-           'Accept': 'application/json',
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({ status }),
-       });
-       const payload = await response.json().catch(() => null);
-       if (!response.ok || !payload?.task || payload.task.status !== status) {
-         const detail = payload?.message || `HTTP ${response.status}`;
-         throw new Error(detail);
-       }
-       updateTaskCardStatus(card, status);
-       if (!taskMatchesCurrentStatusFilter(status)) {
+       await persistTaskOrder(card, zone, sameColumn ? null : status);
+       if (!sameColumn) updateTaskCardStatus(card, status);
+       if (!taskMatchesCurrentStatusFilter(card.dataset.taskStatus)) {
          card.remove();
          refreshTaskColumn(zone);
        }
      } catch (error) {
-       if (prior) moveTaskCard(card, prior, next && next.parentNode === prior ? next : null);
+       moveTaskCard(card, sourceZone, origin.next?.parentNode === sourceZone ? origin.next : null);
+       if (!sameColumn) updateTaskCardStatus(card, origin.status);
        refreshTaskColumn(sourceZone);
        refreshTaskColumn(zone);
        console.error('DevFlow task move failed:', error);
-       showMoveError('Tugas gagal dipindahkan. ' + (error?.message || 'Coba lagi.'));
+       showMoveError('Urutan tugas gagal disimpan. ' + (error?.message || 'Coba lagi.'));
+     } finally {
+       moving = false;
+     }
+   });
+ });
+ taskRoot.querySelectorAll('[data-task-move]').forEach((button) => {
+   button.addEventListener('click', async () => {
+     const card = button.closest('[data-task-card]');
+     const column = card?.closest('[data-task-dropzone]');
+     if (!card || !column || moving) return;
+     const cards = [...column.querySelectorAll('[data-task-card]')];
+     const index = cards.indexOf(card);
+     const neighbor = cards[index + (button.dataset.taskMove === 'up' ? -1 : 1)];
+     if (!neighbor) return;
+     const previousOrder = cards.map((item) => Number(item.dataset.taskId));
+     const nextCard = button.dataset.taskMove === 'up' ? neighbor : neighbor.nextElementSibling;
+     moveTaskCard(card, column, nextCard?.matches('[data-task-card]') ? nextCard : null);
+     moving = true;
+     try {
+       await persistTaskOrder(card, column);
+     } catch (error) {
+       restoreTaskOrder(column, previousOrder);
+       showMoveError('Urutan tugas gagal disimpan. ' + (error?.message || 'Coba lagi.'));
      } finally {
        moving = false;
      }

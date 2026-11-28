@@ -27,6 +27,10 @@
     <div class="mt-3 flex items-center justify-between gap-2 border-t border-zinc-100 pt-3">
         <form data-task-completion-action="complete" data-async-form data-async-action="task-status" @if($task->status === 'done') hidden @endif method="POST" action="{{ $updateUrl }}">@csrf @method('PATCH')<input type="hidden" name="status" value="done"><button class="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"><i class="fa-solid fa-check" aria-hidden="true"></i>Selesaikan</button></form>
         <form data-task-completion-action="reopen" data-async-form data-async-action="task-status" @if($task->status !== 'done') hidden @endif method="POST" action="{{ $updateUrl }}">@csrf @method('PATCH')<input type="hidden" name="status" value="todo"><button class="min-h-9 rounded-lg px-2.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100">Buka kembali</button></form>
+        <div class="flex items-center gap-1" role="group" aria-label="Urutkan kartu">
+            <button type="button" data-task-move="up" class="grid size-9 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-blue-600" aria-label="Pindahkan {{ $task->title }} ke atas" title="Pindahkan ke atas"><i class="fa-solid fa-chevron-up text-xs" aria-hidden="true"></i></button>
+            <button type="button" data-task-move="down" class="grid size-9 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-blue-600" aria-label="Pindahkan {{ $task->title }} ke bawah" title="Pindahkan ke bawah"><i class="fa-solid fa-chevron-down text-xs" aria-hidden="true"></i></button>
+        </div>
         <a href="{{ $task->project ? route('tasks.show', [$task->project, $task]) : route('personal-tasks.show', $task) }}" class="inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs font-medium text-blue-700 hover:bg-blue-50">Detail <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i></a>
     </div>
 </article>

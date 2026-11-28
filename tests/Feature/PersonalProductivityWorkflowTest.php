@@ -182,6 +182,40 @@ class PersonalProductivityWorkflowTest extends TestCase
             ->assertJsonPath('event.html', fn ($html) => str_contains($html, 'Fokus menulis'));
     }
 
+    public function test_task_board_order_is_persisted_and_access_is_scoped(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $firstTask = $user->personalTasks()->create(['title' => 'Tugas pertama', 'priority' => 'normal', 'status' => 'todo']);
+        $secondTask = $user->personalTasks()->create(['title' => 'Tugas kedua', 'priority' => 'normal', 'status' => 'todo']);
+        $privateTask = $otherUser->personalTasks()->create(['title' => 'Tugas pribadi orang lain', 'priority' => 'normal', 'status' => 'todo']);
+
+        $this->actingAs($user)->withHeader('Accept', 'application/json')->post(route('task-board.reorder'), [
+            'active_task_id' => $secondTask->id,
+            'column' => 'not_started',
+            'task_ids' => [$secondTask->id, $firstTask->id],
+        ])->assertOk()->assertJsonPath('message', 'Urutan tugas tersimpan.');
+
+        $this->assertSame(1, $secondTask->fresh()->sort_order);
+        $this->assertSame(2, $firstTask->fresh()->sort_order);
+        $this->get(route('tasks.index', ['view' => 'board']))->assertOk()->assertSeeInOrder(['Tugas kedua', 'Tugas pertama']);
+
+        $this->post(route('task-board.reorder'), [
+            'active_task_id' => $secondTask->id,
+            'column' => 'in_progress',
+            'status' => 'in_progress',
+            'task_ids' => [$secondTask->id],
+        ])->assertOk();
+
+        $this->assertSame('in_progress', $secondTask->fresh()->status);
+        $this->post(route('task-board.reorder'), [
+            'active_task_id' => $privateTask->id,
+            'column' => 'not_started',
+            'task_ids' => [$privateTask->id],
+        ])->assertNotFound();
+        $this->assertNull($privateTask->fresh()->sort_order);
+    }
+
     public function test_task_hub_has_open_and_all_status_filters_and_legacy_inbox_redirects_to_open(): void
     {
         $user = User::factory()->create();
